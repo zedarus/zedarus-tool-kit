@@ -12,6 +12,7 @@ namespace Zedarus.ToolKit.UserInterface
 		[SerializeField]
 		public UIElementsGroup _fadeInGroup;
 		private List<UIElementsGroup> _groups = new List<UIElementsGroup>();
+		private bool _initialized = false;
 		#endregion
 
 		#region Unity Methods
@@ -29,6 +30,7 @@ namespace Zedarus.ToolKit.UserInterface
 		#region Controls
 		public virtual float Show()
 		{
+			Init();
 			UnblockAllInput();
 			float maxDuration = 0;
 			float duration = 0;
@@ -57,9 +59,13 @@ namespace Zedarus.ToolKit.UserInterface
 		#region Main Methods
 		protected virtual void Init()
 		{
+			if (Initialized) return;
+
 			if (_fadeInGroup != null) AddGroup(_fadeInGroup);
 			foreach (UIElementsGroup group in _groups)
 				group.Init();
+
+			_initialized = true;
 		}
 
 		protected virtual void Cycle(float deltaTime)
@@ -82,6 +88,11 @@ namespace Zedarus.ToolKit.UserInterface
 		protected virtual void UnblockAllInput()
 		{
 			_camera.useTouch = _camera.useController = _camera.useMouse = _camera.useKeyboard = true;
+		}
+
+		protected bool Initialized
+		{
+			get { return _initialized; }
 		}
 	}
 }
