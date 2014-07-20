@@ -56,14 +56,14 @@ namespace Zedarus.ToolKit.UserInterface
 				EditorGUILayout.LabelField("", GUILayout.Width(20));
 				EditorGUILayout.LabelField("Show delay", GUILayout.Width(80));
 				animation.ShowDelay = EditorGUILayout.FloatField(animation.ShowDelay, GUILayout.MaxWidth(80));
-				animation.ShowSync = EditorGUILayout.ToggleLeft("sync", animation.ShowSync, GUILayout.Width(128));
+				animation.ShowSync = EditorGUILayout.ToggleLeft("sync with previous", animation.ShowSync, GUILayout.Width(128));
 				EditorGUILayout.EndHorizontal();
 				
 				EditorGUILayout.BeginHorizontal();
 				EditorGUILayout.LabelField("", GUILayout.Width(20));
 				EditorGUILayout.LabelField("Hide delay", GUILayout.Width(80));
 				animation.HideDelay = EditorGUILayout.FloatField(animation.HideDelay, GUILayout.MaxWidth(80));
-				animation.HideSync = EditorGUILayout.ToggleLeft("sync", animation.HideSync, GUILayout.Width(128));
+				animation.HideSync = EditorGUILayout.ToggleLeft("sync with previous", animation.HideSync, GUILayout.Width(128));
 				EditorGUILayout.EndHorizontal();
 
 				if (animation.ShowDelay < 0f) animation.ShowDelay = 0f;
