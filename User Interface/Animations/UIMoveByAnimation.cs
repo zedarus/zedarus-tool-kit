@@ -14,8 +14,10 @@ namespace Zedarus.ToolKit.UserInterface
 	public class UIMoveByAnimation : UIElementAnimation
 	{
 		#region Parameters
-		[SerializeField] private float _distance = 0f;
-		[SerializeField] private MoveDirection _direction = MoveDirection.Up;
+		[SerializeField] private float _showDistance = 0f;
+		[SerializeField] private MoveDirection _showDirection = MoveDirection.Up;
+		[SerializeField] private float _hideDistance = 0f;
+		[SerializeField] private MoveDirection _hideDirection = MoveDirection.Down;
 
 		private Transform _transform;
 		private Vector3 _finalPosition;
@@ -43,7 +45,7 @@ namespace Zedarus.ToolKit.UserInterface
 		
 		public override void Reset()
 		{
-			_transform.localPosition = HidePosition;
+			_transform.localPosition = ResetPosition;
 			base.Reset();
 		}
 		#endregion
@@ -56,26 +58,45 @@ namespace Zedarus.ToolKit.UserInterface
 
 		private Vector3 HidePosition
 		{
-			get { return _finalPosition + OppositeDirectionVector * _distance; }
+			get { return _finalPosition + VectorFromDirection(_hideDirection) * _hideDistance; }
 		}
 
-		private Vector3 OppositeDirectionVector
+		private Vector3 ResetPosition
 		{
-			get 
+			get { return _finalPosition + OppositeVectorFromDirection(_showDirection) * _showDistance; }
+		}
+
+		private Vector3 VectorFromDirection(MoveDirection direction)
+		{
+			switch (direction)
 			{
-				switch (_direction)
-				{
-					case MoveDirection.Up:
-						return Vector3.down;
-					case MoveDirection.Down:
-						return Vector3.up;
-					case MoveDirection.Left:
-						return Vector3.right;
-					case MoveDirection.Right:
-						return Vector3.left;
-					default:
-						return Vector3.zero;
-				}
+				case MoveDirection.Up:
+					return Vector3.up;
+				case MoveDirection.Down:
+					return Vector3.down;
+				case MoveDirection.Left:
+					return Vector3.left;
+				case MoveDirection.Right:
+					return Vector3.right;
+				default:
+					return Vector3.zero;
+			}
+		}
+
+		private Vector3 OppositeVectorFromDirection(MoveDirection direction)
+		{
+			switch (direction)
+			{
+				case MoveDirection.Up:
+					return Vector3.down;
+				case MoveDirection.Down:
+					return Vector3.up;
+				case MoveDirection.Left:
+					return Vector3.right;
+				case MoveDirection.Right:
+					return Vector3.left;
+				default:
+					return Vector3.zero;
 			}
 		}
 		#endregion

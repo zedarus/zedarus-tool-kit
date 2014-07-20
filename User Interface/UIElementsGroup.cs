@@ -11,7 +11,7 @@ namespace Zedarus.ToolKit.UserInterface
 		#endregion
 
 		#region Main Methods
-		public void Init()
+		public virtual void Init()
 		{
 			_animationsController = GetComponent<UIElementAnimationsController>();
 			_animationsController.Init();
