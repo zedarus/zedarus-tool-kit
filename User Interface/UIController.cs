@@ -29,6 +29,7 @@ namespace Zedarus.ToolKit.UserInterface
 		#region Controls
 		public virtual float Show()
 		{
+			UnblockAllInput();
 			float maxDuration = 0;
 			float duration = 0;
 			foreach (UIElementsGroup group in _groups)
@@ -76,6 +77,11 @@ namespace Zedarus.ToolKit.UserInterface
 		protected virtual void BlockAllInput()
 		{
 			_camera.useTouch = _camera.useController = _camera.useMouse = _camera.useKeyboard = false;
+		}
+
+		protected virtual void UnblockAllInput()
+		{
+			_camera.useTouch = _camera.useController = _camera.useMouse = _camera.useKeyboard = true;
 		}
 	}
 }
