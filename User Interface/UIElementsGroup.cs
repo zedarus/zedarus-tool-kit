@@ -21,12 +21,12 @@ namespace Zedarus.ToolKit.UserInterface
 		#endregion
 
 		#region Controls
-		public float Show()
+		public virtual float Show()
 		{
 			return _animationsController.Show();
 		}
 
-		public float Hide()
+		public virtual float Hide()
 		{
 			return _animationsController.Hide();
 		}
