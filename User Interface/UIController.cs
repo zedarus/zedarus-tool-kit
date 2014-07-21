@@ -25,6 +25,11 @@ namespace Zedarus.ToolKit.UserInterface
 		{
 			Cycle(Time.deltaTime);
 		}
+
+		private void OnDestroy()
+		{
+			Destroy();
+		}
 		#endregion
 
 		#region Controls
@@ -65,7 +70,14 @@ namespace Zedarus.ToolKit.UserInterface
 			foreach (UIElementsGroup group in _groups)
 				group.Init();
 
+			CreateEventListeners();
+
 			_initialized = true;
+		}
+
+		protected virtual void Destroy()
+		{
+			RemoveEventListeners();
 		}
 
 		protected virtual void Cycle(float deltaTime)
@@ -78,6 +90,19 @@ namespace Zedarus.ToolKit.UserInterface
 		{
 			_groups.Add(group);
 		}
+		#endregion
+
+		#region Event Listeners
+		protected virtual void CreateEventListeners()
+		{
+		}
+
+		protected virtual void RemoveEventListeners()
+		{
+		}
+		#endregion
+
+		#region Event Handlers
 		#endregion
 
 		protected virtual void BlockAllInput()
