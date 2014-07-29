@@ -17,7 +17,7 @@ namespace Zedarus.ToolKit.UserInterface
 			_animationsController.Init();
 		}
 		
-		public void Cycle(float deltaTime) {}
+		public virtual void Cycle(float deltaTime) {}
 		#endregion
 
 		#region Controls
