@@ -105,12 +105,12 @@ namespace Zedarus.ToolKit.UserInterface
 		#region Event Handlers
 		#endregion
 
-		protected virtual void BlockAllInput()
+		public virtual void BlockAllInput()
 		{
 			_camera.useTouch = _camera.useController = _camera.useMouse = _camera.useKeyboard = false;
 		}
 
-		protected virtual void UnblockAllInput()
+		public virtual void UnblockAllInput()
 		{
 			_camera.useTouch = _camera.useController = _camera.useMouse = _camera.useKeyboard = true;
 		}

@@ -9,14 +9,14 @@ namespace Zedarus.ToolKit.Data.Adapters
 	{
 		public T LoadData<T>(string path) where T : class
 		{
-			Debug.Log("Loading data from: " + path);
+			ZedLogger.Log("Loading data from: " + path);
 			T newData = (T) UnitySerializer.DeserializeFromFile<T>(path, true);
 			return newData;
 		}
 		
 		public bool SaveData<T>(T data, string path) where T : class
 		{
-			Debug.Log("Saving data to: " + path);
+			ZedLogger.Log("Saving data to: " + path);
 			UnitySerializer.SerializeToFile(data, path, true);
 			return true;
 		}

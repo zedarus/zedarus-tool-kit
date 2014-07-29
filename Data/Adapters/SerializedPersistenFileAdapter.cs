@@ -10,7 +10,7 @@ namespace Zedarus.ToolKit.Data.Adapters
 		public T LoadData<T>(string path) where T : class
 		{
 			string filepath = Path.Combine(Application.persistentDataPath, path);
-			Debug.Log("Loading data from: " + filepath);
+			ZedLogger.Log("Loading data from: " + filepath);
 			T newData = (T) UnitySerializer.DeserializeFromFile<T>(filepath, true);
 			return newData;
 		}
@@ -18,7 +18,7 @@ namespace Zedarus.ToolKit.Data.Adapters
 		public bool SaveData<T>(T data, string path) where T : class
 		{
 			string filepath = Path.Combine(Application.persistentDataPath, path);
-			Debug.Log("Saving data to: " + filepath);
+			ZedLogger.Log("Saving data to: " + filepath);
 			UnitySerializer.SerializeToFile(data, filepath, true);
 			return true;
 		}
