@@ -15,6 +15,7 @@ namespace Zedarus.ToolKit.UserInterface
 		private List<Transform> _animatedObjects = new List<Transform>();
 		private List<IUIElementAnimation> _animations = new List<IUIElementAnimation>();
 		private bool _hasButton = true;
+		private bool _displayed = false;
 		#endregion
 
 		#region Controls
@@ -38,6 +39,7 @@ namespace Zedarus.ToolKit.UserInterface
 
 		public float Show()
 		{
+			_displayed = true;
 			ToggleButton(true);
 			StopAllCoroutines();
 
@@ -60,6 +62,7 @@ namespace Zedarus.ToolKit.UserInterface
 
 		public float Hide()
 		{
+			_displayed = false;
 			ToggleButton(false);
 			StopAllCoroutines();
 
@@ -86,6 +89,13 @@ namespace Zedarus.ToolKit.UserInterface
 			ToggleButton(false);
 			foreach (IUIElementAnimation animation in _animations)
 				animation.Reset();
+		}
+		#endregion
+
+		#region Queries
+		public bool Visible
+		{
+			get { return _displayed; }
 		}
 		#endregion
 
