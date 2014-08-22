@@ -22,6 +22,11 @@ namespace Zedarus.ToolKit.Gameplay.Models
 		{
 			
 		}
+
+		public virtual void Update(float deltaTime)
+		{
+			
+		}
 		
 		public int ID
 		{
