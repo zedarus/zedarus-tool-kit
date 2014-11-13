@@ -6,7 +6,8 @@ namespace Zedarus.ToolKit
 	public enum LoggerContext
 	{
 		iCloud,
-		General
+		General,
+		Server
 	}
 
 	public class ZedLogger : SimpleSingleton<ZedLogger>
