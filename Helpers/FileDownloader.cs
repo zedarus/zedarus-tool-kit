@@ -6,25 +6,30 @@ namespace Zedarus.ToolKit.Helpers
 {
 	public class FileDownloader : MonoBehaviour
 	{
-		static public FileDownloader DownloadTextFile(string url, Dictionary<string, string> parameters, System.Action<string> callback)
+		static public FileDownloader DownloadTextFile(string url, Dictionary<string, string> parameters, System.Action<string> callback, bool escape = true)
 		{
 			GameObject go = new GameObject("File Downloader");
 			FileDownloader downloader = go.AddComponent<FileDownloader>();
-			downloader.StartDownloadingCoroutine(url, parameters, callback);
+			downloader.StartDownloadingCoroutine(url, parameters, callback, escape);
 			return downloader;
 		}
 
-		public void StartDownloadingCoroutine(string url, Dictionary<string, string> parameters, System.Action<string> callback)
+		public void StartDownloadingCoroutine(string url, Dictionary<string, string> parameters, System.Action<string> callback, bool escape)
 		{
-			StartCoroutine(LoadTextFileFromServer(url, parameters, callback));
+			StartCoroutine(LoadTextFileFromServer(url, parameters, callback, escape));
 		}
 
-		private IEnumerator LoadTextFileFromServer(string url, Dictionary<string, string> parameters, System.Action<string> callback)
+		private IEnumerator LoadTextFileFromServer(string url, Dictionary<string, string> parameters, System.Action<string> callback, bool escape)
 		{
 			// TODO: check if url already has parameters first
 			string paramsText = "";
 			foreach (KeyValuePair<string, string> param in parameters)
-				paramsText += (paramsText.Length > 0 ? "&" : "" ) + WWW.EscapeURL(param.Key) + "=" + WWW.EscapeURL(param.Value);
+			{
+				if (escape)
+					paramsText += (paramsText.Length > 0 ? "&" : "" ) + WWW.EscapeURL(param.Key) + "=" + WWW.EscapeURL(param.Value);
+				else
+					paramsText += (paramsText.Length > 0 ? "&" : "" ) + param.Key + "=" + param.Value;
+			}
 			if (paramsText.Length > 0) url += "?" + paramsText;
 
 			ZedLogger.Log("FileDownloader: starting text file download from: " + url, LoggerContext.Server);
