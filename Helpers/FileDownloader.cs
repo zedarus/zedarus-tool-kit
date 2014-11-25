@@ -45,7 +45,7 @@ namespace Zedarus.ToolKit.Helpers
 			
 			if (!www.isDone || !string.IsNullOrEmpty(www.error))
 			{
-				ZedLogger.Log("FileDownloader: Loading file from server failed: " + www.error, LoggerContext.Server);
+				ZedLogger.Log("FileDownloader: loading file from server failed: " + www.error, LoggerContext.Server);
 				Destroy(gameObject, 1f);
 				callback(null);
 				yield break;
