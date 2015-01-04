@@ -17,8 +17,10 @@ namespace Zedarus.ToolKit.UserInterface
 		#region Parameters
 		[SerializeField] private float _showDistance = 0f;
 		[SerializeField] private MoveDirection _showDirection = MoveDirection.Up;
+		[SerializeField] private iTween.EaseType _showEaseType = iTween.EaseType.easeOutExpo;
 		[SerializeField] private float _hideDistance = 0f;
 		[SerializeField] private MoveDirection _hideDirection = MoveDirection.Down;
+		[SerializeField] private iTween.EaseType _hideEaseType = iTween.EaseType.easeOutExpo;
 
 		private Transform _transform;
 		private Vector3 _finalPosition;
@@ -34,19 +36,20 @@ namespace Zedarus.ToolKit.UserInterface
 		#region Controls
 		public override void Show()
 		{
-			iTween.MoveTo(gameObject, iTween.Hash("position", ShowPosition, "islocal", true, "time", ShowDuration));
+			iTween.MoveTo(gameObject, iTween.Hash("position", ShowPosition, "islocal", true, "easetype", _showEaseType, "time", ShowDuration));
 			base.Show();
 		}
 		
 		public override void Hide()
 		{
-			iTween.MoveTo(gameObject, iTween.Hash("position", HidePosition, "islocal", true, "time", HideDuration));
+			iTween.MoveTo(gameObject, iTween.Hash("position", HidePosition, "islocal", true, "easetype", _hideEaseType, "time", HideDuration));
 			base.Hide();
 		}
 		
 		public override void Reset()
 		{
-			_transform.localPosition = ResetPosition;
+			if (_transform != null)
+				_transform.localPosition = ResetPosition;
 			base.Reset();
 		}
 		#endregion
