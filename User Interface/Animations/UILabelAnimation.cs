@@ -3,6 +3,7 @@ using System.Collections;
 
 namespace Zedarus.ToolKit.UserInterface
 {
+	[AddComponentMenu("ZTK/UI/Label Animation")]
 	[RequireComponent(typeof(UILabel))]
 	public class UILabelAnimation : UIElementAnimation
 	{

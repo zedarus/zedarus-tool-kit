@@ -10,7 +10,8 @@ namespace Zedarus.ToolKit.UserInterface
 		Left,
 		Right
 	}
-
+	
+	[AddComponentMenu("ZTK/UI/Move By Animation")]
 	public class UIMoveByAnimation : UIElementAnimation
 	{
 		#region Parameters
