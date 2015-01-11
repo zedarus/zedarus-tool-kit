@@ -10,7 +10,6 @@ namespace Zedarus.ToolKit.Events
 		private bool _oneTime;
 		private bool _expired;
 		private System.Action _handler;
-		private System.Action<object[]> _handlerWithParameters;
 
 		public EventListener(int e, System.Action handler, bool consume, bool oneTime)
 		{
@@ -18,25 +17,12 @@ namespace Zedarus.ToolKit.Events
 			_consume = consume;
 			_oneTime = oneTime;
 			_handler = handler;
-			_handlerWithParameters = null;
 			_expired = false;
 		}
 
-		public EventListener(int e, System.Action<object[]> handler, bool consume, bool oneTime)
+		public virtual void Call(Event e)
 		{
-			_event = e;
-			_consume = consume;
-			_oneTime = oneTime;
-			_handler = null;
-			_handlerWithParameters = handler;
-			_expired = false;
-		}
-
-		public void Call(object[] parameters = null)
-		{
-			if (parameters != null && _handlerWithParameters != null)
-				_handlerWithParameters(parameters);
-			else
+			if (_handler != null)
 				_handler();
 
 			if (_oneTime)
@@ -58,14 +44,133 @@ namespace Zedarus.ToolKit.Events
 			get { return _consume; }
 		}
 
-		public System.Action Handler
+		public string Handler
 		{
-			get { return _handler; }
+			get { return _handler.Method.Name; }
+		}
+	}
+
+	public class EventListener<T> : EventListener
+	{
+		private System.Action<T> _handler;
+
+		public EventListener(int e, System.Action<T> handler, bool consume, bool oneTime) : base(e, null, consume, oneTime)
+		{
+			_handler = handler;
 		}
 
-		public System.Action<object[]> HandlerAlt
+		public override void Call(Event e)
 		{
-			get { return _handlerWithParameters; }
+			Event<T> ec = e as Event<T>;
+
+			if (ec == null)
+			{
+				Debug.LogWarning("Incorrect number of parameters in event");
+				return;
+			}
+
+			if (_handler != null)
+				_handler(ec.Param1);
+
+			base.Call(null);
+		}
+
+		public new string Handler
+		{
+			get { return _handler.Method.Name; }
+		}
+	}
+
+	public class EventListener<T1,T2> : EventListener
+	{
+		private System.Action<T1,T2> _handler;
+		
+		public EventListener(int e, System.Action<T1,T2> handler, bool consume, bool oneTime) : base(e, null, consume, oneTime)
+		{
+			_handler = handler;
+		}
+
+		public override void Call(Event e)
+		{
+			Event<T1,T2> ec = e as Event<T1,T2>;
+
+			if (ec == null)
+			{
+				Debug.LogWarning("Incorrect number of parameters in event");
+				return;
+			}
+
+			if (_handler != null)
+				_handler(ec.Param1, ec.Param2);
+			
+			base.Call(null);
+		}
+		
+		public new string Handler
+		{
+			get { return _handler.Method.Name; }
+		}
+	}
+
+	public class EventListener<T1,T2,T3> : EventListener
+	{
+		private System.Action<T1,T2,T3> _handler;
+		
+		public EventListener(int e, System.Action<T1,T2,T3> handler, bool consume, bool oneTime) : base(e, null, consume, oneTime)
+		{
+			_handler = handler;
+		}
+		
+		public override void Call(Event e)
+		{
+			Event<T1,T2,T3> ec = e as Event<T1,T2,T3>;
+
+			if (ec == null)
+			{
+				Debug.LogWarning("Incorrect number of parameters in event");
+				return;
+			}
+
+			if (_handler != null)
+				_handler(ec.Param1, ec.Param2, ec.Param3);
+			
+			base.Call(null);
+		}
+		
+		public new string Handler
+		{
+			get { return _handler.Method.Name; }
+		}
+	}
+
+	public class EventListener<T1,T2,T3,T4> : EventListener
+	{
+		private System.Action<T1,T2,T3,T4> _handler;
+		
+		public EventListener(int e, System.Action<T1,T2,T3,T4> handler, bool consume, bool oneTime) : base(e, null, consume, oneTime)
+		{
+			_handler = handler;
+		}
+		
+		public override void Call(Event e)
+		{
+			Event<T1,T2,T3,T4> ec = e as Event<T1,T2,T3,T4>;
+
+			if (ec == null)
+			{
+				Debug.LogWarning("Incorrect number of parameters in event");
+				return;
+			}
+
+			if (_handler != null)
+				_handler(ec.Param1, ec.Param2, ec.Param3, ec.Param4);
+			
+			base.Call(null);
+		}
+		
+		public new string Handler
+		{
+			get { return _handler.Method.Name; }
 		}
 	}
 }

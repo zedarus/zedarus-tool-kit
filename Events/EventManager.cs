@@ -18,9 +18,29 @@ namespace Zedarus.ToolKit.Events
 		}
 
 		#region Controls
-		static public void SendEvent(int e, params object[] args)
+		static public void SendEvent(int e)
 		{
-			Instance.RegisterEvent(e, args);
+			Instance.RegisterEvent(e);
+		}
+
+		static public void SendEvent<T1>(int e, T1 param1)
+		{
+			Instance.RegisterEvent<T1>(e, param1);
+		}
+
+		static public void SendEvent<T1,T2>(int e, T1 param1, T2 param2)
+		{
+			Instance.RegisterEvent<T1,T2>(e, param1, param2);
+		}
+
+		static public void SendEvent<T1,T2,T3>(int e, T1 param1, T2 param2, T3 param3)
+		{
+			Instance.RegisterEvent<T1,T2,T3>(e, param1, param2, param3);
+		}
+
+		static public void SendEvent<T1,T2,T3,T4>(int e, T1 param1, T2 param2, T3 param3, T4 param4)
+		{
+			Instance.RegisterEvent<T1,T2,T3,T4>(e, param1, param2, param3, param4);
 		}
 
 		/// <summary>
@@ -35,24 +55,27 @@ namespace Zedarus.ToolKit.Events
 			Instance.CreateListener(e, handler, consume, oneTime);
 		}
 
-		/// <summary>
-		/// Adds the listener with parameters.
-		/// </summary>
-		/// <param name="e">Event id.</param>
-		/// <param name="handler">Handler method.</param>
-		/// <param name="consume">If set to <c>true</c>, then event will be consumed and will not trigger other listeners.</param>
-		/// <param name="oneTime">If set to <c>true</c>, handler will be only triggered once.</param>
-		static public void AddListener(int e, System.Action<object[]> handler, bool consume = false, bool oneTime = false)
+		static public void AddListener<T>(int e, System.Action<T> handler, bool consume = false, bool oneTime = false)
 		{
-			Instance.CreateListener(e, handler, consume, oneTime);
+			Instance.CreateListener<T>(e, handler, consume, oneTime);
+		}
+
+		static public void AddListener<T1,T2>(int e, System.Action<T1,T2> handler, bool consume = false, bool oneTime = false)
+		{
+			Instance.CreateListener<T1,T2>(e, handler, consume, oneTime);
+		}
+
+		static public void AddListener<T1,T2,T3>(int e, System.Action<T1,T2,T3> handler, bool consume = false, bool oneTime = false)
+		{
+			Instance.CreateListener<T1,T2,T3>(e, handler, consume, oneTime);
+		}
+
+		static public void AddListener<T1,T2,T3,T4>(int e, System.Action<T1,T2,T3,T4> handler, bool consume = false, bool oneTime = false)
+		{
+			Instance.CreateListener<T1,T2,T3,T4>(e, handler, consume, oneTime);
 		}
 
 		static public void RemoveListener(int e, System.Action handler)
-		{
-			Instance.DestroyListener(e, handler);
-		}
-
-		static public void RemoveListener(int e, System.Action<object[]> handler)
 		{
 			Instance.DestroyListener(e, handler);
 		}
@@ -71,6 +94,7 @@ namespace Zedarus.ToolKit.Events
 		}
 		#endregion
 
+		#region Events
 		public void ProcessEvents()
 		{
 			Event e;
@@ -83,7 +107,7 @@ namespace Zedarus.ToolKit.Events
 					listener = _listeners[i];
 					if (listener.Event == e.ID)
 					{
-						listener.Call(e.Parameters);
+						listener.Call(e);
 
 						if (listener.Expired)
 							_listeners.RemoveAt(i);
@@ -99,26 +123,73 @@ namespace Zedarus.ToolKit.Events
 
 			// TODO: add lifelength for unprocessed events so they are not removed immidately if not processed
 			_events.Clear();
-
-			//Debug.Log("Update");
 		}
 
-		public void RegisterEvent(int e, object[] args)
+		public void RegisterEvent(int e)
 		{
-			_events.Add(new Event(e, args));
+			_events.Add(new Event(e));
 			UpdateSceneObject();
 			ProcessEvents();
 		}
 
+		public void RegisterEvent<T1>(int e, T1 param1)
+		{
+			_events.Add(new Event<T1>(e, param1));
+			UpdateSceneObject();
+			ProcessEvents();
+		}
+
+		public void RegisterEvent<T1,T2>(int e, T1 param1, T2 param2)
+		{
+			_events.Add(new Event<T1,T2>(e, param1, param2));
+			UpdateSceneObject();
+			ProcessEvents();
+		}
+
+		public void RegisterEvent<T1,T2,T3>(int e, T1 param1, T2 param2, T3 param3)
+		{
+			_events.Add(new Event<T1,T2,T3>(e, param1, param2, param3));
+			UpdateSceneObject();
+			ProcessEvents();
+		}
+
+		public void RegisterEvent<T1,T2,T3,T4>(int e, T1 param1, T2 param2, T3 param3, T4 param4)
+		{
+			_events.Add(new Event<T1,T2,T3,T4>(e, param1, param2, param3, param4));
+			UpdateSceneObject();
+			ProcessEvents();
+		}
+		#endregion
+
+		#region Listeners
 		public void CreateListener(int e, System.Action handler, bool consume, bool oneTime)
 		{
+			//Debug.Log("Handler: " + handler.Target +  ", " + handler.Method.Name);
 			_listeners.Add(new EventListener(e, handler, consume, oneTime));
 			UpdateSceneObject();
 		}
 
-		public void CreateListener(int e, System.Action<object[]> handler, bool consume, bool oneTime)
+		public void CreateListener<T>(int e, System.Action<T> handler, bool consume, bool oneTime)
 		{
-			_listeners.Add(new EventListener(e, handler, consume, oneTime));
+			_listeners.Add(new EventListener<T>(e, handler, consume, oneTime));
+			UpdateSceneObject();
+		}
+
+		public void CreateListener<T1,T2>(int e, System.Action<T1,T2> handler, bool consume, bool oneTime)
+		{
+			_listeners.Add(new EventListener<T1,T2>(e, handler, consume, oneTime));
+			UpdateSceneObject();
+		}
+
+		public void CreateListener<T1,T2,T3>(int e, System.Action<T1,T2,T3> handler, bool consume, bool oneTime)
+		{
+			_listeners.Add(new EventListener<T1,T2,T3>(e, handler, consume, oneTime));
+			UpdateSceneObject();
+		}
+
+		public void CreateListener<T1,T2,T3,T4>(int e, System.Action<T1,T2,T3,T4> handler, bool consume, bool oneTime)
+		{
+			_listeners.Add(new EventListener<T1,T2,T3,T4>(e, handler, consume, oneTime));
 			UpdateSceneObject();
 		}
 
@@ -126,13 +197,13 @@ namespace Zedarus.ToolKit.Events
 		{
 			for (int i = _listeners.Count - 1; i >= 0; i--)
 			{
-				if (_listeners[i].Event == e && _listeners[i].Handler == handler)
+				if (_listeners[i].Event == e && _listeners[i].Handler.Equals(handler.Method.Name))
 					_listeners.RemoveAt(i);
 			}
 			UpdateSceneObject();
 		}
 
-		public void DestroyListener(int e, System.Action<object[]> handler)
+		/*public void DestroyListener(int e, System.Action<object[]> handler)
 		{
 			for (int i = _listeners.Count - 1; i >= 0; i--)
 			{
@@ -140,7 +211,8 @@ namespace Zedarus.ToolKit.Events
 					_listeners.RemoveAt(i);
 			}
 			UpdateSceneObject();
-		}
+		}*/
+		#endregion
 
 		public void ClearEventsAndListeners() 
 		{
