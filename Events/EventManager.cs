@@ -80,6 +80,26 @@ namespace Zedarus.ToolKit.Events
 			Instance.DestroyListener(e, handler);
 		}
 
+		static public void RemoveListener<T1>(int e, System.Action<T1> handler)
+		{
+			Instance.DestroyListener<T1>(e, handler);
+		}
+
+		static public void RemoveListener<T1,T2>(int e, System.Action<T1,T2> handler)
+		{
+			Instance.DestroyListener<T1,T2>(e, handler);
+		}
+
+		static public void RemoveListener<T1,T2,T3>(int e, System.Action<T1,T2,T3> handler)
+		{
+			Instance.DestroyListener<T1,T2,T3>(e, handler);
+		}
+
+		static public void RemoveListener<T1,T2,T3,T4>(int e, System.Action<T1,T2,T3,T4> handler)
+		{
+			Instance.DestroyListener<T1,T2,T3,T4>(e, handler);
+		}
+
 		static public void Update()
 		{
 			Instance.ProcessEvents();
@@ -164,7 +184,6 @@ namespace Zedarus.ToolKit.Events
 		#region Listeners
 		public void CreateListener(int e, System.Action handler, bool consume, bool oneTime)
 		{
-			//Debug.Log("Handler: " + handler.Target +  ", " + handler.Method.Name);
 			_listeners.Add(new EventListener(e, handler, consume, oneTime));
 			UpdateSceneObject();
 		}
@@ -195,23 +214,38 @@ namespace Zedarus.ToolKit.Events
 
 		public void DestroyListener(int e, System.Action handler)
 		{
+			DestroyListener(e, handler.Method.Name);
+		}
+
+		public void DestroyListener<T1>(int e, System.Action<T1> handler)
+		{
+			DestroyListener(e, handler.Method.Name);
+		}
+
+		public void DestroyListener<T1,T2>(int e, System.Action<T1,T2> handler)
+		{
+			DestroyListener(e, handler.Method.Name);
+		}
+
+		public void DestroyListener<T1,T2,T3>(int e, System.Action<T1,T2,T3> handler)
+		{
+			DestroyListener(e, handler.Method.Name);
+		}
+
+		public void DestroyListener<T1,T2,T3,T4>(int e, System.Action<T1,T2,T3,T4> handler)
+		{
+			DestroyListener(e, handler.Method.Name);
+		}
+
+		public void DestroyListener(int e, string methodName)
+		{
 			for (int i = _listeners.Count - 1; i >= 0; i--)
 			{
-				if (_listeners[i].Event == e && _listeners[i].Handler.Equals(handler.Method.Name))
+				if (_listeners[i].Event == e && _listeners[i].Handler.Equals(methodName))
 					_listeners.RemoveAt(i);
 			}
 			UpdateSceneObject();
 		}
-
-		/*public void DestroyListener(int e, System.Action<object[]> handler)
-		{
-			for (int i = _listeners.Count - 1; i >= 0; i--)
-			{
-				if (_listeners[i].Event == e && _listeners[i].HandlerAlt == handler)
-					_listeners.RemoveAt(i);
-			}
-			UpdateSceneObject();
-		}*/
 		#endregion
 
 		public void ClearEventsAndListeners() 

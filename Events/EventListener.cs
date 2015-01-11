@@ -44,7 +44,7 @@ namespace Zedarus.ToolKit.Events
 			get { return _consume; }
 		}
 
-		public string Handler
+		public virtual string Handler
 		{
 			get { return _handler.Method.Name; }
 		}
@@ -75,7 +75,7 @@ namespace Zedarus.ToolKit.Events
 			base.Call(null);
 		}
 
-		public new string Handler
+		public override string Handler
 		{
 			get { return _handler.Method.Name; }
 		}
@@ -106,7 +106,7 @@ namespace Zedarus.ToolKit.Events
 			base.Call(null);
 		}
 		
-		public new string Handler
+		public override string Handler
 		{
 			get { return _handler.Method.Name; }
 		}
@@ -137,7 +137,7 @@ namespace Zedarus.ToolKit.Events
 			base.Call(null);
 		}
 		
-		public new string Handler
+		public override string Handler
 		{
 			get { return _handler.Method.Name; }
 		}
@@ -168,7 +168,7 @@ namespace Zedarus.ToolKit.Events
 			base.Call(null);
 		}
 		
-		public new string Handler
+		public override string Handler
 		{
 			get { return _handler.Method.Name; }
 		}
