@@ -19,7 +19,7 @@ namespace Zedarus.ToolKit.UserInterface
 		#endregion
 
 		#region Controls
-		public void Init()
+		public void Init(bool reset = true)
 		{
 			foreach (Transform animatedObject in _animatedObjects)
 			{
@@ -34,7 +34,7 @@ namespace Zedarus.ToolKit.UserInterface
 				}
 			}
 
-			Reset();
+			if (reset) Reset();
 		}
 
 		public float Show()
