@@ -117,24 +117,24 @@ namespace Zedarus.ToolKit.Events
 		#region Events
 		public void ProcessEvents()
 		{
-			Event e;
+			Event eventObject;
 			EventListener listener;
-			for (int i = _events.Count - 1; i >= 0; i--)
+			for (int e = _events.Count - 1; e >= 0; e--)
 			{
-				e = _events[i];
+				eventObject = _events[e];
 				for (int l = _listeners.Count - 1; l >= 0; l--)
 				{
-					listener = _listeners[i];
-					if (listener.Event == e.ID)
+					listener = _listeners[l];
+					if (listener.Event == eventObject.ID)
 					{
-						listener.Call(e);
+						listener.Call(eventObject);
 
 						if (listener.Expired)
-							_listeners.RemoveAt(i);
+							_listeners.RemoveAt(l);
 
 						if (listener.Consume)
 						{
-							_events.RemoveAt(i);
+							_events.RemoveAt(e);
 							break;
 						}
 					}
@@ -252,7 +252,6 @@ namespace Zedarus.ToolKit.Events
 		{
 			_listeners.Clear();
 			UpdateSceneObject();
-			Debug.Log("Clear");
 		}
 
 		#region Scene Object
