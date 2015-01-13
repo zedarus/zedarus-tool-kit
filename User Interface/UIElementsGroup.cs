@@ -8,7 +8,6 @@ namespace Zedarus.ToolKit.UserInterface
 	{	
 		#region Parameters
 		private UIElementAnimationsController _animationsController;
-		private Coroutine _eventRoutine;
 		#endregion
 
 		#region Events
@@ -30,24 +29,18 @@ namespace Zedarus.ToolKit.UserInterface
 		public virtual float Show()
 		{
 			float delay = _animationsController.Show();
-			if (_eventRoutine != null)
-			{
-				StopCoroutine(_eventRoutine);
-				_eventRoutine = null;
-			}
-			_eventRoutine = StartCoroutine(SendOpenedEvent(delay));
+			StopCoroutine("SendOpenedEvent");
+			StopCoroutine("SendClosedEvent");
+			StartCoroutine("SendOpenedEvent", delay);
 			return delay;
 		}
 
 		public virtual float Hide()
 		{
 			float delay = _animationsController.Hide();
-			if (_eventRoutine != null)
-			{
-				StopCoroutine(_eventRoutine);
-				_eventRoutine = null;
-			}
-			_eventRoutine = StartCoroutine(SendClosedEvent(delay));
+			StopCoroutine("SendOpenedEvent");
+			StopCoroutine("SendClosedEvent");
+			StartCoroutine("SendClosedEvent", delay);
 			return delay;
 		}
 		#endregion
