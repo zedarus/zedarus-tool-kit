@@ -109,8 +109,16 @@ namespace Zedarus.ToolKit.UserInterface
 				if (GUILayout.Button("Remove", EditorStyles.miniButton, GUILayout.Width(64)))
 					removeIndex = i;
 
-				totatShowDuration += animation.ShowDuration;
-				totalHideDuration += animation.HideDuration;
+				if (element.SyncAllAnimations)
+				{
+					totatShowDuration = Mathf.Max(totatShowDuration, animation.ShowDuration);
+					totalHideDuration = Mathf.Max(totalHideDuration, animation.HideDuration);
+				}
+				else
+				{
+					totatShowDuration += animation.ShowDuration;
+					totalHideDuration +=  animation.HideDuration;
+				}
 
 				EditorGUILayout.EndHorizontal();
 
@@ -171,6 +179,8 @@ namespace Zedarus.ToolKit.UserInterface
 
 			element.ShowAnimationDuration = totatShowDuration;
 			element.HideAnimationDuration = totalHideDuration;
+
+			element.SyncAllAnimations = EditorGUILayout.Toggle("Sync animations: ", element.SyncAllAnimations); 
 			
 			if (GUI.changed)
 				EditorUtility.SetDirty(element);

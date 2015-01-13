@@ -16,6 +16,8 @@ namespace Zedarus.ToolKit.UserInterface
 		private List<IUIElementAnimation> _animations = new List<IUIElementAnimation>();
 		private bool _hasButton = true;
 		private bool _displayed = false;
+		[SerializeField]
+		private bool _syncAllAnimations = false;
 		#endregion
 
 		#region Controls
@@ -47,7 +49,7 @@ namespace Zedarus.ToolKit.UserInterface
 			for (int i = 0; i < _animations.Count; i++)
 			{
 				IUIElementAnimation animation = _animations[i];
-				StartCoroutine(ShowAnimationWithDelay(animation, previousDuration));
+				StartCoroutine(ShowAnimationWithDelay(animation, _syncAllAnimations ? 0 : previousDuration));
 				previousDuration += animation.ShowDuration;
 			}
 			return _showAnimationDuration;
@@ -70,7 +72,7 @@ namespace Zedarus.ToolKit.UserInterface
 			for (int i = _animations.Count - 1; i >= 0; i--)
 			{
 				IUIElementAnimation animation = _animations[i];
-				StartCoroutine(HideAnimationWithDelay(animation, previousDuration));
+				StartCoroutine(HideAnimationWithDelay(animation, _syncAllAnimations ? 0 : previousDuration));
 				previousDuration += animation.HideDuration;
 			}
 			return _hideAnimationDuration;
@@ -170,6 +172,12 @@ namespace Zedarus.ToolKit.UserInterface
 		{
 			get { return _hideAnimationDuration; }
 			set { _hideAnimationDuration = value; }
+		}
+
+		public bool SyncAllAnimations
+		{
+			get { return _syncAllAnimations; }
+			set { _syncAllAnimations = value; }
 		}
 		#endif
 	}
