@@ -54,6 +54,15 @@ namespace Zedarus.ToolKit.StateMachines
 				_currentStateIndex = nextStateIndex;
 			}
 		}
+
+		public void Destroy()
+		{
+			foreach (StateMachineState state in _states)
+				state.Destroy();
+
+			_states.Clear();
+			_states = null;
+		}
 		#endregion
 	}
 }
