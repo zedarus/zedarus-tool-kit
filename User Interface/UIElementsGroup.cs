@@ -10,6 +10,11 @@ namespace Zedarus.ToolKit.UserInterface
 		private UIElementAnimationsController _animationsController;
 		#endregion
 
+		#region Events
+		public event System.Action<UIElementsGroup> Opened;
+		public event System.Action<UIElementsGroup> Closed;
+		#endregion
+
 		#region Main Methods
 		public virtual void Init()
 		{
@@ -23,12 +28,36 @@ namespace Zedarus.ToolKit.UserInterface
 		#region Controls
 		public virtual float Show()
 		{
-			return _animationsController.Show();
+			float delay = _animationsController.Show();
+			StopCoroutine("SendOpenedEvent");
+			StopCoroutine("SendClosedEvent");
+			StartCoroutine("SendOpenedEvent", delay);
+			return delay;
 		}
 
 		public virtual float Hide()
 		{
-			return _animationsController.Hide();
+			float delay = _animationsController.Hide();
+			StopCoroutine("SendOpenedEvent");
+			StopCoroutine("SendClosedEvent");
+			StartCoroutine("SendClosedEvent", delay);
+			return delay;
+		}
+		#endregion
+
+		#region Event Senders
+		private IEnumerator SendOpenedEvent(float delay)
+		{
+			yield return new WaitForSeconds(delay);
+			if (Opened != null)
+				Opened(this);
+		}
+
+		private IEnumerator SendClosedEvent(float delay)
+		{
+			yield return new WaitForSeconds(delay);
+			if (Closed != null)
+				Closed(this);
 		}
 		#endregion
 	}
