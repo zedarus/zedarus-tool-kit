@@ -8,14 +8,21 @@ namespace Zedarus.ToolKit.StateMachines
 	{
 		#region Properties
 		private List<StateMachineState> _states;
-		private int _currentStateIndex = -1;
+		private int _currentStateIndex;
+		private List<int> _statesHistory;
+		#endregion
+
+		#region Settings
+		private int _historyLenght;
 		#endregion
 
 		#region Initialization
-		public StateMachine()
+		public StateMachine(int historyLenght = 10)
 		{
 			_states = new List<StateMachineState>();
+			_statesHistory = new List<int>();
 			_currentStateIndex = -1;
+			_historyLenght = historyLenght;
 		}
 		#endregion
 
@@ -29,6 +36,24 @@ namespace Zedarus.ToolKit.StateMachines
 		public void CreateState(int state, Action<float> CycleHandler, Action EnterHandler, Action ExitHandler)
 		{
 			_states.Add(new StateMachineState(state, CycleHandler, EnterHandler, ExitHandler));
+		}
+
+		public void RevertToPreviousState(bool skipSameState = false)
+		{
+			if (_statesHistory.Count > 0)
+			{
+				int previousStateIndex = _statesHistory[_statesHistory.Count - 1];
+				if (skipSameState)
+				{
+					int depth = 2;
+					while (_currentStateIndex == previousStateIndex && _statesHistory.Count - depth >= 0)
+					{
+						previousStateIndex = _statesHistory[_statesHistory.Count - depth];
+						depth++;
+					}
+				}
+				ChangeState(_states[previousStateIndex].State);
+			}
 		}
 
 		public void ChangeState(int newState)
@@ -51,6 +76,10 @@ namespace Zedarus.ToolKit.StateMachines
 					_states[_currentStateIndex].Exit();
 
 				_states[nextStateIndex].Enter();
+
+				_statesHistory.Add(_currentStateIndex);
+				if (_statesHistory.Count > _historyLenght)
+					_statesHistory.RemoveAt(0);
 				_currentStateIndex = nextStateIndex;
 			}
 		}
