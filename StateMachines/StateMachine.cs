@@ -93,5 +93,12 @@ namespace Zedarus.ToolKit.StateMachines
 			_states = null;
 		}
 		#endregion
+
+		#region Queries
+		public int CurrentState
+		{
+			get { return _states[_currentStateIndex].State; }
+		}
+		#endregion
 	}
 }
