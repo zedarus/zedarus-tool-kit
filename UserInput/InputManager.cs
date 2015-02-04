@@ -10,6 +10,7 @@ namespace Zedarus.ToolKit.UserInput
 		private List<InputListener> _listeners;
 		private Func<Vector2, Vector2> _converPositionHandler;
 		private LayerMask _mask;
+		private Vector2 _mousePosition;
 		#endregion
 
 		#region Initialization
@@ -58,13 +59,13 @@ namespace Zedarus.ToolKit.UserInput
 
 		public void Update()
 		{
+			_mousePosition = Input.mousePosition;
+			if (_converPositionHandler != null)
+				_mousePosition = _converPositionHandler(_mousePosition);
+
 			if (Input.GetMouseButtonDown(0))
 			{
-				Vector2 p = Input.mousePosition;
-				if (_converPositionHandler != null)
-					p = _converPositionHandler(p);
-
-				Collider2D[] colliders = Physics2D.OverlapPointAll(p, _mask.value);
+				Collider2D[] colliders = Physics2D.OverlapPointAll(_mousePosition, _mask.value);
 				foreach (Collider2D c in colliders)
 				{
 					foreach (InputListener listener in _listeners)
@@ -74,6 +75,13 @@ namespace Zedarus.ToolKit.UserInput
 					}
 				}
 			}
+		}
+		#endregion
+
+		#region Getters
+		public Vector2 MousePosition
+		{
+			get { return _mousePosition; }
 		}
 		#endregion
 	}
