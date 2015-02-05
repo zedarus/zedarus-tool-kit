@@ -11,12 +11,14 @@ namespace Zedarus.ToolKit.UserInput
 		private Func<Vector2, Vector2> _converPositionHandler;
 		private LayerMask _mask;
 		private Vector2 _mousePosition;
+		private Collider2D[] _colliders;
 		#endregion
 
 		#region Initialization
 		public void Init(Func<Vector2, Vector2> convertPositionHandler, LayerMask mask)
 		{
 			_converPositionHandler = null;
+			_colliders = new Collider2D[64];
 
 			if (_listeners != null)
 			{
@@ -42,9 +44,9 @@ namespace Zedarus.ToolKit.UserInput
 		#endregion
 
 		#region Controls
-		public void CreateListener(int id, Action click) 
+		public void CreateListener(int id, Action click, Action press, Action release, Action releaseOutside) 
 		{
-			InputListener listener = new InputListener(id, click);
+			InputListener listener = new InputListener(id, click, press, release, releaseOutside);
 			_listeners.Add(listener);
 		}
 
@@ -63,17 +65,34 @@ namespace Zedarus.ToolKit.UserInput
 			if (_converPositionHandler != null)
 				_mousePosition = _converPositionHandler(_mousePosition);
 
-			if (Input.GetMouseButtonDown(0))
+			//bool click = Input.GetMouseButton(0);
+			bool press = Input.GetMouseButtonDown(0);
+			bool release = Input.GetMouseButtonUp(0);
+
+			if (press || release)
 			{
-				Collider2D[] colliders = Physics2D.OverlapPointAll(_mousePosition, _mask.value);
-				foreach (Collider2D c in colliders)
+				int numberOfColliders = Physics2D.OverlapPointNonAlloc(_mousePosition, _colliders, _mask.value);
+				List<int> collidersIDs = new List<int>();
+				for (int i = 0; i < numberOfColliders; i++)
+					collidersIDs.Add(_colliders[i].GetInstanceID());
+
+				foreach (InputListener listener in _listeners)
 				{
-					foreach (InputListener listener in _listeners)
+					if (collidersIDs.Contains(listener.ID))
 					{
-						if (listener.ID == c.GetInstanceID())
-							listener.Call();
+						if (press)
+							listener.Press();
+						if (release)
+							listener.Release();
+					}
+					else
+					{
+						if (release)
+							listener.ReleaseOutside();
 					}
 				}
+
+				collidersIDs.Clear();
 			}
 		}
 		#endregion
