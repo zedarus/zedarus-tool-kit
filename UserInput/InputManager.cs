@@ -81,9 +81,9 @@ namespace Zedarus.ToolKit.UserInput
 					if (collidersIDs.Contains(listener.ID))
 					{
 						if (press)
-							listener.Press();
+							listener.Press(_mousePosition);
 						if (release)
-							listener.Release();
+							listener.Release(_mousePosition);
 					}
 					else
 					{

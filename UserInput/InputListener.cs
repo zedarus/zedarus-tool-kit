@@ -13,6 +13,7 @@ namespace Zedarus.ToolKit.UserInput
 		private Action _releaseHandler;
 		private Action _releaseOutsideHandler;
 		private bool _pressed;
+		private Vector2 _pressPosition;
 		#endregion
 
 		public InputListener(int id, Action clickHandler, Action pressHandler, Action releaseHandler, Action releaseOutsideHandler)
@@ -35,20 +36,24 @@ namespace Zedarus.ToolKit.UserInput
 				_clickHandler();
 		}
 
-		public void Press()
+		public void Press(Vector2 position)
 		{
+			_pressPosition = position;
+
 			if (_pressHandler != null)
 				_pressHandler();
 
 			_pressed = true;
 		}
 
-		public void Release()
+		public void Release(Vector2 position)
 		{
 			if (_releaseHandler != null)
 				_releaseHandler();
 
-			if (_pressed)
+			bool moved = Vector2.Distance(position, _pressPosition) > 0.1f;
+
+			if (_pressed && !moved)
 				Click();
 
 			_pressed = false;
