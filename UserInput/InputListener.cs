@@ -61,10 +61,13 @@ namespace Zedarus.ToolKit.UserInput
 
 		public void ReleaseOutside()
 		{
-			if (_releaseOutsideHandler != null)
-				_releaseOutsideHandler();
+			if (_pressed)
+			{
+				if (_releaseOutsideHandler != null)
+					_releaseOutsideHandler();
 
-			_pressed = false;
+				_pressed = false;
+			}
 		}
 	}
 }
