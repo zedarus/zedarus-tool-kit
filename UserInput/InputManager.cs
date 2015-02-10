@@ -91,7 +91,7 @@ namespace Zedarus.ToolKit.UserInput
 				for (int i = 0; i < numberOfColliders; i++)
 				{
 					collidersIDs.Add(_colliders[i].GetInstanceID());
-					if (_processOnlyFirstCollider) break;
+					if (_processOnlyFirstCollider && press) break;
 				}
 
 				foreach (InputListener listener in _listeners)
