@@ -79,12 +79,15 @@ namespace Zedarus.ToolKit.UserInput
 
 			if (press || release)
 			{
-				Vector2 ignorePosition = Vector2.zero;
-				if (_converIgnorePositionHandler != null)
-					ignorePosition = _converIgnorePositionHandler(Input.mousePosition);
-				int ignoreColliers = Physics2D.OverlapPointNonAlloc(ignorePosition, _colliders, _ignoreMask.value);
+				if (press)
+				{
+					Vector2 ignorePosition = Vector2.zero;
+					if (_converIgnorePositionHandler != null)
+						ignorePosition = _converIgnorePositionHandler(Input.mousePosition);
+					int ignoreColliers = Physics2D.OverlapPointNonAlloc(ignorePosition, _colliders, _ignoreMask.value);
 
-				if (ignoreColliers > 0) return;
+					if (ignoreColliers > 0) return;
+				}
 
 				int numberOfColliders = Physics2D.OverlapPointNonAlloc(_mousePosition, _colliders, _mask.value);
 				List<int> collidersIDs = new List<int>();
