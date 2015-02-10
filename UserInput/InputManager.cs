@@ -12,11 +12,13 @@ namespace Zedarus.ToolKit.UserInput
 		private LayerMask _mask;
 		private Vector2 _mousePosition;
 		private Collider2D[] _colliders;
+		private bool _processOnlyFirstCollider;
 		#endregion
 
 		#region Initialization
-		public void Init(Func<Vector2, Vector2> convertPositionHandler, LayerMask mask)
+		public void Init(Func<Vector2, Vector2> convertPositionHandler, LayerMask mask, bool processOnlyFirstCollider)
 		{
+			_processOnlyFirstCollider = processOnlyFirstCollider;
 			_converPositionHandler = null;
 			_colliders = new Collider2D[64];
 
@@ -74,7 +76,10 @@ namespace Zedarus.ToolKit.UserInput
 				int numberOfColliders = Physics2D.OverlapPointNonAlloc(_mousePosition, _colliders, _mask.value);
 				List<int> collidersIDs = new List<int>();
 				for (int i = 0; i < numberOfColliders; i++)
+				{
 					collidersIDs.Add(_colliders[i].GetInstanceID());
+					if (_processOnlyFirstCollider) break;
+				}
 
 				foreach (InputListener listener in _listeners)
 				{
@@ -94,6 +99,7 @@ namespace Zedarus.ToolKit.UserInput
 
 				collidersIDs.Clear();
 			}
+
 		}
 		#endregion
 
