@@ -51,7 +51,8 @@ namespace Zedarus.ToolKit.UserInput
 			if (_releaseHandler != null)
 				_releaseHandler();
 
-			bool moved = Vector2.Distance(position, _pressPosition) > 0.1f;
+			// TODO: we need to take screen density (SD, HD, SHD) into account here for touches
+			bool moved = Vector2.Distance(position, _pressPosition) > 3f;
 
 			if (_pressed && !moved)
 				Click();
