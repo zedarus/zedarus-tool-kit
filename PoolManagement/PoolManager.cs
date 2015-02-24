@@ -26,7 +26,7 @@ namespace Zedarus.ToolKit.PoolManagement
 			}
 		}
 
-		public T GetItemFromPool()
+		public virtual T GetItemFromPool()
 		{
 			if (_pool.Count > 0)
 			{
@@ -44,7 +44,7 @@ namespace Zedarus.ToolKit.PoolManagement
 				return null;
 		}
 
-		public T[] GetItemFromPool(int number)
+		public virtual T[] GetItemFromPool(int number)
 		{
 			List<T> items = new List<T>();
 			for (int i = 0; i < number; i++)
@@ -57,14 +57,14 @@ namespace Zedarus.ToolKit.PoolManagement
 			return items.ToArray();
 		}
 		
-		public void ReturnItemToPool(T item)
+		public virtual void ReturnItemToPool(T item)
 		{
 			_active.Remove(item);
 			item.Deactivate();
 			_pool.Add(item);
 		}
 
-		public void ReturnItemToPoolAtIndex(int index)
+		public virtual void ReturnItemToPoolAtIndex(int index)
 		{
 			T item = _active[index];
 			_active.RemoveAt(index);
