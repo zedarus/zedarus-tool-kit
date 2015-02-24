@@ -51,10 +51,20 @@ namespace Zedarus.ToolKit.UserInput
 		#endregion
 
 		#region Controls
+		public void CreateListener(Collider2D collider, Action click, Action press, Action release, Action releaseOutside)
+		{
+			CreateListener(collider.GetInstanceID(), click, press, release, releaseOutside);
+		}
+
 		public void CreateListener(int id, Action click, Action press, Action release, Action releaseOutside) 
 		{
 			InputListener listener = new InputListener(id, click, press, release, releaseOutside);
 			_listeners.Add(listener);
+		}
+
+		public void RemoveListener(Collider2D collider)
+		{
+			RemoveListener(collider.GetInstanceID());
 		}
 
 		public void RemoveListener(int id)
