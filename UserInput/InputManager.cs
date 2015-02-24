@@ -8,11 +8,13 @@ namespace Zedarus.ToolKit.UserInput
 	{
 		#region Properties
 		private List<InputListener> _listeners;
+		private List<InputGestureListener> _gestureListeners;
 		private Func<Vector2, Vector2> _converPositionHandler;
 		private Func<Vector2, Vector2> _converIgnorePositionHandler;
 		private LayerMask _mask;
 		private LayerMask _ignoreMask;
 		private Vector2 _mousePosition;
+		private Vector2 _pressPosition;
 		private Collider2D[] _colliders;
 		private bool _processOnlyFirstCollider;
 		#endregion
@@ -32,6 +34,15 @@ namespace Zedarus.ToolKit.UserInput
 			}
 
 			_listeners = new List<InputListener>();
+
+			if (_gestureListeners != null)
+			{
+				_gestureListeners.Clear();
+				_gestureListeners = null;
+			}
+
+			_gestureListeners = new List<InputGestureListener>();
+
 			_converPositionHandler = convertPositionHandler;
 			_converIgnorePositionHandler = convertIgnorePositionHandler;
 			_mask = mask;
@@ -47,6 +58,12 @@ namespace Zedarus.ToolKit.UserInput
 				_listeners.Clear();
 				_listeners = null;
 			}
+
+			if (_gestureListeners != null)
+			{
+				_gestureListeners.Clear();
+				_gestureListeners = null;
+			}
 		}
 		#endregion
 
@@ -60,6 +77,12 @@ namespace Zedarus.ToolKit.UserInput
 		{
 			InputListener listener = new InputListener(id, click, press, release, releaseOutside);
 			_listeners.Add(listener);
+		}
+
+		public void CreateGestureListener(Action<Vector3> swipe)
+		{
+			InputGestureListener listener = new InputGestureListener(swipe);
+			_gestureListeners.Add(listener);
 		}
 
 		public void RemoveListener(Collider2D collider)
@@ -86,6 +109,32 @@ namespace Zedarus.ToolKit.UserInput
 			//bool click = Input.GetMouseButton(0);
 			bool press = Input.GetMouseButtonDown(0);
 			bool release = Input.GetMouseButtonUp(0);
+
+			if (press)
+				_pressPosition = _mousePosition;
+
+			if (release)
+			{
+				Vector2 diff = _mousePosition - _pressPosition;
+
+				float distance = Vector2.Distance(_mousePosition, _pressPosition);
+
+				// TODO: take screen density (SD, HD, SHD) into account here
+				if (distance > 3f)
+				{
+					Vector3 direction = Vector3.zero;
+					if (Mathf.Abs(diff.x) > Mathf.Abs(diff.y))
+					{
+						if (diff.x > 0)
+							direction = Vector3.right;
+						else
+							direction = Vector3.left;
+					}
+
+					foreach (InputGestureListener listener in _gestureListeners)
+						listener.Swipe(direction);
+				}
+			}
 
 			if (press || release)
 			{
