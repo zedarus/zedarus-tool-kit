@@ -8,6 +8,8 @@ namespace Zedarus.ToolKit.UserInput
 	{
 		#region Properties
 		private List<InputListener> _listeners;
+		private List<InputListener> _newListeners;
+		private List<int> _listenersToRemove;
 		private Func<Vector2, Vector2> _converPositionHandler;
 		private Func<Vector2, Vector2> _converIgnorePositionHandler;
 		private LayerMask _mask;
@@ -31,7 +33,21 @@ namespace Zedarus.ToolKit.UserInput
 				_listeners = null;
 			}
 
+			if (_newListeners != null)
+			{
+				_newListeners.Clear();
+				_newListeners = null;
+			}
+
+			if (_listenersToRemove != null)
+			{
+				_listenersToRemove.Clear();
+				_listenersToRemove = null;
+			}
+
 			_listeners = new List<InputListener>();
+			_newListeners = new List<InputListener>();
+			_listenersToRemove = new List<int>();
 
 			_converPositionHandler = convertPositionHandler;
 			_converIgnorePositionHandler = convertIgnorePositionHandler;
@@ -48,6 +64,18 @@ namespace Zedarus.ToolKit.UserInput
 				_listeners.Clear();
 				_listeners = null;
 			}
+
+			if (_newListeners != null)
+			{
+				_newListeners.Clear();
+				_newListeners = null;
+			}
+
+			if (_listenersToRemove != null)
+			{
+				_listenersToRemove.Clear();
+				_listenersToRemove = null;
+			}
 		}
 		#endregion
 
@@ -60,7 +88,7 @@ namespace Zedarus.ToolKit.UserInput
 		public void CreateListener(int id, Action click, Action press, Action release, Action releaseOutside, Action<Vector3> swipeGesture = null) 
 		{
 			InputListener listener = new InputListener(id, click, press, release, releaseOutside, swipeGesture);
-			_listeners.Add(listener);
+			_newListeners.Add(listener);
 		}
 
 		public void RemoveListener(Collider2D collider)
@@ -70,11 +98,7 @@ namespace Zedarus.ToolKit.UserInput
 
 		public void RemoveListener(int id)
 		{
-			for (int i = _listeners.Count - 1; i >= 0; i--)
-			{
-				if (_listeners[i].ID == id)
-					_listeners.RemoveAt(i);
-			}
+			_listenersToRemove.Add(id);
 		}
 
 		public void Update()
@@ -127,6 +151,22 @@ namespace Zedarus.ToolKit.UserInput
 				collidersIDs.Clear();
 			}
 
+			// Remove existing and add new listeners for next frame
+			foreach (int id in _listenersToRemove)
+			{
+				for (int i = _listeners.Count - 1; i >= 0; i--)
+				{
+					if (_listeners[i].ID == id)
+						_listeners.RemoveAt(i);
+				}
+			}
+			_listenersToRemove.Clear();
+
+			if (_newListeners.Count > 0)
+			{
+				_listeners.AddRange(_newListeners);
+				_newListeners.Clear();
+			}
 		}
 		#endregion
 
