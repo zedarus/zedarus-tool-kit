@@ -72,6 +72,12 @@ namespace Zedarus.ToolKit.PoolManagement
 			_pool.Add(item);
 		}
 
+		public void ReturnAllItemsToPool()
+		{
+			for (int i = _active.Count - 1; i >= 0; i--)
+				ReturnItemToPoolAtIndex(i);
+		}
+
 		public List<T> Active
 		{
 			get { return _active; }
