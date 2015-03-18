@@ -152,15 +152,18 @@ namespace Zedarus.ToolKit.UserInput
 			}
 
 			// Remove existing and add new listeners for next frame
-			foreach (int id in _listenersToRemove)
+			if (_listenersToRemove != null)
 			{
-				for (int i = _listeners.Count - 1; i >= 0; i--)
+				foreach (int id in _listenersToRemove)
 				{
-					if (_listeners[i].ID == id)
-						_listeners.RemoveAt(i);
+					for (int i = _listeners.Count - 1; i >= 0; i--)
+					{
+						if (_listeners[i].ID == id)
+							_listeners.RemoveAt(i);
+					}
 				}
+				_listenersToRemove.Clear();
 			}
-			_listenersToRemove.Clear();
 
 			if (_newListeners.Count > 0)
 			{
