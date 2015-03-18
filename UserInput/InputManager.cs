@@ -165,10 +165,13 @@ namespace Zedarus.ToolKit.UserInput
 				_listenersToRemove.Clear();
 			}
 
-			if (_newListeners.Count > 0)
+			if (_newListeners != null)
 			{
-				_listeners.AddRange(_newListeners);
-				_newListeners.Clear();
+				if (_newListeners.Count > 0)
+				{
+					_listeners.AddRange(_newListeners);
+					_newListeners.Clear();
+				}
 			}
 		}
 		#endregion
