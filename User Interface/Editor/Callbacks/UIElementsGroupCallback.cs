@@ -6,6 +6,7 @@ using System;
 
 namespace Zedarus.ToolKit.UserInterface
 {
+	#if !ZTK_DISABLE_NGUI
 	[InitializeOnLoad]
 	public class UIElementsGroupCallback
 	{
@@ -40,4 +41,5 @@ namespace Zedarus.ToolKit.UserInterface
 			}
 		}
 	}
+	#endif
 }

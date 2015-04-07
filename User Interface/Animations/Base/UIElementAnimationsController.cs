@@ -5,6 +5,7 @@ using Zedarus.ToolKit;
 
 namespace Zedarus.ToolKit.UserInterface
 {
+	#if !ZTK_DISABLE_NGUI
 	public class UIElementAnimationsController : MonoBehaviour
 	{
 		#region Parameters
@@ -174,4 +175,5 @@ namespace Zedarus.ToolKit.UserInterface
 			set { _element = value; }
 		}
 	}
+	#endif
 }

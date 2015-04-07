@@ -3,6 +3,7 @@ using System.Collections;
 
 namespace Zedarus.ToolKit.UserInterface
 {
+	#if !ZTK_DISABLE_NGUI
 	[AddComponentMenu("ZTK/UI/Sprite Fade Animation")]
 	[RequireComponent(typeof(UISprite))]
 	public class UISpriteFadeAnimation : UIElementAnimation
@@ -42,4 +43,5 @@ namespace Zedarus.ToolKit.UserInterface
 		}
 		#endregion
 	}
+	#endif
 }

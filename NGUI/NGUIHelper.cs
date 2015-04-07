@@ -3,6 +3,7 @@ using System.Collections;
 
 namespace Zedarus.ToolKit.NGUI
 {
+	#if !ZTK_DISABLE_NGUI
 	public class NGUIHelper
 	{
 		static public float ScreenHeight
@@ -16,4 +17,5 @@ namespace Zedarus.ToolKit.NGUI
 			}
 		}
 	}
+	#endif
 }

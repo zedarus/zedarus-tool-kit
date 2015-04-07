@@ -3,6 +3,7 @@ using System.Collections;
 
 namespace Zedarus.ToolKit.UserInterface
 {
+	#if !ZTK_DISABLE_NGUI
 	[AddComponentMenu("ZTK/UI/Label Animation")]
 	[RequireComponent(typeof(UILabel))]
 	public class UILabelAnimation : UIElementAnimation
@@ -39,4 +40,5 @@ namespace Zedarus.ToolKit.UserInterface
 		}
 		#endregion
 	}
+	#endif
 }

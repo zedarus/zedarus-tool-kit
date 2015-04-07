@@ -3,6 +3,7 @@ using System.Collections;
 
 namespace Zedarus.ToolKit.NGUI
 {
+	#if !ZTK_DISABLE_NGUI
 	public enum ResolutionType { None, SD, HD, SHD };
 	
 	public static class ScreenAspectRatio 
@@ -160,4 +161,5 @@ namespace Zedarus.ToolKit.NGUI
 			return resolution;
 		}
 	}
+#endif
 }

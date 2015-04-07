@@ -3,6 +3,7 @@ using System.Collections;
 
 namespace Zedarus.ToolKit.UserInterface
 {
+	#if !ZTK_DISABLE_NGUI
 	public class UIElementAnimation : MonoBehaviour, IUIElementAnimation
 	{
 		#region Parameters
@@ -51,4 +52,5 @@ namespace Zedarus.ToolKit.UserInterface
 		}
 		#endregion
 	}
+	#endif
 }

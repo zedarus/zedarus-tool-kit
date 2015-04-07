@@ -3,6 +3,7 @@ using System.Collections;
 
 namespace Zedarus.ToolKit.UserInterface
 {
+	#if !ZTK_DISABLE_NGUI
 	[AddComponentMenu("ZTK/UI/Renderer Animation")]
 	public class UIRendererAnimation : UIElementAnimation
 	{
@@ -40,4 +41,5 @@ namespace Zedarus.ToolKit.UserInterface
 		}
 		#endregion
 	}
+	#endif
 }
