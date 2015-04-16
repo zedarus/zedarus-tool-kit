@@ -12,11 +12,11 @@ namespace Zedarus.ToolKit.API
 		protected override void Setup() 
 		{
 			#if UNITY_IPHONE
-			FlurryAnalytics.startSession(GlobalSettings.Instance.API.FlurryKey);
+			FlurryAnalytics.startSession(APIManager.Instance.Settings.FlurryKey);
 			FlurryAnalytics.setSessionReportsOnCloseEnabled(true);
 			FlurryAnalytics.setSessionReportsOnPauseEnabled(true);
 			#elif UNITY_ANDROID
-			FlurryAndroid.onStartSession(GlobalSettings.Instance.API.FlurryKey, false, false);
+			FlurryAndroid.onStartSession(APIManager.Instance.Settings.FlurryKey, false, false);
 			FlurryAndroid.setLogEnabled(GlobalSettings.Instance.DevelopmentBuild);
 			#endif
 		}

@@ -21,7 +21,7 @@ namespace Zedarus.ToolKit.API
 		public void CreateBanner()
 		{
 			#if UNITY_ANDROID
-			AdMobAndroid.createBanner(GlobalSettings.Instance.API.AdMobUnitID, AdMobAndroidAd.phone320x50, AdMobAdPlacement.TopCenter);
+			AdMobAndroid.createBanner(APIManager.Instance.Settings.AdMobUnitID, AdMobAndroidAd.phone320x50, AdMobAdPlacement.TopCenter);
 			AdMobAndroid.hideBanner(true);
 			#endif
 		}

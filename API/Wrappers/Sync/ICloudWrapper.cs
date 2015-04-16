@@ -58,7 +58,7 @@ namespace Zedarus.ToolKit.API
 				data.Merge(remoteData);
 			
 			byte[] bytes = UnitySerializer.Serialize(data);
-			bool result = P31CloudFile.writeAllBytes(GlobalSettings.Instance.API.iCloudFilename, bytes);
+			bool result = P31CloudFile.writeAllBytes(APIManager.Instance.Settings.iCloudFilename, bytes);
 			
 			ZedLogger.Log("File written in the cloud: " + result, LoggerContext.iCloud);
 			return result;
@@ -70,9 +70,9 @@ namespace Zedarus.ToolKit.API
 		public PlayerData GetPlayerData()
 		{
 			#if UNITY_IPHONE
-			if (P31CloudFile.exists(GlobalSettings.Instance.API.iCloudFilename))
+			if (P31CloudFile.exists(APIManager.Instance.Settings.iCloudFilename))
 			{
-				byte[] bytes = P31CloudFile.readAllBytes(GlobalSettings.Instance.API.iCloudFilename);
+				byte[] bytes = P31CloudFile.readAllBytes(APIManager.Instance.Settings.iCloudFilename);
 				PlayerData data = UnitySerializer.Deserialize<PlayerData>(bytes);
 				return data;
 			}
@@ -136,7 +136,7 @@ namespace Zedarus.ToolKit.API
 			{
 				ZedLogger.Log(doc, LoggerContext.iCloud);
 				
-				if (doc.filename.Equals(GlobalSettings.Instance.API.iCloudFilename))
+				if (doc.filename.Equals(APIManager.Instance.Settings.iCloudFilename))
 				{
 					if (doc.isDownloaded)
 					{

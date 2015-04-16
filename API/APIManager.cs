@@ -25,7 +25,8 @@ namespace Zedarus.ToolKit.API
 	
 	public class APIManager : SimpleSingleton<APIManager>
 	{
-		#region Parameter
+		#region Properties
+		private APISettings _settings;
 		private StoreController _storeController;
 		private SocialController _socialController;
 		private ScoreController _scoreController;
@@ -38,6 +39,8 @@ namespace Zedarus.ToolKit.API
 		#region Initalization
 		private APIManager()
 		{
+			_settings = new APISettings();
+
 			_storeController = new StoreController();
 			_socialController = new SocialController();
 			_scoreController = new ScoreController();
@@ -77,6 +80,11 @@ namespace Zedarus.ToolKit.API
 		#endregion
 		
 		#region Getters
+		public APISettings Settings
+		{
+			get { return _settings; }
+		}
+
 		public StoreController Store
 		{
 			get { return _storeController; }

@@ -16,19 +16,19 @@ namespace Zedarus.ToolKit.API
 		#region Setup
 		protected override void Setup()
 		{
-			Chartboost.init(GlobalSettings.Instance.API.ChartboostID, GlobalSettings.Instance.API.ChartboostSecret, GlobalSettings.Instance.API.ChartboostID, GlobalSettings.Instance.API.ChartboostSecret, true);
+			Chartboost.init(APIManager.Instance.Settings.ChartboostID, APIManager.Instance.Settings.ChartboostSecret, APIManager.Instance.Settings.ChartboostID, APIManager.Instance.Settings.ChartboostSecret, true);
 		}
 		#endregion
 
 		#region Controls
 		public void CacheBootupAd() 
 		{
-			Chartboost.cacheInterstitial(GlobalSettings.Instance.API.ChartboostLocationStartup);
+			Chartboost.cacheInterstitial(APIManager.Instance.Settings.ChartboostLocationStartup);
 		}
 
 		public void CacheBetweenLevelAd()
 		{
-			Chartboost.cacheInterstitial(GlobalSettings.Instance.API.ChartboostLocationLevelComplete);
+			Chartboost.cacheInterstitial(APIManager.Instance.Settings.ChartboostLocationLevelComplete);
 		}
 
 		public void CacheMoreGamesAd()
@@ -42,7 +42,7 @@ namespace Zedarus.ToolKit.API
 			if (InterstitialClosed != null)
 				InterstitialClosed();
 			#else
-			Chartboost.showInterstitial(GlobalSettings.Instance.API.ChartboostLocationStartup);
+			Chartboost.showInterstitial(APIManager.Instance.Settings.ChartboostLocationStartup);
 			#endif
 		}
 
@@ -52,7 +52,7 @@ namespace Zedarus.ToolKit.API
 			if (InterstitialClosed != null)
 				InterstitialClosed();
 			#else
-			Chartboost.showInterstitial(GlobalSettings.Instance.API.ChartboostLocationLevelComplete);
+			Chartboost.showInterstitial(APIManager.Instance.Settings.ChartboostLocationLevelComplete);
 			#endif
 		}
 

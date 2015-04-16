@@ -21,7 +21,7 @@ namespace Zedarus.ToolKit.API
 		#region Setup
 		protected override void Setup() 
 		{
-			TwitterCombo.init(GlobalSettings.Instance.API.TwitterKey, GlobalSettings.Instance.API.TwitterSecret);
+			TwitterCombo.init(APIManager.Instance.Settings.TwitterKey, APIManager.Instance.Settings.TwitterSecret);
 		}
 		#endregion
 		
