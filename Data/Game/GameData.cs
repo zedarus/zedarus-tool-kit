@@ -20,7 +20,6 @@ namespace Zedarus.ToolKit.Data.Game
 
 		#region Models
 		private Dictionary<Type, IModelCollection> _collections;
-		protected ModelCollection<Enemy> _enemies;
 		#endregion
 
 		#region Init
@@ -33,15 +32,6 @@ namespace Zedarus.ToolKit.Data.Game
 		public void AddModel<T>() where T : Model
 		{
 			_collections.Add(typeof(T), new ModelCollection<T>());
-		}
-
-		public ModelCollection<T> GetModel<T>() where T : Model
-		{
-			Type key = typeof(T);
-			if (_collections.ContainsKey(key))
-			    return _collections[key] as ModelCollection<T>;
-		   else
-				return null;
 		}
 		#endregion
 
@@ -66,11 +56,7 @@ namespace Zedarus.ToolKit.Data.Game
 						Type thisType = typeof(GameData);
 						MethodInfo loadMethod = thisType.GetMethod("LoadFromDB");
 						MethodInfo loadMethodGeneric = loadMethod.MakeGenericMethod(modelType);
-						//_collections[v.Key] = loadMethodGeneric.Invoke(null, new object[] { result }) as IModelCollection;
 						newCollection.Add(v.Key, loadMethodGeneric.Invoke(null, new object[] { result }) as IModelCollection);
-						//_collections[v.Key] = typeof(GameData).GetMethod("LoadFromDB").MakeGenericMethod(modelType).Invoke(this, new object[] { result }) as IModelCollection;
-						//Debug.Log(newCollection[v.Key] as ModelCollection<Enemy>);
-						//_collections[v.Key] = LoadFromDB<modelType>(result);
 					}
 					else
 						Debug.LogWarning("Can't invoke GetDBTable() static method on model: " + modelType.Name); 
@@ -81,8 +67,6 @@ namespace Zedarus.ToolKit.Data.Game
 
 			_collections = newCollection;
 			newCollection = null;
-
-			_enemies = LoadFromDB<Enemy>(Enemy.GetDBTable());
 		}
 
 		protected virtual void LoadVersionData()
@@ -98,7 +82,7 @@ namespace Zedarus.ToolKit.Data.Game
 		public static ModelCollection<T> LoadFromDB<T>(string table) where T : Model
 		{
 			ModelCollection<T> container = new ModelCollection<T>();
-			SimpleDataTable result = SQLiteAdapter.Manager.QueryGeneric(LoadFromDBQuery(table + TableNameSuffix));
+			SimpleDataTable result = SQLiteAdapter.Manager.QueryGeneric("SELECT * FROM " + table);
 			for (int i = 0; i < result.rows.Count; i++)
 			{
 				T item = (T)Activator.CreateInstance(typeof(T), result.columns, result.rows[i]);
@@ -106,17 +90,37 @@ namespace Zedarus.ToolKit.Data.Game
 			}
 			return container;
 		}
-
-		protected static string LoadFromDBQuery(string table)
-		{
-			return "SELECT * FROM " + table;
-		}
 		#endregion
 
 		#region Saving Data
-		protected virtual void Save()
+		// TODO: implement data save
+		/*protected virtual void Save()
 		{
 			SaveVersionData();
+
+			foreach (KeyValuePair<Type, IModelCollection> v in _collections)
+			{
+				Type modelType = v.Key;
+				if (modelType != null)
+				{
+					MethodInfo method = modelType.GetMethod("GetDBTable");
+					if (method != null)
+					{
+						string result = method.Invoke(null, null) as string;
+						Debug.Log(result);
+						
+						Type thisType = typeof(GameData);
+						MethodInfo loadMethod = thisType.GetMethod("SaveToDB");
+						MethodInfo loadMethodGeneric = loadMethod.MakeGenericMethod(modelType);
+						loadMethodGeneric.Invoke(null, new object[] { v.Value, result });
+					}
+					else
+						Debug.LogWarning("Can't invoke GetDBTable() static method on model: " + modelType.Name); 
+				}
+				else
+					Debug.LogWarning("Can't get model type for collection with key: " + v.Key);
+			}
+
 			SaveToDB<Enemy>(_enemies, Enemy.GetDBTable());
 		}
 
@@ -126,7 +130,7 @@ namespace Zedarus.ToolKit.Data.Game
 			SQLiteAdapter.Manager.Execute(query, _version.ToString(), _date.ToString("yyyy-MM-dd HH:mm:ss"));
 		}
 
-		private void SaveToDB<T>(ModelCollection<T> collection, string table) where T : Model
+		public static void SaveToDB<T>(ModelCollection<T> collection, string table) where T : Model
 		{
 			string fullTableName = table + TableNameSuffix;
 			ClearTable(fullTableName);
@@ -135,7 +139,7 @@ namespace Zedarus.ToolKit.Data.Game
 				SaveModelToDB(item.Value, fullTableName);
 		}
 
-		protected virtual void SaveModelToDB(Model model, string table)
+		protected static void SaveModelToDB(Model model, string table)
 		{
 			SimpleDataTable result = SQLiteAdapter.Manager.QueryGeneric("SELECT * FROM " + table + " WHERE id = " + model.ID);
 			if (result.rows.Count > 0)
@@ -144,16 +148,17 @@ namespace Zedarus.ToolKit.Data.Game
 				SQLiteAdapter.Manager.Execute(model.GetInsertQuery(table));
 		}
 
-		protected virtual void ClearTable(string table)
+		protected static void ClearTable(string table)
 		{
 			// TODO: this potentially might lead to data corruption if interrupted
 			string query = "DELETE FROM " + table + " WHERE 1 = 1";
 			SQLiteAdapter.Manager.Execute(query);
-		}
+		}*/
 		#endregion
 
 		#region Merge
-		public void Merge(GameData data)
+		// TODO: implement merge later
+		/*public void Merge(GameData data)
 		{
 			if (_version < data.Version)
 				ApplyNewVersion(data);
@@ -174,11 +179,18 @@ namespace Zedarus.ToolKit.Data.Game
 				oldModels[newModel.Key] = newModel.Value;
 
 			oldModels.Reindex();
-		}
+		}*/
 		#endregion
 
 		#region Queries
-		public ModelCollection<Enemy> Enemies { get { return _enemies; } }
+		public ModelCollection<T> GetModel<T>() where T : Model
+		{
+			Type key = typeof(T);
+			if (_collections.ContainsKey(key))
+				return _collections[key] as ModelCollection<T>;
+			else
+				return null;
+		}
 		#endregion
 
 		#region Getters
@@ -191,11 +203,6 @@ namespace Zedarus.ToolKit.Data.Game
 		{
 			get { return _date; }
 		}
-
-		protected static string TableNameSuffix
-		{
-			get { return ""; }
-		}
 		#endregion
 
 		/// <summary>
@@ -204,19 +211,14 @@ namespace Zedarus.ToolKit.Data.Game
 		/// </summary>
 		private void AOTBugFix()
 		{
-			Dictionary<int, Enemy> o6 = new Dictionary<int, Enemy>();
-
+			/*Dictionary<int, Enemy> o6 = new Dictionary<int, Enemy>();
 			Debug.Log(o6);
-
 			ModelCollectionIndex<string, Enemy> a6 = new ModelCollectionIndex<string, Enemy>(null);
-
 			Debug.Log(a6);
 			ModelCollectionIndex<int, Enemy> b6 = new ModelCollectionIndex<int, Enemy>(null);
-
 			Debug.Log(b6);
 			ModelCollectionIndex<float, Enemy> c6 = new ModelCollectionIndex<float, Enemy>(null);
-
-			Debug.Log(c6);
+			Debug.Log(c6);*/
 		}
 	}
 }

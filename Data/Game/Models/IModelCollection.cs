@@ -6,6 +6,5 @@ namespace Zedarus.ToolKit.Data.Game.Models
 {
 	public interface IModelCollection
 	{
-		Type GetModelType();
 	}
 }

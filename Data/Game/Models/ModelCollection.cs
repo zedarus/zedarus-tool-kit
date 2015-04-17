@@ -32,11 +32,6 @@ namespace Zedarus.ToolKit.Data.Game.Models
 			return true;
 		}
 
-		public Type GetModelType()
-		{
-			return typeof(T);
-		}
-
 		#region Get By ID
 		public T Get(int id)
 		{
