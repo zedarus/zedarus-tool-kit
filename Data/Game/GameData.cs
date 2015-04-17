@@ -14,8 +14,9 @@ namespace Zedarus.ToolKit.Data.Game
 	public class GameData
 	{
 		#region Properties
-		protected DateTime _date;
-		protected int _version;
+		private DateTime _date;
+		private int _version;
+		private bool _loaded;
 		#endregion
 
 		#region Models
@@ -27,49 +28,39 @@ namespace Zedarus.ToolKit.Data.Game
 		{
 			_collections = new Dictionary<Type, IModelCollection>();
 			_version = 0;
+			_loaded = false;
 		}
 
-		public void AddModel<T>() where T : Model
+		public void AddModel<T>(string tableName) where T : Model
 		{
-			_collections.Add(typeof(T), new ModelCollection<T>());
+			if (_loaded)
+			{
+				Debug.LogWarning("Can't add model after data was loaded");
+				return;
+			}
+
+			_collections.Add(typeof(T), new ModelCollection<T>(tableName));
 		}
 		#endregion
 
 		#region Loading Data
-		public virtual void Load()
+		public void Load()
 		{
-			LoadVersionData();
-
-			Dictionary<Type, IModelCollection> newCollection = new Dictionary<Type, IModelCollection>();
-
-			foreach (KeyValuePair<Type, IModelCollection> v in _collections)
+			if (_loaded)
 			{
-				Type modelType = v.Key;
-				if (modelType != null)
-				{
-					MethodInfo method = modelType.GetMethod("GetDBTable");
-					if (method != null)
-					{
-						string result = method.Invoke(null, null) as string;
-						Debug.Log(result);
-
-						Type thisType = typeof(GameData);
-						MethodInfo loadMethod = thisType.GetMethod("LoadFromDB");
-						MethodInfo loadMethodGeneric = loadMethod.MakeGenericMethod(modelType);
-						newCollection.Add(v.Key, loadMethodGeneric.Invoke(null, new object[] { result }) as IModelCollection);
-					}
-					else
-						Debug.LogWarning("Can't invoke GetDBTable() static method on model: " + modelType.Name); 
-				}
-				else
-					Debug.LogWarning("Can't get model type for collection with key: " + v.Key);
+				Debug.LogWarning("Game data already loaded");
+				return;
 			}
 
-			_collections = newCollection;
-			newCollection = null;
+			LoadVersionData();
+
+			foreach (KeyValuePair<Type, IModelCollection> v in _collections)
+				v.Value.LoadFromDB();
+
+			_loaded = true;
 		}
 
-		protected virtual void LoadVersionData()
+		private void LoadVersionData()
 		{
 			SimpleDataTable result = SQLiteAdapter.Manager.QueryGeneric("SELECT * FROM version");
 			string version = result.rows[0].fields[1].ToString();
@@ -77,18 +68,6 @@ namespace Zedarus.ToolKit.Data.Game
 			
 			int.TryParse(version, out _version);
 			_date = GeneralHelper.ParseTime(date);
-		}
-
-		public static ModelCollection<T> LoadFromDB<T>(string table) where T : Model
-		{
-			ModelCollection<T> container = new ModelCollection<T>();
-			SimpleDataTable result = SQLiteAdapter.Manager.QueryGeneric("SELECT * FROM " + table);
-			for (int i = 0; i < result.rows.Count; i++)
-			{
-				T item = (T)Activator.CreateInstance(typeof(T), result.columns, result.rows[i]);
-				container.Add(item.ID, item);
-			}
-			return container;
 		}
 		#endregion
 
@@ -185,6 +164,12 @@ namespace Zedarus.ToolKit.Data.Game
 		#region Queries
 		public ModelCollection<T> GetModel<T>() where T : Model
 		{
+			if (!_loaded)
+			{
+				Debug.LogWarning("Can't get model because data was not loaded yet");
+				return null;
+			}
+
 			Type key = typeof(T);
 			if (_collections.ContainsKey(key))
 				return _collections[key] as ModelCollection<T>;

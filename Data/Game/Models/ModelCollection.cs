@@ -3,25 +3,29 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using Zedarus.ToolKit.Data.Adapters;
+using SimpleSQL;
 
 namespace Zedarus.ToolKit.Data.Game.Models
 {
 	public class ModelCollection<T> : IModelCollection where T : Model
 	{
+		private string _tableName;
 		private Dictionary<int, T> _models;
 		private Dictionary<string, ModelCollectionIndex<string, T>> _indexes;
 		private Dictionary<string, ModelCollectionIndex<int, T>> _indexesInt;
 		private Dictionary<string, ModelCollectionIndex<float, T>> _indexesFloat;
 
-		public ModelCollection()
+		public ModelCollection(string tableName)
 		{
+			_tableName = tableName;
 			_models = new Dictionary<int, T>();
 			_indexes = new Dictionary<string, ModelCollectionIndex<string, T>>();
 			_indexesInt = new Dictionary<string, ModelCollectionIndex<int, T>>();
 			_indexesFloat = new Dictionary<string, ModelCollectionIndex<float, T>>();
 		}
 
-		public bool Add(int id, T model)
+		private bool Add(int id, T model)
 		{
 			if (_models.ContainsKey(id))
 				return false;
@@ -30,6 +34,17 @@ namespace Zedarus.ToolKit.Data.Game.Models
 
 			_models.Add(id, model);
 			return true;
+		}
+
+		public bool LoadFromDB()
+		{
+			SimpleDataTable result = SQLiteAdapter.Manager.QueryGeneric("SELECT * FROM " + _tableName);
+			for (int i = 0; i < result.rows.Count; i++)
+			{
+				T item = (T)Activator.CreateInstance(typeof(T), result.columns, result.rows[i]);
+				Add(item.ID, item);
+			}
+			return false;
 		}
 
 		#region Get By ID

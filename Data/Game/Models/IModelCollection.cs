@@ -6,5 +6,6 @@ namespace Zedarus.ToolKit.Data.Game.Models
 {
 	public interface IModelCollection
 	{
+		bool LoadFromDB();
 	}
 }
