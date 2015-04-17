@@ -17,7 +17,7 @@ namespace Zedarus.ToolKit.Data
 		#region Data
 		private GameData _gameData;
 		private PlayerData _playerData;
-		private bool _ready = false;
+		private string _playerDataFilename;
 		#endregion
 
 		private Action _dataLoadedCallback;
@@ -30,15 +30,16 @@ namespace Zedarus.ToolKit.Data
 		#endregion
 
 		#region Controls
-		public void Load()
+		public void Load(string playerDataFilename)
 		{
+			_playerDataFilename = playerDataFilename;
 			_gameData.Load();
-			_playerData = PlayerData.Load();
+			_playerData = PlayerData.Load(_playerDataFilename);
 		}
 
 		public void Save()
 		{
-			PlayerData.Save(_playerData);	
+			PlayerData.Save(_playerData, _playerDataFilename);	
 		}
 		#endregion
 
@@ -51,11 +52,6 @@ namespace Zedarus.ToolKit.Data
 		public PlayerData Player
 		{
 			get { return _playerData; }
-		}
-
-		public bool Ready
-		{
-			get { return _ready; }
 		}
 		#endregion
 	}

@@ -1,12 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-namespace Zedarus.ToolKit.Data.Models
+namespace Zedarus.ToolKit.Data.Player.Models
 {
 	public interface ISyncModelInterface<T>
 	{
-		string UUID { get; }
-		
-		void Merge(T data);
+		//string UUID { get; }	
+		bool Merge(T data);
 	}
 }
