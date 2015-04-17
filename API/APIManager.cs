@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using Zedarus.ToolKit;
 
 namespace Zedarus.ToolKit.API
@@ -25,57 +26,79 @@ namespace Zedarus.ToolKit.API
 	
 	public class APIManager : SimpleSingleton<APIManager>
 	{
+		#region Enums
+		public enum Controllers
+		{
+			Store,
+			Social,
+			Score,
+			Sync,
+			Analytics,
+			AdsInterstitials,
+			AdsBanners
+		}
+		#endregion
+
 		#region Properties
+		private bool _initStarted;
+		private bool _initialized;
+		private int _initControllersCount;
 		private APISettings _settings;
-		private StoreController _storeController;
-		private SocialController _socialController;
-		private ScoreController _scoreController;
-		private SyncController _syncController;
-		private AnalyticsController _analyticsController;
-		private InterstitialsAdsController _interstitialsAdsController;
-		private BannerAdsController _bannersAdsController;
+		private Dictionary<Controllers, APIController> _controllers;
 		#endregion
 		
 		#region Initalization
 		private APIManager()
 		{
+			_initStarted = false;
+			_initialized = false;
+			_initControllersCount = 0;
 			_settings = new APISettings();
-
-			_storeController = new StoreController();
-			_socialController = new SocialController();
-			_scoreController = new ScoreController();
-			_syncController = new SyncController();
-			_analyticsController = new AnalyticsController();
-			_interstitialsAdsController = new InterstitialsAdsController();
-			_bannersAdsController = new BannerAdsController();
-			
-			_storeController.Initialized += OnControllerInitialized;
-			_socialController.Initialized += OnControllerInitialized;
-			_scoreController.Initialized += OnControllerInitialized;
-			_syncController.Initialized += OnControllerInitialized;
-			_analyticsController.Initialized += OnControllerInitialized;
-			_interstitialsAdsController.Initialized += OnControllerInitialized;
-			_bannersAdsController.Initialized += OnControllerInitialized;
+			_controllers = new Dictionary<Controllers, APIController>();
 		}
 		#endregion
 		
 		#region Controls
 		public void Init()
 		{
-			_storeController.Init();
-			_socialController.Init();
-			_scoreController.Init();
-			_syncController.Init();
-			_analyticsController.Init();
-			_interstitialsAdsController.Init();
-			_bannersAdsController.Init();
+			if (!_initialized)
+			{
+				if (!_initStarted)
+				{
+					_initControllersCount = 0;
+					_initStarted = true;
+					foreach (KeyValuePair<Controllers, APIController> controller in _controllers)
+					{
+						controller.Value.Initialized += OnControllerInitialized;
+						controller.Value.Init();
+					}
+				} else
+					Debug.Log("API manager initalization is already in progress");
+			} else
+				Debug.Log("API manager already initialized");
+		}
+
+		public void AddController(Controllers type, APIController controller)
+		{
+			if (_initialized || _initStarted)
+			{
+				Debug.Log("Can't add new API controllers after initialization was started or was finished");
+				return;
+			}
+
+			if (_controllers.ContainsKey(type))
+				Debug.Log("Already has controller for this type: " + type);
+			else
+				_controllers.Add(type, controller);
 		}
 		#endregion
 		
 		#region Event Handlers
 		private void OnControllerInitialized()
 		{
-
+			_initControllersCount++;
+			if (_initControllersCount >= _controllers.Count)
+				_initialized = true;
 		}
 		#endregion
 		
@@ -87,37 +110,50 @@ namespace Zedarus.ToolKit.API
 
 		public StoreController Store
 		{
-			get { return _storeController; }
+			get { return GetControllerForType<StoreController>(Controllers.Store); }
 		}
 		
 		public SocialController Social
 		{
-			get { return _socialController; }
+			get { return GetControllerForType<SocialController>(Controllers.Social); }
 		}
 		
 		public ScoreController Score
 		{
-			get { return _scoreController; }	
+			get { return GetControllerForType<ScoreController>(Controllers.Score); }	
 		}
 		
 		public SyncController Sync
 		{
-			get { return _syncController; }
+			get { return GetControllerForType<SyncController>(Controllers.Sync); }
 		}
 		
 		public AnalyticsController Analytics
 		{
-			get { return _analyticsController; }
+			get { return GetControllerForType<AnalyticsController>(Controllers.Analytics); }
 		}
 
 		public InterstitialsAdsController InterstitialsAds
 		{
-			get { return _interstitialsAdsController; }
+			get { return GetControllerForType<InterstitialsAdsController>(Controllers.AdsInterstitials); }
 		}
 
 		public BannerAdsController BannerAds
 		{
-			get { return _bannersAdsController; }
+			get { return GetControllerForType<BannerAdsController>(Controllers.AdsBanners); }
+		}
+
+		public T Controller<T>(Controllers type) where T : APIController
+		{
+			return GetControllerForType<T>(type);
+		}
+
+		private T GetControllerForType<T>(Controllers type) where T : APIController
+		{
+			if (_controllers.ContainsKey(type))
+				return _controllers[type] as T;
+			else
+				return null;
 		}
 		#endregion
 	}

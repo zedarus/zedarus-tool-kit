@@ -102,6 +102,7 @@ namespace Zedarus.ToolKit.API
 	public class AnalyticsController : APIController 
 	{
 		#region Initialization
+		public AnalyticsController(MultipleAPIUseMode useMode, params APIs[] values) : base(useMode, values) {}
 		protected override void Setup() {}	
 		#endregion
 		

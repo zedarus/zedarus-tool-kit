@@ -15,6 +15,7 @@ namespace Zedarus.ToolKit.API
 		#endregion
 		
 		#region Initialization
+		public SyncController(MultipleAPIUseMode useMode, params APIs[] values) : base(useMode, values) {}
 		protected override void Setup() {}	
 		#endregion
 		

@@ -31,6 +31,13 @@ namespace Zedarus.ToolKit.API
 		#endregion
 		
 		#region Initialization
+		public APIController() {}
+
+		public APIController(MultipleAPIUseMode useMode, params APIs[] values) : this()
+		{
+			UseAPI(useMode, values);
+		}
+
 		public void UseAPI(MultipleAPIUseMode useMode, params APIs[] values)
 		{
 			_apiUseMode = useMode;
@@ -91,7 +98,8 @@ namespace Zedarus.ToolKit.API
 			{
 				wrapper.SetAPI(wrapperAPI);
 				_wrappers.Add(wrapper);
-			}
+			} else
+				Debug.LogWarning("No wrapper for API " + wrapperAPI + " in controller: " + this);
 		}
 		
 		protected abstract IAPIWrapperInterface GetWrapperForAPI(APIs wrapperAPI);
