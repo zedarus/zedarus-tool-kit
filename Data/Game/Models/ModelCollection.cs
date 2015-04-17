@@ -2,10 +2,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 
 namespace Zedarus.ToolKit.Data.Game.Models
 {
-	public class ModelCollection<T> where T : Model
+	public class ModelCollection<T> : IModelCollection where T : Model
 	{
 		private Dictionary<int, T> _models;
 		private Dictionary<string, ModelCollectionIndex<string, T>> _indexes;
@@ -31,6 +32,11 @@ namespace Zedarus.ToolKit.Data.Game.Models
 			return true;
 		}
 
+		public Type GetModelType()
+		{
+			return typeof(T);
+		}
+
 		#region Get By ID
 		public T Get(int id)
 		{
@@ -40,6 +46,7 @@ namespace Zedarus.ToolKit.Data.Game.Models
 				return null;
 		}
 
+		// TODO: use index here instead
 		public T this[int id]
 		{
 			get { return _models[id]; }
@@ -51,17 +58,33 @@ namespace Zedarus.ToolKit.Data.Game.Models
 		{
 			get
 			{
-				if (_models.Count > 0)
-				{
-					int i = 0;
-					while (i < 500)
-					{
-						if (_models.ContainsKey(i))
-							return _models[i];
-						i++;
-					}
+				T[] all = All;
+				if (all != null)
+					return all[0];
+				else
 					return null;
-				}
+			}
+		}
+
+		public T Last
+		{
+			get
+			{
+				T[] all = All;
+				if (all != null)
+					return all[all.Length - 1];
+				else
+					return null;
+			}
+		}
+
+		public T Random
+		{
+			get 
+			{
+				T[] all = All;
+				if (all != null && all.Length > 0)
+					return all[UnityEngine.Random.Range(0, all.Length)];
 				else
 					return null;
 			}

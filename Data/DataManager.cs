@@ -12,7 +12,7 @@ using Zedarus.ToolKit.Data.Adapters;
 
 namespace Zedarus.ToolKit.Data
 {
-	public class Data : SimpleSingleton<Data>
+	public class DataManager : SimpleSingleton<DataManager>
 	{
 		#region Data
 		private GameData _gameData;
@@ -23,7 +23,7 @@ namespace Zedarus.ToolKit.Data
 		private Action _dataLoadedCallback;
 
 		#region Init
-		public Data()
+		public DataManager()
 		{
 			_gameData = new GameData();
 		}
@@ -32,6 +32,7 @@ namespace Zedarus.ToolKit.Data
 		#region Controls
 		public void Load()
 		{
+			_gameData.Load();
 			_playerData = PlayerData.Load();
 		}
 

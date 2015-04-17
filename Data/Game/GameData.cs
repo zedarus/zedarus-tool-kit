@@ -19,21 +19,69 @@ namespace Zedarus.ToolKit.Data.Game
 		#endregion
 
 		#region Models
+		private Dictionary<Type, IModelCollection> _collections;
 		protected ModelCollection<Enemy> _enemies;
 		#endregion
 
 		#region Init
 		public GameData()
 		{
+			_collections = new Dictionary<Type, IModelCollection>();
 			_version = 0;
-			Load();
+		}
+
+		public void AddModel<T>() where T : Model
+		{
+			_collections.Add(typeof(T), new ModelCollection<T>());
+		}
+
+		public ModelCollection<T> GetModel<T>() where T : Model
+		{
+			Type key = typeof(T);
+			if (_collections.ContainsKey(key))
+			    return _collections[key] as ModelCollection<T>;
+		   else
+				return null;
 		}
 		#endregion
 
 		#region Loading Data
-		protected virtual void Load()
+		public virtual void Load()
 		{
 			LoadVersionData();
+
+			Dictionary<Type, IModelCollection> newCollection = new Dictionary<Type, IModelCollection>();
+
+			foreach (KeyValuePair<Type, IModelCollection> v in _collections)
+			{
+				Type modelType = v.Key;
+				if (modelType != null)
+				{
+					MethodInfo method = modelType.GetMethod("GetDBTable");
+					if (method != null)
+					{
+						string result = method.Invoke(null, null) as string;
+						Debug.Log(result);
+
+						Type thisType = typeof(GameData);
+						MethodInfo loadMethod = thisType.GetMethod("LoadFromDB");
+						MethodInfo loadMethodGeneric = loadMethod.MakeGenericMethod(modelType);
+						//_collections[v.Key] = loadMethodGeneric.Invoke(null, new object[] { result }) as IModelCollection;
+						newCollection.Add(v.Key, loadMethodGeneric.Invoke(null, new object[] { result }) as IModelCollection);
+						//_collections[v.Key] = typeof(GameData).GetMethod("LoadFromDB").MakeGenericMethod(modelType).Invoke(this, new object[] { result }) as IModelCollection;
+						//Debug.Log(newCollection[v.Key] as ModelCollection<Enemy>);
+						//_collections[v.Key] = LoadFromDB<modelType>(result);
+					}
+					else
+						Debug.LogWarning("Can't invoke GetDBTable() static method on model: " + modelType.Name); 
+				}
+				else
+					Debug.LogWarning("Can't get model type for collection with key: " + v.Key);
+			}
+
+			_collections = newCollection;
+			newCollection = null;
+
 			_enemies = LoadFromDB<Enemy>(Enemy.GetDBTable());
 		}
 
@@ -47,7 +95,7 @@ namespace Zedarus.ToolKit.Data.Game
 			_date = GeneralHelper.ParseTime(date);
 		}
 
-		private ModelCollection<T> LoadFromDB<T>(string table) where T : Model
+		public static ModelCollection<T> LoadFromDB<T>(string table) where T : Model
 		{
 			ModelCollection<T> container = new ModelCollection<T>();
 			SimpleDataTable result = SQLiteAdapter.Manager.QueryGeneric(LoadFromDBQuery(table + TableNameSuffix));
@@ -59,7 +107,7 @@ namespace Zedarus.ToolKit.Data.Game
 			return container;
 		}
 
-		protected virtual string LoadFromDBQuery(string table)
+		protected static string LoadFromDBQuery(string table)
 		{
 			return "SELECT * FROM " + table;
 		}
@@ -144,7 +192,7 @@ namespace Zedarus.ToolKit.Data.Game
 			get { return _date; }
 		}
 
-		protected virtual string TableNameSuffix
+		protected static string TableNameSuffix
 		{
 			get { return ""; }
 		}
