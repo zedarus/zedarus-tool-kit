@@ -41,18 +41,18 @@ namespace Zedarus.ToolKit.API
 				Wrapper.Sync();
 		}
 		
-		public bool SavePlayerData(PlayerData data) 
+		public bool SetData<T>(T data) where T : class 
 		{
 			if (Wrapper != null)
-				return Wrapper.SavePlayerData(data);
+				return Wrapper.SetData(data);
 			else
 				return false;
 		}
 		
-		public PlayerData GetPlayerData() 
+		public T GetData<T>() where T : class 
 		{
 			if (Wrapper != null)
-				return Wrapper.GetPlayerData();
+				return Wrapper.GetData<T>();
 			else
 				return null;
 		}

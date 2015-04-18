@@ -13,8 +13,8 @@ namespace Zedarus.ToolKit.API
 		
 		#region Controls
 		void Sync();
-		bool SavePlayerData(PlayerData data);
-		PlayerData GetPlayerData();
+		bool SetData<T>(T data);
+		T GetData<T>();
 		#endregion
 	}
 }
