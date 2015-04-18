@@ -3,9 +3,10 @@ using System.Collections;
 
 namespace Zedarus.ToolKit.Data.Player.Models
 {
-	public interface ISyncModelInterface<T>
+	public interface IPlayerDataModel<T>
 	{
-		//string UUID { get; }	
+		//string UUID { get; }
+		void Reset();
 		bool Merge(T data);
 	}
 }
