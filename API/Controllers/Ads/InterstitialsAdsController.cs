@@ -2,8 +2,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Zedarus.Traffico.Settings;
-using Zedarus.Traffico.Data.PlayerData;
 
 namespace Zedarus.ToolKit.API
 {
@@ -74,7 +72,7 @@ namespace Zedarus.ToolKit.API
 			IInterstitialsAdsWrapperInterface wrapper = Wrapper;
 			
 			if (canShowAd)
-				PlayerDataManager.Instance.ResetIntersititalsEvents();
+				APIManager.Instance.State.ResetIntersititalsEvents();
 
 			if (Enabled && wrapper != null && canShowAd)
 				wrapper.ShowBetweenLevelAd();
@@ -92,7 +90,7 @@ namespace Zedarus.ToolKit.API
 		public bool ShouldDisplayBetweenLevelAd()
 		{
 			if (Enabled)
-				return PlayerDataManager.Instance.GetInterstitialsEvents() >= GlobalSettings.Instance.InterstitialsLevelsInterval;
+				return APIManager.Instance.State.InterstitialsEvents >= APIManager.Instance.Settings.InterstitialsTriggerEventsInterval;
 			else
 				return false;
 		}
@@ -138,10 +136,7 @@ namespace Zedarus.ToolKit.API
 		#region Helpers
 		private bool Enabled
 		{
-			get 
-			{
-				return GlobalSettings.Instance.AdsEnabled && PlayerDataManager.Instance.AdsEnabled;
-			}
+			get  { return APIManager.Instance.Settings.AdsEnabled && !APIManager.Instance.State.AdsRemoved; }
 		}
 		#endregion
 	}

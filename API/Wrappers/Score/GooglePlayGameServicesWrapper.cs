@@ -2,14 +2,12 @@ using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Zedarus.Traffico.Data.PlayerData;
-using Zedarus.Traffico.Data.GameData;
-using Zedarus.Traffico.Data.GameData.Models;
 using Zedarus.Traffico.Localisation;
 using Zedarus.ToolKit;
 
 namespace Zedarus.ToolKit.API
 {
+	#if API_GAME_SERVICES_P31
 	public class GooglePlayGameServicesWrapper : APIWrapper<GooglePlayGameServicesWrapper>, IScoreWrapperInterface
 	{
 		#region Parameters
@@ -383,4 +381,5 @@ namespace Zedarus.ToolKit.API
 		}
 		#endregion
 	}
+	#endif
 }

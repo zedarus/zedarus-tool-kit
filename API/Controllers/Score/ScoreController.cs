@@ -2,10 +2,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Zedarus.Traffico.Data.GameData;
-using Zedarus.Traffico.Data.GameData.Models;
-using Zedarus.Traffico.Data.PlayerData;
 using Zedarus.ToolKit;
+using Zedarus.ToolKit.Events;
 
 namespace Zedarus.ToolKit.API
 {
@@ -34,8 +32,10 @@ namespace Zedarus.ToolKit.API
 				case APIs.AppleGameCenter:
 					return GameCenterWrapper.Instance;
 				#endif
+				#if API_GAME_SERVICES_P31
 				case APIs.GoogleGameServices:
 					return GooglePlayGameServicesWrapper.Instance;
+				#endif
 				case APIs.Generic:
 					return GenericScoreWrapper.Instance;
 				default:
@@ -71,20 +71,6 @@ namespace Zedarus.ToolKit.API
 			if (Wrapper != null) Wrapper.RestoreAchievement(achievementID);
 		}
 		
-		public void SubmitTotalScore(int score)
-		{
-			SubmitScoreForLevelPack(score, 0);
-		}
-		
-		public void SubmitScoreForLevelPack(int score, int levelpackID)
-		{
-			LeaderboardData leaderboard = GameDataManager.Instance.GetLeaderboardForLevelPack(levelpackID);
-			if (leaderboard != null)
-				SubmitScore(score, leaderboard.id);	
-			else
-				ZedLogger.Log("Leaderboard not found for this levelpack");
-		}
-		
 		public void SubmitScore(int score, int leaderboardID) 
 		{
 			if (Wrapper != null) Wrapper.SubmitScore(score, leaderboardID);
@@ -116,9 +102,9 @@ namespace Zedarus.ToolKit.API
 		protected override void CompleteInitialization()
 		{
 			base.CompleteInitialization();
-			
-			PlayerDataManager.Instance.UploadScore();
-			PlayerDataManager.Instance.UploadAchievements();
+
+			EventManager.SendEvent(APIEvents.UploadScore);
+			EventManager.SendEvent(APIEvents.UploadAchievements);
 		}
 	}
 }

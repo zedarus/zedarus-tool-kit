@@ -2,8 +2,6 @@ using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Zedarus.Traffico.Settings;
-using Zedarus.Traffico.Data.PlayerData;
 
 namespace Zedarus.ToolKit.API
 {
@@ -83,10 +81,7 @@ namespace Zedarus.ToolKit.API
 		#region Helpers
 		private bool Enabled
 		{
-			get 
-			{
-				return GlobalSettings.Instance.AdsEnabled && PlayerDataManager.Instance.AdsEnabled;
-			}
+			get  { return APIManager.Instance.Settings.AdsEnabled && !APIManager.Instance.State.AdsRemoved; }
 		}
 		#endregion
 	}

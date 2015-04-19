@@ -1,9 +1,8 @@
 using UnityEngine;
 using System;
 using System.Collections;
-using Zedarus.Traffico.Settings;
-using Zedarus.Traffico.Data.PlayerData;
 using Zedarus.ToolKit;
+using Zedarus.ToolKit.Events;
 
 namespace Zedarus.ToolKit.API
 {
@@ -101,7 +100,7 @@ namespace Zedarus.ToolKit.API
 			_action = action;
 		}
 		
-		private Reward ApplyReward(bool result)
+		/*private Reward ApplyReward(bool result)
 		{	
 			Reward award = new Reward(_action, result);
 			_action = SocialAction.None;
@@ -112,12 +111,12 @@ namespace Zedarus.ToolKit.API
 			switch (award.Currency)
 			{
 				case SocialSharingReward.Coins:
-					PlayerDataManager.Instance.Wallet.AddCoins(award.Amount, true);
+					//PlayerDataManager.Instance.Wallet.AddCoins(award.Amount, true);
 					break;
 			}
 			
 			return award;
-		}
+		}*/
 		#endregion
 		
 		#region Event Listeners
@@ -189,8 +188,9 @@ namespace Zedarus.ToolKit.API
 		}
 		#endregion
 	}
-	
-	internal class Reward
+
+	// TODO: refactor this
+	/*internal class Reward
 	{
 		private SocialSharingReward _currency;
 		private int _amount;
@@ -242,5 +242,5 @@ namespace Zedarus.ToolKit.API
 		{
 			get { return _amount; }
 		}
-	}
+	}*/
 }

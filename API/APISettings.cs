@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace Zedarus.ToolKit.API
 {
@@ -17,8 +18,45 @@ namespace Zedarus.ToolKit.API
 		private string _adMobUnitID;
 		private string _adMobPublisherID;
 		#endregion
+
+		#region Properties
+		private bool _iapEnabled;
+		private bool _adsEnabled;
+		private int _interstitialsTriggerEventsInterval;
+		private Dictionary<int, string> _storeItemsKeys = new Dictionary<int, string>();
+		#endregion
+
+		#region Init
+		public APISettings()
+		{
+			_iapEnabled = false;
+			_adsEnabled = false;
+			_interstitialsTriggerEventsInterval = 0;
+			_storeItemsKeys = new Dictionary<int, string>();
+		}
+		#endregion
 		
 		#region Controls
+		public void SetIAPEnabled(bool enabled)
+		{
+			_iapEnabled = enabled;
+		}
+
+		public void SetAdsEnabled(bool adsEnabled)
+		{
+			_adsEnabled = adsEnabled;
+		}
+
+		public void SetInterstitialsTriggerInterval(int interval)
+		{
+			_interstitialsTriggerEventsInterval = interval;
+		}
+		
+		public void RegisterStoreItem(int id, string key)
+		{
+			_storeItemsKeys.Add(id, key);
+		}
+
 		public void SetTwitter(string key, string secret)
 		{
 			_twitterKey = key;
@@ -51,6 +89,26 @@ namespace Zedarus.ToolKit.API
 		#endregion
 		
 		#region Getters
+		public bool AdsEnabled
+		{
+			get { return _adsEnabled; }
+		}
+
+		public bool IAPEnabled
+		{
+			get { return _iapEnabled; }
+		}
+
+		public int InterstitialsTriggerEventsInterval
+		{
+			get { return _interstitialsTriggerEventsInterval; }
+		}
+
+		public Dictionary<int, string> StoreItems
+		{
+			get { return _storeItemsKeys; }
+		}
+
 		public string TwitterKey
 		{
 			get { return _twitterKey; } 

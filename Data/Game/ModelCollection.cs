@@ -15,9 +15,11 @@ namespace Zedarus.ToolKit.Data.Game.Models
 		private Dictionary<string, ModelCollectionIndex<int, T>> _indexesInt;
 		private Dictionary<string, ModelCollectionIndex<float, T>> _indexesFloat;
 
-		public ModelCollection(string tableName)
+		public ModelCollection()
 		{
-			_tableName = tableName;
+			T sampleInstance = (T)Activator.CreateInstance(typeof(T));
+			_tableName = sampleInstance.GetDBTable();
+			sampleInstance = null;
 			_models = new Dictionary<int, T>();
 			_indexes = new Dictionary<string, ModelCollectionIndex<string, T>>();
 			_indexesInt = new Dictionary<string, ModelCollectionIndex<int, T>>();

@@ -31,7 +31,7 @@ namespace Zedarus.ToolKit.Data.Game
 			_loaded = false;
 		}
 
-		public void AddModel<T>(string tableName) where T : Model
+		public void AddModel<T>() where T : Model
 		{
 			if (_loaded)
 			{
@@ -39,7 +39,7 @@ namespace Zedarus.ToolKit.Data.Game
 				return;
 			}
 
-			_collections.Add(typeof(T), new ModelCollection<T>(tableName));
+			_collections.Add(typeof(T), new ModelCollection<T>());
 		}
 		#endregion
 

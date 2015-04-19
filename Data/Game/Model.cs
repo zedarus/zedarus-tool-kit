@@ -16,6 +16,10 @@ namespace Zedarus.ToolKit.Data.Game.Models
 		protected bool _deleted;
 		protected List<string> _indexes;
 
+		public Model() 
+		{
+		}
+
 		public Model(int id, bool enabled, bool deleted)
 		{
 			_id = id;
@@ -189,7 +193,7 @@ namespace Zedarus.ToolKit.Data.Game.Models
 			return new string[] {_id.ToString(), (_enabled ? 1 : 0).ToString(), (_deleted ? 1 : 0).ToString()};
 		}
 
-		public static string GetDBTable()
+		public virtual string GetDBTable()
 		{
 			return "table";
 		}

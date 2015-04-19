@@ -2,20 +2,11 @@ using UnityEngine;
 using System.Collections;
 
 namespace Zedarus.ToolKit.API
-{
-	public enum StoreItemType
-	{
-		CoinsPackSmall = 1,
-		CoinsPackMedium = 2,
-		CoinsPackBig = 3,
-		RemoveAds = 4,
-		None = 5,
-	}
-	
+{	
 	public class StoreItem
 	{
 		#region Parameters
-		private StoreItemType _type;
+		private int _type;
 		private string _id;
 		private string _price;
 		#endregion
@@ -23,12 +14,12 @@ namespace Zedarus.ToolKit.API
 		#region Initialization
 		public StoreItem()
 		{
-			_type = StoreItemType.None;
+			_type = 0;
 			_id = string.Empty;
 			_price = "--";
 		}
 		
-		public StoreItem(StoreItemType type, string id)
+		public StoreItem(int type, string id)
 		{
 			_type = type;
 			_id = id;
@@ -44,7 +35,7 @@ namespace Zedarus.ToolKit.API
 		#endregion
 		
 		#region Getters
-		public StoreItemType Type
+		public int Type
 		{
 			get { return _type; }
 		}

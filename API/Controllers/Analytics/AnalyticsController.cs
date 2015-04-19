@@ -3,9 +3,6 @@ using System;
 using System.Text.RegularExpressions;
 using System.Collections;
 using System.Collections.Generic;
-using Zedarus.Traffico.Data.GameData;
-using Zedarus.Traffico.Data.GameData.Models;
-using Zedarus.Traffico.Data.PlayerData;
 using Zedarus.Traffico.Settings;
 
 namespace Zedarus.ToolKit.API
@@ -347,15 +344,15 @@ namespace Zedarus.ToolKit.API
 		#region Gameplay
 		public void LogUnlockAchievement(int achievementID) 
 		{
-			AchievementData achievement = GameDataManager.Instance.GetAchievementWithID(achievementID);
-			int gameMode = PlayerDataManager.Instance.GetCurrentGameModeID();
+			//AchievementData achievement = GameDataManager.Instance.GetAchievementWithID(achievementID);
+			//int gameMode = PlayerDataManager.Instance.GetCurrentGameModeID();
 			//float playtime = PlayerDataManager.Instance.GetTotalPlaytime(gameMode);
 			//int levelsCompleted = PlayerDataManager.Instance.GetNumberOfLevelsCompletedInGameModeWithID(gameMode);
 			
 			Dictionary<string, string> parameters = new Dictionary<string, string>();
-			parameters.Add("achievement_id", achievement.id.ToString());
-			parameters.Add("achievement_name", achievement.GameCenterIosID);
-			parameters.Add("game_mode_id", gameMode.ToString());
+			parameters.Add("achievement_id", achievementID.ToString());
+			//parameters.Add("achievement_name", achievement.GameCenterIosID);
+			//parameters.Add("game_mode_id", gameMode.ToString());
 			//parameters.Add("playtime_seconds", Mathf.CeilToInt(playtime).ToString());
 			//parameters.Add("levels_completed", levelsCompleted.ToString());
 			

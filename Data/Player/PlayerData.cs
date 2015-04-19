@@ -22,14 +22,14 @@ namespace Zedarus.ToolKit.Data.Player
 		#endregion
 
 		#region Parameters
-		private Dictionary<Type, int> _idsTable;
+		//private Dictionary<Type, int> _idsTable;
 		//[SerializeThis] private string _uuid;
 		#endregion
 
 		#region Models
 		[SerializeThis] private bool _useDataSync;   // do not sync this
 		[SerializeThis] private bool _askedToUseSync;   // do not sync this
-		[SerializeThis] private Dictionary<int, PlayerDataModel> _models;
+		[SerializeThis] private Dictionary<string, PlayerDataModel> _models;
 		#endregion
 		
 		#region Readers
@@ -40,25 +40,27 @@ namespace Zedarus.ToolKit.Data.Player
 		public PlayerData()
 		{
 			//_uuid = System.Guid.NewGuid().ToString();
-			_idsTable = new Dictionary<Type, int>();
-			_models = new Dictionary<int, PlayerDataModel>();
+			//_idsTable = new Dictionary<Type, int>();
+			_models = new Dictionary<string, PlayerDataModel>();
 			_useDataSync = false;
 			_askedToUseSync = false;
 		}
 		#endregion
 
 		#region Controls
-		public void AddModel<T>(int modelID) where T : PlayerDataModel
+		public void AddModel<T>() where T : PlayerDataModel
 		{
-			if (_models.ContainsKey(modelID))
+			string t = typeof(T).FullName;
+
+			if (_models.ContainsKey(t))
 			{
-				_idsTable.Add(typeof(T), modelID);
-				//Debug.Log("Model with this id (" + modelID + ") already added to player data: " + typeof(T));
+				//_idsTable.Add(typeof(T), modelID);
+				Debug.Log("Model with this id (" + t + ") already added to player data");
 			}
 			else
 			{
-				_idsTable.Add(typeof(T), modelID);
-				_models.Add(modelID, (T)Activator.CreateInstance(typeof(T)));
+				//_idsTable.Add(typeof(T), modelID);
+				_models.Add(t, (T)Activator.CreateInstance(typeof(T)));
 			}
 		}
 		#endregion
@@ -66,15 +68,10 @@ namespace Zedarus.ToolKit.Data.Player
 		#region Getters
 		public T GetModel<T>() where T : PlayerDataModel
 		{	
-			Type key = typeof(T);
-			if (_idsTable.ContainsKey(key))
-			{
-				int modelID = _idsTable[key];
-				if (_models.ContainsKey(modelID))
-					return _models[modelID] as T;
-				else
-					return null;
-			} else
+			string key = typeof(T).FullName;
+			if (_models.ContainsKey(key))
+				return _models[key] as T;
+			else
 				return null;
 		}
 		#endregion

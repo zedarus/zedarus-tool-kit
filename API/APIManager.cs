@@ -44,16 +44,19 @@ namespace Zedarus.ToolKit.API
 		private bool _initialized;
 		private int _initControllersCount;
 		private APISettings _settings;
+		private APIState _state;
 		private Dictionary<Controllers, APIController> _controllers;
 		#endregion
 		
 		#region Initalization
 		private APIManager()
 		{
+			APIEvents.Register();
 			_initStarted = false;
 			_initialized = false;
 			_initControllersCount = 0;
 			_settings = new APISettings();
+			_state = new APIState();
 			_controllers = new Dictionary<Controllers, APIController>();
 		}
 		#endregion
@@ -91,6 +94,17 @@ namespace Zedarus.ToolKit.API
 			else
 				_controllers.Add(type, controller);
 		}
+
+		public void UseState(APIState state)
+		{
+			if (state == null)
+			{
+				Debug.Log("Can't use new APIState because it's null");
+				return;
+			}
+
+			_state = state;
+		}
 		#endregion
 		
 		#region Event Handlers
@@ -106,6 +120,11 @@ namespace Zedarus.ToolKit.API
 		public APISettings Settings
 		{
 			get { return _settings; }
+		}
+
+		public APIState State
+		{
+			get { return _state; }
 		}
 
 		public StoreController Store

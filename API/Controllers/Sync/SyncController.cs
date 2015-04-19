@@ -2,8 +2,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Zedarus.Traffico.Data.GameData;
-using Zedarus.Traffico.Data.GameData.Models;
 using Zedarus.Traffico.Data.PlayerData;
 
 namespace Zedarus.ToolKit.API
