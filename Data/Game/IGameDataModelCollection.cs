@@ -4,7 +4,7 @@ using System.Collections;
 
 namespace Zedarus.ToolKit.Data.Game.Models
 {
-	public interface IModelCollection
+	public interface IGameDataModelCollection
 	{
 		bool LoadFromDB();
 	}

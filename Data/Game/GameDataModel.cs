@@ -9,25 +9,25 @@ using Zedarus.ToolKit.Helpers;
 
 namespace Zedarus.ToolKit.Data.Game.Models
 {
-	public class Model
+	public class GameDataModel
 	{
 		protected int _id;
 		protected bool _enabled;
 		protected bool _deleted;
 		protected List<string> _indexes;
 
-		public Model() 
+		public GameDataModel() 
 		{
 		}
 
-		public Model(int id, bool enabled, bool deleted)
+		public GameDataModel(int id, bool enabled, bool deleted)
 		{
 			_id = id;
 			_enabled = enabled;
 			_deleted = deleted;
 		}
 
-		public Model(JsonData json)
+		public GameDataModel(JsonData json)
 		{
 			if (json != null)
 			{
@@ -37,7 +37,7 @@ namespace Zedarus.ToolKit.Data.Game.Models
 			}
 		}
 
-		public Model(List<SimpleDataColumn> columns, SimpleDataRow row)
+		public GameDataModel(List<SimpleDataColumn> columns, SimpleDataRow row)
 		{
 			if (columns != null && row != null)
 			{

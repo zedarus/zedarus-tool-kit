@@ -20,18 +20,18 @@ namespace Zedarus.ToolKit.Data.Game
 		#endregion
 
 		#region Models
-		private Dictionary<Type, IModelCollection> _collections;
+		private Dictionary<Type, IGameDataModelCollection> _collections;
 		#endregion
 
 		#region Init
 		public GameData()
 		{
-			_collections = new Dictionary<Type, IModelCollection>();
+			_collections = new Dictionary<Type, IGameDataModelCollection>();
 			_version = 0;
 			_loaded = false;
 		}
 
-		public void AddModel<T>() where T : Model
+		public void AddModel<T>() where T : GameDataModel
 		{
 			if (_loaded)
 			{
@@ -39,7 +39,7 @@ namespace Zedarus.ToolKit.Data.Game
 				return;
 			}
 
-			_collections.Add(typeof(T), new ModelCollection<T>());
+			_collections.Add(typeof(T), new GameDataModelCollection<T>());
 		}
 		#endregion
 
@@ -54,7 +54,7 @@ namespace Zedarus.ToolKit.Data.Game
 
 			LoadVersionData();
 
-			foreach (KeyValuePair<Type, IModelCollection> v in _collections)
+			foreach (KeyValuePair<Type, IGameDataModelCollection> v in _collections)
 				v.Value.LoadFromDB();
 
 			_loaded = true;
@@ -162,7 +162,7 @@ namespace Zedarus.ToolKit.Data.Game
 		#endregion
 
 		#region Queries
-		public ModelCollection<T> GetModel<T>() where T : Model
+		public GameDataModelCollection<T> GetModel<T>() where T : GameDataModel
 		{
 			if (!_loaded)
 			{
@@ -172,7 +172,7 @@ namespace Zedarus.ToolKit.Data.Game
 
 			Type key = typeof(T);
 			if (_collections.ContainsKey(key))
-				return _collections[key] as ModelCollection<T>;
+				return _collections[key] as GameDataModelCollection<T>;
 			else
 				return null;
 		}

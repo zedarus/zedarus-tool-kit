@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -7,23 +7,23 @@ using SimpleSQL;
 
 namespace Zedarus.ToolKit.Data.Game.Models
 {
-	public class ModelCollection<T> : IModelCollection where T : Model
+	public class GameDataModelCollection<T> : IGameDataModelCollection where T : GameDataModel
 	{
 		private string _tableName;
 		private Dictionary<int, T> _models;
-		private Dictionary<string, ModelCollectionIndex<string, T>> _indexes;
-		private Dictionary<string, ModelCollectionIndex<int, T>> _indexesInt;
-		private Dictionary<string, ModelCollectionIndex<float, T>> _indexesFloat;
+		private Dictionary<string, GameDataModelCollectionIndex<string, T>> _indexes;
+		private Dictionary<string, GameDataModelCollectionIndex<int, T>> _indexesInt;
+		private Dictionary<string, GameDataModelCollectionIndex<float, T>> _indexesFloat;
 
-		public ModelCollection()
+		public GameDataModelCollection()
 		{
 			T sampleInstance = (T)Activator.CreateInstance(typeof(T));
 			_tableName = sampleInstance.GetDBTable();
 			sampleInstance = null;
 			_models = new Dictionary<int, T>();
-			_indexes = new Dictionary<string, ModelCollectionIndex<string, T>>();
-			_indexesInt = new Dictionary<string, ModelCollectionIndex<int, T>>();
-			_indexesFloat = new Dictionary<string, ModelCollectionIndex<float, T>>();
+			_indexes = new Dictionary<string, GameDataModelCollectionIndex<string, T>>();
+			_indexesInt = new Dictionary<string, GameDataModelCollectionIndex<int, T>>();
+			_indexesFloat = new Dictionary<string, GameDataModelCollectionIndex<float, T>>();
 		}
 
 		private bool Add(int id, T model)
@@ -228,27 +228,27 @@ namespace Zedarus.ToolKit.Data.Game.Models
 				if (propertyType == typeof(int))
 				{
 					if (!_indexesInt.ContainsKey(index))
-						_indexesInt.Add(index, new ModelCollectionIndex<int, T>(index));
+						_indexesInt.Add(index, new GameDataModelCollectionIndex<int, T>(index));
 				}
 				else if (propertyType == typeof(float))
 				{
 					if (!_indexesFloat.ContainsKey(index))
-						_indexesFloat.Add(index, new ModelCollectionIndex<float, T>(index));
+						_indexesFloat.Add(index, new GameDataModelCollectionIndex<float, T>(index));
 				}
 				else if (propertyType == typeof(string))
 				{
 					if (!_indexes.ContainsKey(index))
-						_indexes.Add(index, new ModelCollectionIndex<string, T>(index));
+						_indexes.Add(index, new GameDataModelCollectionIndex<string, T>(index));
 				}
 			}
 
-			foreach (KeyValuePair<string, ModelCollectionIndex<string, T>> index in _indexes)
+			foreach (KeyValuePair<string, GameDataModelCollectionIndex<string, T>> index in _indexes)
 				index.Value.Add(model);
 
-			foreach (KeyValuePair<string, ModelCollectionIndex<int, T>> index in _indexesInt)
+			foreach (KeyValuePair<string, GameDataModelCollectionIndex<int, T>> index in _indexesInt)
 				index.Value.Add(model);
 
-			foreach (KeyValuePair<string, ModelCollectionIndex<float, T>> index in _indexesFloat)
+			foreach (KeyValuePair<string, GameDataModelCollectionIndex<float, T>> index in _indexesFloat)
 				index.Value.Add(model);
 		}
 

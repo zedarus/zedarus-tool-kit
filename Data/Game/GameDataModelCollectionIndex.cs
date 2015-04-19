@@ -1,15 +1,15 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
 namespace Zedarus.ToolKit.Data.Game.Models
 {
-	public class ModelCollectionIndex<T, M> where M : Model
+	public class GameDataModelCollectionIndex<T, M> where M : GameDataModel
 	{
 		private string _field;
 		private List<KeyValuePair<T, int>> _entries;
 
-		public ModelCollectionIndex(string field)
+		public GameDataModelCollectionIndex(string field)
 		{
 			_field = field;
 			_entries = new List<KeyValuePair<T, int>>();
