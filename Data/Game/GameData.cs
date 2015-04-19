@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using Zedarus.ToolKit;
 using Zedarus.ToolKit.Helpers;
 using Zedarus.ToolKit.Data.Adapters;
-using Zedarus.ToolKit.Data.Game.Models;
+using Zedarus.ToolKit.Data.Game;
 using SimpleSQL;
 
 namespace Zedarus.ToolKit.Data.Game

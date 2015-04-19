@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-namespace Zedarus.ToolKit.Data.Player.Models
+namespace Zedarus.ToolKit.Data.Player
 {
 	public abstract class PlayerDataModel
 	{

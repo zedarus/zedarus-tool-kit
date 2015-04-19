@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using Zedarus.ToolKit.Data.Adapters;
 using SimpleSQL;
 
-namespace Zedarus.ToolKit.Data.Game.Models
+namespace Zedarus.ToolKit.Data.Game
 {
 	public class GameDataModelCollection<T> : IGameDataModelCollection where T : GameDataModel
 	{

@@ -6,7 +6,7 @@ using Zedarus.ToolKit;
 using Zedarus.ToolKit.Helpers;
 using Zedarus.ToolKit.Data;
 using Zedarus.ToolKit.Data.Adapters;
-using Zedarus.ToolKit.Data.Player.Models;
+using Zedarus.ToolKit.Data.Player;
 using Zedarus.ToolKit.API;
 using Serialization;
 using LitJson;

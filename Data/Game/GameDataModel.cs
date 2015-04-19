@@ -7,7 +7,7 @@ using LitJson;
 using SimpleSQL;
 using Zedarus.ToolKit.Helpers;
 
-namespace Zedarus.ToolKit.Data.Game.Models
+namespace Zedarus.ToolKit.Data.Game
 {
 	public class GameDataModel
 	{

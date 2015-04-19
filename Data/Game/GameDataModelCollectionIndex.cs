@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Zedarus.ToolKit.Data.Game.Models
+namespace Zedarus.ToolKit.Data.Game
 {
 	public class GameDataModelCollectionIndex<T, M> where M : GameDataModel
 	{

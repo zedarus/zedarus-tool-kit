@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using Zedarus.ToolKit.Data.Player.Models;
+using Zedarus.ToolKit.Data.Player;
 using Serialization;
 
 namespace Zedarus.ToolKit.API

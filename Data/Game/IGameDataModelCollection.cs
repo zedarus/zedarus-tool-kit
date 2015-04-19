@@ -2,7 +2,7 @@
 using System;
 using System.Collections;
 
-namespace Zedarus.ToolKit.Data.Game.Models
+namespace Zedarus.ToolKit.Data.Game
 {
 	public interface IGameDataModelCollection
 	{
