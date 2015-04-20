@@ -13,18 +13,16 @@ namespace Zedarus.ToolKit.Data.Game
 	{
 		protected int _id;
 		protected bool _enabled;
-		protected bool _deleted;
 		protected List<string> _indexes;
 
 		public GameDataModel() 
 		{
 		}
 
-		public GameDataModel(int id, bool enabled, bool deleted)
+		public GameDataModel(int id, bool enabled)
 		{
 			_id = id;
 			_enabled = enabled;
-			_deleted = deleted;
 		}
 
 		public GameDataModel(JsonData json)
@@ -33,7 +31,6 @@ namespace Zedarus.ToolKit.Data.Game
 			{
 				_id = GetInt(json, "id");
 				_enabled = GetBool(json, "enabled");
-				_deleted = GetBool(json, "deleted");
 			}
 		}
 
@@ -43,7 +40,6 @@ namespace Zedarus.ToolKit.Data.Game
 			{
 				_id = GetInt(columns, row, "id");
 				_enabled = GetBool(columns, row, "enabled");
-				_deleted = GetBool(columns, row, "deleted");
 			}
 		}
 
@@ -61,11 +57,6 @@ namespace Zedarus.ToolKit.Data.Game
 		public bool Enabled
 		{
 			get { return _enabled; }
-		}
-
-		public bool Deleted
-		{
-			get { return _deleted; }
 		}
 
 		public string[] Indexes
@@ -185,12 +176,17 @@ namespace Zedarus.ToolKit.Data.Game
 
 		protected virtual string[] GetDBFields()
 		{
-			return new string[] {"id", "enabled", "deleted"};
+			return new string[] {"id", "enabled"};
 		}
 
 		protected virtual string[] GetDBValues()
 		{
-			return new string[] {_id.ToString(), (_enabled ? 1 : 0).ToString(), (_deleted ? 1 : 0).ToString()};
+			return new string[] {_id.ToString(), BoolToString(_enabled)};
+		}
+
+		protected string BoolToString(bool value)
+		{
+			return (value ? 1 : 0).ToString();
 		}
 
 		public virtual string GetDBTable()
