@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using System.Collections;
-using Zedarus.Traffico.Helpers.ScreenAndResolution;
 
 namespace Zedarus.ToolKit.API
 {
