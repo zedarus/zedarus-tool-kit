@@ -25,12 +25,18 @@ namespace Zedarus.ToolKit
 		#region Init
 		private void Init()
 		{
+			InitAPI();
 			APIManager.Instance.Init();
 
 			InitGameData();
 			InitPlayerData("default.dat");
 			
 			initialized = true;
+		}
+
+		protected virtual void InitAPI()
+		{
+			
 		}
 
 		protected virtual void InitGameData()

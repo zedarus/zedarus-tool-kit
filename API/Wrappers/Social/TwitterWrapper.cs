@@ -2,7 +2,6 @@ using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Zedarus.Traffico.Settings;
 using Zedarus.ToolKit;
 #if API_TWITTER_P31
 using Prime31;

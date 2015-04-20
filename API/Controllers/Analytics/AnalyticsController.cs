@@ -3,7 +3,6 @@ using System;
 using System.Text.RegularExpressions;
 using System.Collections;
 using System.Collections.Generic;
-using Zedarus.Traffico.Settings;
 
 namespace Zedarus.ToolKit.API
 {

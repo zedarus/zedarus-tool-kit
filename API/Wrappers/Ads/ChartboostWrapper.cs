@@ -2,7 +2,6 @@
 using System;
 using System.Collections;
 using Zedarus.ToolKit;
-using Zedarus.Traffico.Settings;
 
 namespace Zedarus.ToolKit.API
 {
