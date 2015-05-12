@@ -119,6 +119,11 @@ namespace Zedarus.ToolKit.Events
 		{
 			Instance.ClearEventsAndListeners();
 		}
+
+		static public bool IsListenerExists(int e)
+		{
+			return Instance.GetListenersCountForEvent(e) > 0;
+		}
 		#endregion
 
 		#region Events
@@ -214,6 +219,17 @@ namespace Zedarus.ToolKit.Events
 		#endregion
 
 		#region Listeners
+		public int GetListenersCountForEvent(int e)
+		{
+			int count = 0;
+			foreach (EventListener listener in _listeners)
+			{
+				if (listener.Event == e)
+					count++;
+			}
+			return count;
+		}
+
 		public void CreateListener(int e, System.Action handler, bool consume, bool oneTime)
 		{
 			_listeners.Add(new EventListener(e, handler, consume, oneTime));
