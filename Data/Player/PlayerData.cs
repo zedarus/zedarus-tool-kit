@@ -189,6 +189,7 @@ namespace Zedarus.ToolKit.Data.Player
 			
 			_buildNumber = buildNumber;
 			_gameVersion = version;
+			Debug.Log(_gameVersion);
 		}
 		#endregion
 

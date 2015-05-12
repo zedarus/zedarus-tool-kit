@@ -98,6 +98,7 @@ namespace Zedarus.ToolKit.API
 		private void SetRewardAction(SocialAction action)
 		{
 			_action = action;
+			Debug.Log(_action);
 		}
 		
 		/*private Reward ApplyReward(bool result)
