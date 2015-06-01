@@ -4,6 +4,7 @@ using Zedarus.ToolKit;
 
 namespace Zedarus.ToolKit.API
 {
+	#if API_ADMOB_P31
 	public class AdMobWrapper : APIWrapper<AdMobWrapper>, IBannerAdsWrapperInterface
 	{
 		#region Setup
@@ -137,4 +138,5 @@ namespace Zedarus.ToolKit.API
 		}
 		#endregion
 	}
+	#endif
 }

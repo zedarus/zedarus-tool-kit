@@ -62,10 +62,12 @@ namespace Zedarus.ToolKit.Helpers
 			Rect screenSize = new Rect(0, 0, camera.pixelWidth, camera.pixelHeight);
 			
 			#if UNITY_ANDROID
+			#if ZTK_NGUI
 			if (Application.platform == RuntimePlatform.Android) {
 				screenSize.width = DisplayMetricsAndroid.WidthPixels;
 				screenSize.height = DisplayMetricsAndroid.HeightPixels;
 			}
+			#endif
 			#endif
 			
 			resolution = ResolutionType.HD;

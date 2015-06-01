@@ -20,8 +20,10 @@ namespace Zedarus.ToolKit.API
 		{
 			switch (wrapperAPI)
 			{
+				#if API_ADMOB_P31
 				case APIs.AdMob:
 					return AdMobWrapper.Instance;
+				#endif
 				#if API_IAD_P31
 				case APIs.AppleiAds:
 					return IAdWrapper.Instance;
