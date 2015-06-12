@@ -29,6 +29,8 @@ namespace Zedarus.ToolKit.Helpers
 		{
 			if (OnTimerEnd != null)
 				OnTimerEnd();
+
+			OnTimerEnd = null;
 			
 			Destroy(gameObject);
 		}
