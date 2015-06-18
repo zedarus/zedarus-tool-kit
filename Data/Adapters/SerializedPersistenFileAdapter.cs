@@ -1,10 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.IO;
+#if !ZTK_DISABLE_SERIALIZATION
 using Serialization;
+#endif
 
 namespace Zedarus.ToolKit.Data.Adapters
 {
+	#if !ZTK_DISABLE_SERIALIZATION
 	public class SerializedPersistentFileAdapter : IDataAdapter
 	{
 		public T LoadData<T>(string path) where T : class
@@ -23,4 +26,5 @@ namespace Zedarus.ToolKit.Data.Adapters
 			return true;
 		}
 	}
+	#endif
 }

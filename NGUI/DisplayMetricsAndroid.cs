@@ -2,6 +2,7 @@ using UnityEngine;
 
 namespace Zedarus.ToolKit.NGUI
 {
+	#if !ZTK_DISABLE_NGUI
 	public class DisplayMetricsAndroid
 	{
 	#if UNITY_ANDROID
@@ -67,4 +68,5 @@ namespace Zedarus.ToolKit.NGUI
 		}
 	#endif
 	}
+	#endif
 }

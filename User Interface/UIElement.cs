@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 namespace Zedarus.ToolKit.UserInterface
 {
+	#if !ZTK_DISABLE_NGUI
 	public class UIElement : MonoBehaviour
 	{
 		#region Parameters
@@ -181,4 +182,5 @@ namespace Zedarus.ToolKit.UserInterface
 		}
 		#endif
 	}
+	#endif
 }

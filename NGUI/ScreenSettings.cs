@@ -4,6 +4,7 @@ using Zedarus.ToolKit;
 
 namespace Zedarus.ToolKit.NGUI
 {
+	#if !ZTK_DISABLE_NGUI
 	public class ScreenSettings : SimpleSingleton<ScreenSettings> 
 	{
 		#region Parameters
@@ -44,4 +45,5 @@ namespace Zedarus.ToolKit.NGUI
 			return new ScreenSize(SHDResolutionCutoff.width, SHDResolutionCutoff.height);
 		}
 	}
+	#endif
 }

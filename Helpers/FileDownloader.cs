@@ -14,12 +14,19 @@ namespace Zedarus.ToolKit.Helpers
 			return downloader;
 		}
 
-		static public FileDownloader PostJSON(string url, string json, Dictionary<string, string> parameters, System.Action<string> callback, bool escape = true)
+		static public FileDownloader PostData(string url, Dictionary<string, string> data, Dictionary<string, string> parameters, System.Action<string> callback, bool escape = true)
 		{
 			GameObject go = new GameObject("File Uploader");
 			FileDownloader downloader = go.AddComponent<FileDownloader>();
-			downloader.StartUploadingCoroutine(url, json, parameters, callback, escape);
+			downloader.StartUploadingCoroutine(url, data, parameters, callback, escape);
 			return downloader;
+		}
+
+		static public FileDownloader PostJSON(string url, string json, Dictionary<string, string> parameters, System.Action<string> callback, bool escape = true)
+		{
+			Dictionary<string, string> data = new Dictionary<string, string>();
+			data.Add("data", json);
+			return PostData(url, data, parameters, callback, escape);
 		}
 
 		public void StartDownloadingCoroutine(string url, Dictionary<string, string> parameters, System.Action<string> callback, bool escape)
@@ -27,9 +34,9 @@ namespace Zedarus.ToolKit.Helpers
 			StartCoroutine(LoadTextFileFromServer(url, parameters, callback, escape));
 		}
 
-		public void StartUploadingCoroutine(string url, string json, Dictionary<string, string> parameters, System.Action<string> callback, bool escape)
+		public void StartUploadingCoroutine(string url, Dictionary<string, string> data, Dictionary<string, string> parameters, System.Action<string> callback, bool escape)
 		{
-			StartCoroutine(UploadJsonToServer(url, json, parameters, callback, escape));
+			StartCoroutine(UploadDataToServer(url, data, parameters, callback, escape));
 		}
 
 		private IEnumerator LoadTextFileFromServer(string url, Dictionary<string, string> parameters, System.Action<string> callback, bool escape)
@@ -68,7 +75,7 @@ namespace Zedarus.ToolKit.Helpers
 			Destroy(gameObject, 1f);
 		}
 
-		private IEnumerator UploadJsonToServer(string url, string json, Dictionary<string, string> parameters, System.Action<string> callback, bool escape)
+		private IEnumerator UploadDataToServer(string url, Dictionary<string, string> data, Dictionary<string, string> parameters, System.Action<string> callback, bool escape)
 		{
 			string paramsText = "";
 			foreach (KeyValuePair<string, string> param in parameters)
@@ -83,7 +90,10 @@ namespace Zedarus.ToolKit.Helpers
 			ZedLogger.Log("FileDownloader: starting posting JSON to server: " + url, LoggerContext.Server);
 
 			WWWForm form = new WWWForm();
-			form.AddField("data", json);
+			foreach (KeyValuePair<string, string> d in data)
+			{
+				form.AddField(d.Key, d.Value);
+			}
 
 			WWW www = new WWW(url, form);
 			float elapsedTime = 0f;

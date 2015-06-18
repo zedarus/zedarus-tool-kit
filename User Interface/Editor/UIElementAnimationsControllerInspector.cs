@@ -5,6 +5,7 @@ using System.Collections.Generic;
 
 namespace Zedarus.ToolKit.UserInterface
 {
+	#if !ZTK_DISABLE_NGUI
 	[CustomEditor(typeof(UIElementAnimationsController), true)]
 	public class UIElementAnimationsControllerInspector : Editor
 	{
@@ -138,4 +139,5 @@ namespace Zedarus.ToolKit.UserInterface
 			#endif
 		}
 	}
+	#endif
 }

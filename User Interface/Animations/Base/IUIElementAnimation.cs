@@ -3,6 +3,7 @@ using System.Collections;
 
 namespace Zedarus.ToolKit.UserInterface
 {
+	#if !ZTK_DISABLE_NGUI
 	public interface IUIElementAnimation
 	{
 		void Init();
@@ -13,4 +14,5 @@ namespace Zedarus.ToolKit.UserInterface
 		float HideDuration { get; set; }
 		GameObject ObjectReference { get; }
 	}
+	#endif
 }

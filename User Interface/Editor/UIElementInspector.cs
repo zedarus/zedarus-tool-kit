@@ -6,6 +6,7 @@ using Zedarus.ToolKit.Extentions;
 
 namespace Zedarus.ToolKit.UserInterface
 {
+	#if !ZTK_DISABLE_NGUI
 	[CustomEditor(typeof(UIElement), true)]
 	public class UIElementInspector : Editor
 	{
@@ -187,4 +188,5 @@ namespace Zedarus.ToolKit.UserInterface
 			#endif
 		}
 	}
+	#endif
 }

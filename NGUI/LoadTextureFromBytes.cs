@@ -4,6 +4,7 @@ using Zedarus.ToolKit.Helpers.Assets;
 
 namespace Zedarus.ToolKit.NGUI
 {
+	#if !ZTK_DISABLE_NGUI
 	[System.Serializable]
 	public class ImagePath 
 	{
@@ -92,4 +93,5 @@ namespace Zedarus.ToolKit.NGUI
 		}
 		#endregion
 	}
+	#endif
 }

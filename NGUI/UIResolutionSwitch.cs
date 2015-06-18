@@ -4,6 +4,7 @@ using Zedarus.ToolKit.Helpers.Assets;
 
 namespace Zedarus.ToolKit.NGUI
 {
+	#if !ZTK_DISABLE_NGUI
 	[RequireComponent(typeof(UIRoot))]
 	/// <summary>
 	/// <para>GUI resolution switch controller is a special class that determines which assets (images, atlases, fonts) to use based on current screen resolution.</para>
@@ -368,4 +369,5 @@ namespace Zedarus.ToolKit.NGUI
 		}
 		#endregion
 	}
+	#endif
 }
