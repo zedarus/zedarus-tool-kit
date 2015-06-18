@@ -46,10 +46,10 @@ namespace Zedarus.ToolKit.NGUI
 			}
 			else
 			{
-				if (renderer != null && renderer.material.mainTexture != null)
+				if (GetComponent<Renderer>() != null && GetComponent<Renderer>().material.mainTexture != null)
 				{
-					Destroy(renderer.material.mainTexture);
-					renderer.material.mainTexture = null;
+					Destroy(GetComponent<Renderer>().material.mainTexture);
+					GetComponent<Renderer>().material.mainTexture = null;
 				}
 			}
 		}
@@ -87,8 +87,8 @@ namespace Zedarus.ToolKit.NGUI
 			}
 			else
 			{
-				if (renderer != null)
-					renderer.material.mainTexture = texture;
+				if (GetComponent<Renderer>() != null)
+					GetComponent<Renderer>().material.mainTexture = texture;
 			}
 		}
 		#endregion
