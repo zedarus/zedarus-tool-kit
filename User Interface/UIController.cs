@@ -36,7 +36,9 @@ namespace Zedarus.ToolKit.UserInterface
 		#region Controls
 		public virtual float Show()
 		{
-			Init();
+			if (!Initialized)
+				Init();
+			
 			UnblockAllInput();
 			float maxDuration = 0;
 			float duration = 0;
