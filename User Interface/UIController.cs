@@ -19,7 +19,8 @@ namespace Zedarus.ToolKit.UserInterface
 		#region Unity Methods
 		private void Start()
 		{
-			Init();
+			if (InitOnStart)
+				Init();
 		}
 
 		private void Update()
@@ -121,6 +122,11 @@ namespace Zedarus.ToolKit.UserInterface
 		protected bool Initialized
 		{
 			get { return _initialized; }
+		}
+
+		protected virtual bool InitOnStart
+		{
+			get { return true; }
 		}
 	}
 	#endif
