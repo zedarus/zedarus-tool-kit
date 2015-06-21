@@ -59,7 +59,8 @@ namespace Zedarus.ToolKit.UserInterface
 		public float Show(float delay)
 		{
 			StopAllCoroutines();
-			StartCoroutine(ShowWithDelay(delay));
+			if (gameObject.activeSelf)
+				StartCoroutine(ShowWithDelay(delay));
 			return _showAnimationDuration;
 		}
 
