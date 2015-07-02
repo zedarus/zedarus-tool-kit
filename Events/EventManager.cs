@@ -122,12 +122,14 @@ namespace Zedarus.ToolKit.Events
 			for (int e = _events.Count - 1; e >= 0; e--)
 			{
 				eventObject = _events[e];
+				eventObject.Live();
 				for (int l = _listeners.Count - 1; l >= 0; l--)
 				{
 					listener = _listeners[l];
 					if (listener.Event == eventObject.ID)
 					{
 						listener.Call(eventObject);
+						eventObject.Process();
 
 						if (listener.Expired)
 							_listeners.RemoveAt(l);
@@ -141,8 +143,11 @@ namespace Zedarus.ToolKit.Events
 				}
 			}
 
-			// TODO: add lifelength for unprocessed events so they are not removed immidately if not processed
-			_events.Clear();
+			for (int e = _events.Count - 1; e >= 0; e--)
+			{
+				if (_events[e].Processed || _events[e].Dead)
+					_events.RemoveAt(e);
+			}
 		}
 
 		public void RegisterEvent(int e)

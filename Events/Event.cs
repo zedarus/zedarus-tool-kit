@@ -7,15 +7,39 @@ namespace Zedarus.ToolKit.Events
 	{
 		private int _id;
 		private object _sender;
+		private bool _processed;
+		private int _life;
 
 		public Event(int id)
 		{
 			_id = id;
+			_processed = false;
+			_life = 3;
+		}
+
+		public void Process()
+		{
+			_processed = true;
+		}
+
+		public void Live()
+		{
+			_life--;
 		}
 
 		public int ID
 		{
 			get { return _id; }
+		}
+
+		public bool Processed
+		{
+			get { return _processed; }
+		}
+
+		public bool Dead
+		{
+			get { return _life <= 0; }
 		}
 	}
 
