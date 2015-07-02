@@ -6,14 +6,16 @@ namespace Zedarus.ToolKit.Events
 	public class EventListener
 	{
 		private int _event;
+		private long _targetID;
 		private bool _consume;
 		private bool _oneTime;
 		private bool _expired;
 		private System.Action _handler;
 
-		public EventListener(int e, System.Action handler, bool consume, bool oneTime)
+		public EventListener(int e, System.Action handler, long targetID, bool consume, bool oneTime)
 		{
 			_event = e;
+			_targetID = targetID;
 			_consume = consume;
 			_oneTime = oneTime;
 			_handler = handler;
@@ -32,6 +34,11 @@ namespace Zedarus.ToolKit.Events
 		public int Event
 		{
 			get { return _event; }
+		}
+
+		public long TargetID
+		{
+			get { return _targetID; }
 		}
 
 		public bool Expired
@@ -54,7 +61,7 @@ namespace Zedarus.ToolKit.Events
 	{
 		private System.Action<T> _handler;
 
-		public EventListener(int e, System.Action<T> handler, bool consume, bool oneTime) : base(e, null, consume, oneTime)
+		public EventListener(int e, System.Action<T> handler, long targetID, bool consume, bool oneTime) : base(e, null, targetID, consume, oneTime)
 		{
 			_handler = handler;
 		}
@@ -85,7 +92,7 @@ namespace Zedarus.ToolKit.Events
 	{
 		private System.Action<T1,T2> _handler;
 		
-		public EventListener(int e, System.Action<T1,T2> handler, bool consume, bool oneTime) : base(e, null, consume, oneTime)
+		public EventListener(int e, System.Action<T1,T2> handler, long targetID, bool consume, bool oneTime) : base(e, null, targetID, consume, oneTime)
 		{
 			_handler = handler;
 		}
@@ -116,7 +123,7 @@ namespace Zedarus.ToolKit.Events
 	{
 		private System.Action<T1,T2,T3> _handler;
 		
-		public EventListener(int e, System.Action<T1,T2,T3> handler, bool consume, bool oneTime) : base(e, null, consume, oneTime)
+		public EventListener(int e, System.Action<T1,T2,T3> handler, long targetID, bool consume, bool oneTime) : base(e, null, targetID, consume, oneTime)
 		{
 			_handler = handler;
 		}
@@ -147,7 +154,7 @@ namespace Zedarus.ToolKit.Events
 	{
 		private System.Action<T1,T2,T3,T4> _handler;
 		
-		public EventListener(int e, System.Action<T1,T2,T3,T4> handler, bool consume, bool oneTime) : base(e, null, consume, oneTime)
+		public EventListener(int e, System.Action<T1,T2,T3,T4> handler, long targetID, bool consume, bool oneTime) : base(e, null, targetID, consume, oneTime)
 		{
 			_handler = handler;
 		}
