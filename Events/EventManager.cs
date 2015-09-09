@@ -11,6 +11,8 @@ namespace Zedarus.ToolKit.Events
 		private ObjectIDGenerator _idGenerator = new ObjectIDGenerator();
 		private List<Event> _events;
 		private List<EventListener> _listeners;
+		private bool _processingEvents = false;
+		private bool _scheduleEvents = false;
 
 		public EventManager()
 		{
@@ -119,6 +121,14 @@ namespace Zedarus.ToolKit.Events
 		#region Events
 		public void ProcessEvents()
 		{
+			if (_processingEvents)
+			{
+				_scheduleEvents = true;
+				return;
+			}
+
+			_processingEvents = true;
+
 			Event eventObject;
 			EventListener listener;
 			for (int e = _events.Count - 1; e >= 0; e--)
@@ -149,6 +159,14 @@ namespace Zedarus.ToolKit.Events
 			{
 				if (_events[e].Processed || _events[e].Dead)
 					_events.RemoveAt(e);
+			}
+
+			_processingEvents = false;
+
+			if (_scheduleEvents)
+			{
+				_scheduleEvents = false;
+				ProcessEvents();
 			}
 		}
 
