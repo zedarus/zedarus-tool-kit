@@ -11,10 +11,12 @@ namespace Zedarus.ToolKit.StateMachines
 		private int _currentStateIndex;
 		private List<int> _statesHistory;
 		private bool _changingStateInProgress = false;
+		private int _queuedState = NONE;
 		#endregion
 
 		#region Settings
 		private int _historyLenght;
+		private const int NONE = -1;
 		#endregion
 
 		#region Initialization
@@ -57,11 +59,13 @@ namespace Zedarus.ToolKit.StateMachines
 			}
 		}
 
-		public void ChangeState(int newState)
+		public void ChangeState(int newState, bool allowQueue = false)
 		{
 			if (_changingStateInProgress)
 			{
-				Debug.LogWarning("You can't change state from state Enter of Exit methods. Use Update method instead");
+				Debug.Log("You can't change state from state Enter of Exit methods. Use Update method instead");
+				if (allowQueue)
+					_queuedState = newState;
 				return;
 			}
 
@@ -90,6 +94,13 @@ namespace Zedarus.ToolKit.StateMachines
 					_statesHistory.RemoveAt(0);
 				_currentStateIndex = nextStateIndex;
 				_changingStateInProgress = false;
+			}
+
+			if (_queuedState != NONE)
+			{
+				int qs = _queuedState;
+				_queuedState = NONE;
+				ChangeState(qs);
 			}
 		}
 
