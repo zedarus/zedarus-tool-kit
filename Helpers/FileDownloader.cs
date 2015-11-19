@@ -59,7 +59,7 @@ namespace Zedarus.ToolKit.Helpers
 			while (!www.isDone)
 			{
 				elapsedTime += Time.deltaTime;
-				if (elapsedTime >= 10f) break;
+				if (elapsedTime >= 60f) break;
 				yield return null;
 			}
 			
