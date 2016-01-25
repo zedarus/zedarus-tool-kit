@@ -1,14 +1,18 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using Zedarus.ToolKit.Helpers;
 
 namespace Zedarus.ToolKit.Events
 {
 	public class EventManager : SimplePrivateSingleton<EventManager>
 	{
+		private ObjectIDGenerator _idGenerator = new ObjectIDGenerator();
 		private List<Event> _events;
 		private List<EventListener> _listeners;
+		private bool _processingEvents = false;
+		private bool _scheduleEvents = false;
 
 		public EventManager()
 		{
@@ -117,17 +121,27 @@ namespace Zedarus.ToolKit.Events
 		#region Events
 		public void ProcessEvents()
 		{
+			if (_processingEvents)
+			{
+				_scheduleEvents = true;
+				return;
+			}
+
+			_processingEvents = true;
+
 			Event eventObject;
 			EventListener listener;
 			for (int e = _events.Count - 1; e >= 0; e--)
 			{
 				eventObject = _events[e];
+				eventObject.Live();
 				for (int l = _listeners.Count - 1; l >= 0; l--)
 				{
 					listener = _listeners[l];
 					if (listener.Event == eventObject.ID)
 					{
 						listener.Call(eventObject);
+						eventObject.Process();
 
 						if (listener.Expired)
 							_listeners.RemoveAt(l);
@@ -141,8 +155,19 @@ namespace Zedarus.ToolKit.Events
 				}
 			}
 
-			// TODO: add lifelength for unprocessed events so they are not removed immidately if not processed
-			_events.Clear();
+			for (int e = _events.Count - 1; e >= 0; e--)
+			{
+				if (_events[e].Processed || _events[e].Dead)
+					_events.RemoveAt(e);
+			}
+
+			_processingEvents = false;
+
+			if (_scheduleEvents)
+			{
+				_scheduleEvents = false;
+				ProcessEvents();
+			}
 		}
 
 		public void RegisterEvent(int e)
@@ -184,64 +209,72 @@ namespace Zedarus.ToolKit.Events
 		#region Listeners
 		public void CreateListener(int e, System.Action handler, bool consume, bool oneTime)
 		{
-			_listeners.Add(new EventListener(e, handler, consume, oneTime));
+			bool firstTime;
+			_listeners.Add(new EventListener(e, handler, _idGenerator.GetId(handler.Target, out firstTime), consume, oneTime));
 			UpdateSceneObject();
 		}
 
 		public void CreateListener<T>(int e, System.Action<T> handler, bool consume, bool oneTime)
 		{
-			_listeners.Add(new EventListener<T>(e, handler, consume, oneTime));
+			bool firstTime;
+			_listeners.Add(new EventListener<T>(e, handler, _idGenerator.GetId(handler.Target, out firstTime), consume, oneTime));
 			UpdateSceneObject();
 		}
 
 		public void CreateListener<T1,T2>(int e, System.Action<T1,T2> handler, bool consume, bool oneTime)
 		{
-			_listeners.Add(new EventListener<T1,T2>(e, handler, consume, oneTime));
+			bool firstTime;
+			_listeners.Add(new EventListener<T1,T2>(e, handler, _idGenerator.GetId(handler.Target, out firstTime), consume, oneTime));
 			UpdateSceneObject();
 		}
 
 		public void CreateListener<T1,T2,T3>(int e, System.Action<T1,T2,T3> handler, bool consume, bool oneTime)
 		{
-			_listeners.Add(new EventListener<T1,T2,T3>(e, handler, consume, oneTime));
+			bool firstTime;
+			_listeners.Add(new EventListener<T1,T2,T3>(e, handler, _idGenerator.GetId(handler.Target, out firstTime), consume, oneTime));
 			UpdateSceneObject();
 		}
 
 		public void CreateListener<T1,T2,T3,T4>(int e, System.Action<T1,T2,T3,T4> handler, bool consume, bool oneTime)
 		{
-			_listeners.Add(new EventListener<T1,T2,T3,T4>(e, handler, consume, oneTime));
+			bool firstTime;
+			_listeners.Add(new EventListener<T1,T2,T3,T4>(e, handler, _idGenerator.GetId(handler.Target, out firstTime), consume, oneTime));
 			UpdateSceneObject();
 		}
 
 		public void DestroyListener(int e, System.Action handler)
 		{
-			DestroyListener(e, handler.Method.Name);
+			
+			DestroyListener(e, handler.Method.Name, handler.Target);
 		}
 
 		public void DestroyListener<T1>(int e, System.Action<T1> handler)
 		{
-			DestroyListener(e, handler.Method.Name);
+			DestroyListener(e, handler.Method.Name, handler.Target);
 		}
 
 		public void DestroyListener<T1,T2>(int e, System.Action<T1,T2> handler)
 		{
-			DestroyListener(e, handler.Method.Name);
+			DestroyListener(e, handler.Method.Name, handler.Target);
 		}
 
 		public void DestroyListener<T1,T2,T3>(int e, System.Action<T1,T2,T3> handler)
 		{
-			DestroyListener(e, handler.Method.Name);
+			DestroyListener(e, handler.Method.Name, handler.Target);
 		}
 
 		public void DestroyListener<T1,T2,T3,T4>(int e, System.Action<T1,T2,T3,T4> handler)
 		{
-			DestroyListener(e, handler.Method.Name);
+			DestroyListener(e, handler.Method.Name, handler.Target);
 		}
 
-		public void DestroyListener(int e, string methodName)
+		public void DestroyListener(int e, string methodName, object target)
 		{
+			bool firstTime;
+			long id = _idGenerator.GetId(target, out firstTime);
 			for (int i = _listeners.Count - 1; i >= 0; i--)
 			{
-				if (_listeners[i].Event == e && _listeners[i].Handler.Equals(methodName))
+				if (_listeners[i].Event == e && _listeners[i].Handler.Equals(methodName) && _listeners[i].TargetID == id)
 					_listeners.RemoveAt(i);
 			}
 			UpdateSceneObject();
