@@ -7,7 +7,8 @@ namespace Zedarus.ToolKit
 	{
 		iCloud,
 		General,
-		Server
+		Server,
+		Score,
 	}
 
 	public class ZedLogger : SimpleSingleton<ZedLogger>
@@ -50,6 +51,8 @@ namespace Zedarus.ToolKit
 			{
 				case LoggerContext.iCloud:
 					return false;
+				case LoggerContext.Score:
+					return true;
 				default:
 					return false;
 			}
