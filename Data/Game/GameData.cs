@@ -7,7 +7,9 @@ using Zedarus.ToolKit;
 using Zedarus.ToolKit.Helpers;
 using Zedarus.ToolKit.Data.Adapters;
 using Zedarus.ToolKit.Data.Game;
+#if ZTK_DATA_SQL
 using SimpleSQL;
+#endif
 
 namespace Zedarus.ToolKit.Data.Game
 {
@@ -62,12 +64,16 @@ namespace Zedarus.ToolKit.Data.Game
 
 		private void LoadVersionData()
 		{
+			#if ZTK_DATA_SQL
 			SimpleDataTable result = SQLiteAdapter.Manager.QueryGeneric("SELECT * FROM version");
 			string version = result.rows[0].fields[1].ToString();
 			string date = result.rows[0].fields[2].ToString();
 			
 			int.TryParse(version, out _version);
 			_date = GeneralHelper.ParseTime(date);
+			#else
+			_date = DateTime.Now;
+			#endif
 		}
 		#endregion
 

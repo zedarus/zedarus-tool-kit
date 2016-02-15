@@ -19,8 +19,10 @@ namespace Zedarus.ToolKit.Localisation
 		public LocalisationManager()
 		{
 			_pages = new Dictionary<int, string>();
+			#if ZTK_LOC_M2H
 			LanguageCode localLang = Language.LanguageNameToCode(Application.systemLanguage);
 			APIManager.Instance.Analytics.LogSystemLanguage(localLang.ToString());
+			#endif
 		}
 		#endregion
 
@@ -50,14 +52,23 @@ namespace Zedarus.ToolKit.Localisation
 
 		public string Get(string word, int page) 
 		{
+			#if ZTK_LOC_M2H
 			return Language.Get(word, ConvertPageIDToStringValue(page));
+			#else
+			return "no localisation plugin";
+			#endif
 		}
 
 		public string Get(string word) 
 		{
+			#if ZTK_LOC_M2H
 			return Language.Get(word);
+			#else
+			return "no localisation plugin";
+			#endif
 		}
-		
+
+		#if ZTK_LOC_M2H
 		public string GetForLanguage(string word, int page, LanguageCode language)
 		{
 			LanguageCode currentLanguage = Language.CurrentLanguage();
@@ -66,6 +77,7 @@ namespace Zedarus.ToolKit.Localisation
 			ChangeLanguage(currentLanguage);
 			return s;
 		}
+		#endif
 		#endregion
 		
 		#region Helpers
@@ -79,15 +91,19 @@ namespace Zedarus.ToolKit.Localisation
 
 		public void ChangeLanguage(string languageCode) 
 		{
+			#if ZTK_LOC_M2H
 			Language.SwitchLanguage(languageCode);
 			APIManager.Instance.Analytics.LogLanguageChange(languageCode.ToLower());
+			#endif
 		}
-		
+
+		#if ZTK_LOC_M2H
 		public void ChangeLanguage(LanguageCode languageCode) 
 		{
 			Language.SwitchLanguage(languageCode);
 			APIManager.Instance.Analytics.LogLanguageChange(languageCode.ToString().ToLower());
 		}
+		#endif
 		#endregion
 	}
 }

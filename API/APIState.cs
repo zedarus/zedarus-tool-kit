@@ -2,15 +2,22 @@
 using System.Collections;
 using System.Collections.Generic;
 using Zedarus.ToolKit.Data.Player;
+#if ZTK_DATA_SERIALIZATION
 using Serialization;
+#endif
 
 namespace Zedarus.ToolKit.API
 {
 	public class APIState : PlayerDataModel
 	{
 		#region Properties
+		#if ZTK_DATA_SERIALIZATION
 		[SerializeThis] private bool _adsRemoved;
 		[SerializeThis] private int _interstitialsEvents;
+		#else
+		private bool _adsRemoved;
+		private int _interstitialsEvents;
+		#endif
 		#endregion
 
 		#region Init

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using System.Collections;
 using Zedarus.ToolKit;
 
@@ -22,11 +23,11 @@ namespace Zedarus.ToolKit.ScenesManagement
 			_currentScene = _nextScene = sceneName;
 
 			if (_useLoadingScene)
-				Application.LoadLevel(LoadingSceneName);
+				SceneManager.LoadScene(LoadingSceneName);
 			else
 			{
 				Resources.UnloadUnusedAssets();
-				Application.LoadLevel(_nextScene);
+				SceneManager.LoadScene(_nextScene);
 			}
 		}
 
@@ -69,7 +70,7 @@ namespace Zedarus.ToolKit.ScenesManagement
 		#region Scenes Loading
 		private AsyncOperation LoadScene(string sceneName) 
 		{
-			AsyncOperation asyncOperation = Application.LoadLevelAsync(sceneName);
+			AsyncOperation asyncOperation = SceneManager.LoadSceneAsync(sceneName);
 			asyncOperation.allowSceneActivation = false;
 			return asyncOperation;
 		}

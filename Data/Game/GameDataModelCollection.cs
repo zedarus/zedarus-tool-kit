@@ -3,13 +3,17 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Zedarus.ToolKit.Data.Adapters;
+#if ZTK_DATA_SQL
 using SimpleSQL;
+#endif
 
 namespace Zedarus.ToolKit.Data.Game
 {
 	public class GameDataModelCollection<T> : IGameDataModelCollection where T : GameDataModel
 	{
-		private string _tableName;
+		#if ZTK_DATA_SQL
+		private string _tableName = null;
+		#endif
 		private Dictionary<int, T> _models;
 		private Dictionary<string, GameDataModelCollectionIndex<string, T>> _indexes;
 		private Dictionary<string, GameDataModelCollectionIndex<int, T>> _indexesInt;
@@ -17,9 +21,11 @@ namespace Zedarus.ToolKit.Data.Game
 
 		public GameDataModelCollection()
 		{
+			#if ZTK_DATA_SQL
 			T sampleInstance = (T)Activator.CreateInstance(typeof(T));
 			_tableName = sampleInstance.GetDBTable();
 			sampleInstance = null;
+			#endif
 			_models = new Dictionary<int, T>();
 			_indexes = new Dictionary<string, GameDataModelCollectionIndex<string, T>>();
 			_indexesInt = new Dictionary<string, GameDataModelCollectionIndex<int, T>>();
@@ -39,13 +45,17 @@ namespace Zedarus.ToolKit.Data.Game
 
 		public bool LoadFromDB()
 		{
+			#if ZTK_DATA_SQL
 			SimpleDataTable result = SQLiteAdapter.Manager.QueryGeneric("SELECT * FROM " + _tableName);
 			for (int i = 0; i < result.rows.Count; i++)
 			{
 				T item = (T)Activator.CreateInstance(typeof(T), result.columns, result.rows[i]);
 				Add(item.ID, item);
 			}
+			return true;
+			#else
 			return false;
+			#endif
 		}
 
 		#region Get By ID

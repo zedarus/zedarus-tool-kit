@@ -3,9 +3,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
-using LitJson;
-using SimpleSQL;
 using Zedarus.ToolKit.Helpers;
+#if ZTK_DATA_JSON
+using LitJson;
+#endif
+#if ZTK_DATA_SQL
+using SimpleSQL;
+#endif
 
 namespace Zedarus.ToolKit.Data.Game
 {
@@ -25,6 +29,7 @@ namespace Zedarus.ToolKit.Data.Game
 			_enabled = enabled;
 		}
 
+		#if ZTK_DATA_JSON
 		public GameDataModel(JsonData json)
 		{
 			if (json != null)
@@ -33,7 +38,9 @@ namespace Zedarus.ToolKit.Data.Game
 				_enabled = GetBool(json, "enabled");
 			}
 		}
+		#endif
 
+		#if ZTK_DATA_SQL
 		public GameDataModel(List<SimpleDataColumn> columns, SimpleDataRow row)
 		{
 			if (columns != null && row != null)
@@ -42,6 +49,7 @@ namespace Zedarus.ToolKit.Data.Game
 				_enabled = GetBool(columns, row, "enabled");
 			}
 		}
+		#endif
 
 		public virtual string[] GetIndexes()
 		{
@@ -66,6 +74,7 @@ namespace Zedarus.ToolKit.Data.Game
 		#endregion
 
 		#region JSON
+		#if ZTK_DATA_JSON
 		protected string GetString(JsonData json, string field)
 		{
 			if (json[field] != null)
@@ -101,9 +110,11 @@ namespace Zedarus.ToolKit.Data.Game
 		{
 			return GeneralHelper.ParseTime(GetString(json, field));
 		}
+		#endif
 		#endregion
 
 		#region SQLite
+		#if ZTK_DATA_SQL
 		protected object GetObject(List<SimpleDataColumn> columns, SimpleDataRow row, string field)
 		{
 			int index = 0;
@@ -221,6 +232,7 @@ namespace Zedarus.ToolKit.Data.Game
 			newFields.CopyTo(fields, oldFields.Length);
 			return fields;
 		}
+		#endif
 		#endregion
 	}
 }

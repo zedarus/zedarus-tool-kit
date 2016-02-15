@@ -8,17 +8,25 @@ using Zedarus.ToolKit.Data;
 using Zedarus.ToolKit.Data.Adapters;
 using Zedarus.ToolKit.Data.Player;
 using Zedarus.ToolKit.API;
+#if ZTK_DATA_SERIALIZATION
 using Serialization;
-using LitJson;
+#endif
+//using LitJson;
 
 namespace Zedarus.ToolKit.Data.Player
 {
 	public class PlayerData
 	{
 		#region Build Info
+		#if ZTK_DATA_SERIALIZATION
 		[SerializeThis] private string _gameVersion;
 		[SerializeThis] private int _buildNumber = 0;
 		[SerializeThis] private DateTime _timestamp;
+		#else
+		private string _gameVersion;
+		private int _buildNumber = 0;
+		private DateTime _timestamp;
+		#endif
 		#endregion
 
 		#region Parameters
@@ -27,9 +35,15 @@ namespace Zedarus.ToolKit.Data.Player
 		#endregion
 
 		#region Models
+		#if ZTK_DATA_SERIALIZATION
 		[SerializeThis] private bool _useDataSync;   // do not sync this
 		[SerializeThis] private bool _askedToUseSync;   // do not sync this
 		[SerializeThis] private Dictionary<string, PlayerDataModel> _models;
+		#else
+		private bool _useDataSync;   // do not sync this
+		private bool _askedToUseSync;   // do not sync this
+		private Dictionary<string, PlayerDataModel> _models;
+		#endif
 		#endregion
 		
 		#region Readers

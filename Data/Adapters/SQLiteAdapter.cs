@@ -2,25 +2,26 @@
 using System.Collections;
 using Zedarus.ToolKit;
 using Zedarus.ToolKit.Data.Adapters;
+#if ZTK_USE_SQL
 using SimpleSQL;
+#endif
 
 namespace Zedarus.ToolKit.Data.Adapters
 {
 	public class SQLiteAdapter : IDataAdapter
 	{
-		private static SimpleSQLManager dbManager = null;
-
 		public T LoadData<T>(string path) where T : class
 		{
-			//Manager.QueryGeneric();
 			return null;
 		}
 		
 		public bool SaveData<T>(T data, string path) where T : class
 		{
-			//ZedLogger.Log("Saving data to: " + path);
 			return true;
 		}
+
+		#if ZTK_USE_SQL
+		private static SimpleSQLManager dbManager = null;
 
 		static public SimpleSQLManager Manager
 		{
@@ -35,5 +36,6 @@ namespace Zedarus.ToolKit.Data.Adapters
 				return SQLiteAdapter.dbManager;
 			}
 		}
+		#endif
 	}
 }
