@@ -120,7 +120,13 @@ namespace Zedarus.ToolKit.StateMachines
 		#region Queries
 		public int CurrentState
 		{
-			get { return _states[_currentStateIndex].State; }
+			get 
+			{
+				if (_currentStateIndex >= 0 && _currentStateIndex < _states.Count)
+					return _states[_currentStateIndex].State; 
+				else
+					return -1;
+			}
 		}
 
 		public bool StateWithIDExists(int id)
