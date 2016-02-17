@@ -11,6 +11,7 @@ namespace Zedarus.ToolKit.StateMachines
 		private int _currentStateIndex;
 		private List<int> _statesHistory;
 		private bool _changingStateInProgress = false;
+		private Queue<int> _statesQueue = new Queue<int>();
 		#endregion
 
 		#region Settings
@@ -34,9 +35,12 @@ namespace Zedarus.ToolKit.StateMachines
 				_states[_currentStateIndex].Update(deltaTime);
 		}
 
-		public void CreateState(int state, Action<float> CycleHandler, Action EnterHandler, Action ExitHandler)
+		public void CreateState(int state, Action<float> CycleHandler, Action EnterHandler, Action ExitHandler, Func<bool> EnterConditionHandler)
 		{
-			_states.Add(new StateMachineState(state, CycleHandler, EnterHandler, ExitHandler));
+			if (!StateWithIDExists(state))
+				_states.Add(new StateMachineState(state, CycleHandler, EnterHandler, ExitHandler, EnterConditionHandler));
+			else
+				Debug.LogError("Can't create state with ID " + state + " because this ID already exists in this state machine");
 		}
 
 		public void RevertToPreviousState(bool skipSameState = false)
@@ -61,7 +65,8 @@ namespace Zedarus.ToolKit.StateMachines
 		{
 			if (_changingStateInProgress)
 			{
-				Debug.LogWarning("You can't change state from state Enter of Exit methods. Use Update method instead");
+				Debug.Log("You can't change state from state Enter of Exit methods. State change queued untill current one finished");
+				_statesQueue.Enqueue(newState);
 				return;
 			}
 
@@ -79,17 +84,26 @@ namespace Zedarus.ToolKit.StateMachines
 
 			if (nextStateIndex != _currentStateIndex)
 			{
-				_changingStateInProgress = true;
-				if (_currentStateIndex != -1)
-					_states[_currentStateIndex].Exit();
+				if (_states[nextStateIndex].CheckEnterCondition())
+				{
+					_changingStateInProgress = true;
+					if (_currentStateIndex != -1)
+						_states[_currentStateIndex].Exit();
 
-				_states[nextStateIndex].Enter();
+					_states[nextStateIndex].Enter();
 
-				_statesHistory.Add(_currentStateIndex);
-				if (_statesHistory.Count > _historyLenght)
-					_statesHistory.RemoveAt(0);
-				_currentStateIndex = nextStateIndex;
+					_statesHistory.Add(_currentStateIndex);
+					if (_statesHistory.Count > _historyLenght)
+						_statesHistory.RemoveAt(0);
+					_currentStateIndex = nextStateIndex;
+				}
+
 				_changingStateInProgress = false;
+			}
+
+			if (_statesQueue.Count > 0)
+			{
+				ChangeState(_statesQueue.Dequeue());
 			}
 		}
 
@@ -107,6 +121,22 @@ namespace Zedarus.ToolKit.StateMachines
 		public int CurrentState
 		{
 			get { return _states[_currentStateIndex].State; }
+		}
+
+		public bool StateWithIDExists(int id)
+		{
+			return GetStateWithID(id) != null;
+		}
+
+		public StateMachineState GetStateWithID(int id)
+		{
+			foreach (StateMachineState state in _states)
+			{
+				if (state.State == id)
+					return state;
+			}
+
+			return null;
 		}
 		#endregion
 	}

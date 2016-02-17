@@ -11,15 +11,17 @@ namespace Zedarus.ToolKit.StateMachines
 		private Action<float> _cycleHandler;
 		private Action _enterHandler;
 		private Action _exitHandler;
+		private Func<bool> _enterConditionHandler;
 		#endregion
 
 		#region Initialization
-		public StateMachineState(int state, Action<float> CycleHandler, Action EnterHandler, Action ExitHandler)
+		public StateMachineState(int state, Action<float> CycleHandler, Action EnterHandler, Action ExitHandler, Func<bool> EnterConditionHandler)
 		{
 			_state = state;
 			_cycleHandler = CycleHandler;
 			_enterHandler = EnterHandler;
 			_exitHandler = ExitHandler;
+			_enterConditionHandler = EnterConditionHandler;
 		}
 		#endregion
 
@@ -42,12 +44,21 @@ namespace Zedarus.ToolKit.StateMachines
 				_exitHandler();
 		}
 
+		public bool CheckEnterCondition()
+		{
+			if (_enterConditionHandler != null)
+				return _enterConditionHandler();
+			else
+				return true;
+		}
+
 		public void Destroy()
 		{
 			_state = 0;
 			_cycleHandler = null;
 			_enterHandler = null;
 			_exitHandler = null;
+			_enterConditionHandler = null;
 		}
 		#endregion
 
