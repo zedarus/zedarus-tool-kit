@@ -3,7 +3,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Zedarus.ToolKit.Data.Adapters;
-using SimpleSQL;
 
 namespace Zedarus.ToolKit.Data.Game
 {
@@ -18,7 +17,7 @@ namespace Zedarus.ToolKit.Data.Game
 		public GameDataModelCollection()
 		{
 			T sampleInstance = (T)Activator.CreateInstance(typeof(T));
-			_tableName = sampleInstance.GetDBTable();
+			//_tableName = sampleInstance.GetDBTable();
 			sampleInstance = null;
 			_models = new Dictionary<int, T>();
 			_indexes = new Dictionary<string, GameDataModelCollectionIndex<string, T>>();
@@ -39,12 +38,12 @@ namespace Zedarus.ToolKit.Data.Game
 
 		public bool LoadFromDB()
 		{
-			SimpleDataTable result = SQLiteAdapter.Manager.QueryGeneric("SELECT * FROM " + _tableName);
-			for (int i = 0; i < result.rows.Count; i++)
-			{
-				T item = (T)Activator.CreateInstance(typeof(T), result.columns, result.rows[i]);
-				Add(item.ID, item);
-			}
+			//SimpleDataTable result = SQLiteAdapter.Manager.QueryGeneric("SELECT * FROM " + _tableName);
+			//for (int i = 0; i < result.rows.Count; i++)
+			//{
+			//	T item = (T)Activator.CreateInstance(typeof(T), result.columns, result.rows[i]);
+			//	Add(item.ID, item);
+			//}
 			return false;
 		}
 
