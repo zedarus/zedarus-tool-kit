@@ -18,6 +18,10 @@ namespace Zedarus.ToolKit.StateMachines
 		private int _historyLenght;
 		#endregion
 
+		#region Events
+		public event Action<int> StateChange;
+		#endregion
+
 		#region Initialization
 		public StateMachine(int historyLenght = 10)
 		{
@@ -91,6 +95,9 @@ namespace Zedarus.ToolKit.StateMachines
 						_states[_currentStateIndex].Exit();
 
 					_states[nextStateIndex].Enter();
+
+					if (StateChange != null)
+						StateChange(_states[nextStateIndex].State);
 
 					_statesHistory.Add(_currentStateIndex);
 					if (_statesHistory.Count > _historyLenght)
