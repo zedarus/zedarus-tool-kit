@@ -11,7 +11,7 @@ namespace Zedarus.ToolKit.PoolManagement
 		private Transform _container;
 		private bool _autoReuse;
 
-		public PoolManager(Transform container, bool autoReuse = false)
+		public PoolManager(Transform container, int size, T prefab, bool autoReuse = false)
 		{
 			_autoReuse = autoReuse;
 			_pool = new List<T>();
@@ -23,6 +23,23 @@ namespace Zedarus.ToolKit.PoolManagement
 			{
 				child.Init();
 				_pool.Add(child);
+			}
+
+			if (_pool.Count < size && prefab != null)
+			{
+				int attempts = size + 200;
+				while (_pool.Count < size && attempts > 0)
+				{
+					T newPoolObject = GameObject.Instantiate(prefab) as T;
+					if (newPoolObject != null)
+					{
+						newPoolObject.transform.parent = container;
+						newPoolObject.Init();
+						_pool.Add(newPoolObject);
+					}
+					else
+						attempts--;
+				}
 			}
 		}
 
