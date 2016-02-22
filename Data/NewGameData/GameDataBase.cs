@@ -100,6 +100,11 @@ namespace Zedarus.Toolkit.Data.New.Game
 			return null;
 		}
 
+		public virtual void RemoveModelDataAt(int modelID, int modelDataIndex)
+		{
+			
+		}
+
 		public int RenderModelsDataListView(int modelID)
 		{
 			int selectedModelDataIndex = -1;

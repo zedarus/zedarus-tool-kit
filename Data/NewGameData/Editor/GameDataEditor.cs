@@ -6,28 +6,31 @@ namespace Zedarus.Toolkit.Data.New.Game
 {
 	public class GameDataEditor : EditorWindow
 	{
+		#region Settings
 		private enum State
 		{
-			BLANK,
-			EDIT,
-			ADD
+			Blank = 0,
+			Edit = 1,
+			Add = 2,
 		}
 
-		private State state;
-
 		private const string _windowUIPath = "Window/Zedarus Games/Game Data";
+		#endregion
+
+		#region Properties
+		private State _state;
+
 		private int _currentModelID = 0;
 		private int _selectedModelDataIndex = -1;
 
 		private GameDataBase _data = null;
-		private IGameDataModel _newModel = null;
+		private IGameDataModel _model = null;
 
-		private Vector2 _scrollPos;
 		private Vector2 _modelsViewScrollPos = Vector2.zero;
 		private Vector2 _modelsListViewScrollPos = Vector2.zero;
+		#endregion
 
-		//private EnemyData _enemyContainer = new EnemyData();
-
+		#region Initialization
 		[MenuItem(_windowUIPath)]
 		public static void Init()
 		{
@@ -35,11 +38,12 @@ namespace Zedarus.Toolkit.Data.New.Game
 			window.minSize = new Vector2(800, 400);
 			window.Show();
 		}
+		#endregion
 
 		#region Unity Methods
 		private void OnEnable()
 		{
-			state = State.BLANK;
+			_state = State.Blank;
 		}
 
 		private void OnGUI()
@@ -60,6 +64,11 @@ namespace Zedarus.Toolkit.Data.New.Game
 				RenderModelsListView();
 				RenderEditArea();
 				EditorGUILayout.EndHorizontal();
+			}
+			else
+			{
+				_currentModelID = 0;
+				_selectedModelDataIndex = -1;
 			}
 		}
 
@@ -82,6 +91,7 @@ namespace Zedarus.Toolkit.Data.New.Game
 
 			if (modelID > 0 && modelID != _currentModelID)
 			{
+				GUI.FocusControl(null);
 				_currentModelID = modelID;
 			}
 
@@ -108,17 +118,19 @@ namespace Zedarus.Toolkit.Data.New.Game
 					IGameDataModel selectedModel = _data.GetModelDataAt(_currentModelID, modelIndex);
 					if (selectedModel != null)
 					{
-						_newModel = _data.CreateNewModel(_currentModelID);
-						_newModel.CopyValuesFrom(selectedModel);
+						GUI.FocusControl(null);
+						_model = _data.CreateNewModel(_currentModelID);
+						_model.CopyValuesFrom(selectedModel);
 						_selectedModelDataIndex = modelIndex;
-						state = State.EDIT;
+						_state = State.Edit;
 					}
 				}
 
 				if (GUILayout.Button("New"))
 				{
-					_newModel = _data.CreateNewModel(_currentModelID);
-					state = State.ADD;
+					GUI.FocusControl(null);
+					_model = _data.CreateNewModel(_currentModelID);
+					_state = State.Add;
 				}
 
 				EditorGUILayout.Space();
@@ -131,41 +143,96 @@ namespace Zedarus.Toolkit.Data.New.Game
 			EditorGUILayout.BeginVertical(GUILayout.ExpandWidth(true));
 			EditorGUILayout.Space();
 
-			if (state == State.ADD)
+			switch (_state)
 			{
-				if (_newModel != null)
-				{
-					if (_newModel.RenderForm("Add"))
-					{
-						_data.AddModelData(_currentModelID, _newModel);
-						GUI.FocusControl(null);
-						EditorUtility.SetDirty(_data);
-						_newModel = null;
-						state = State.BLANK;
-					}
-				}
-			}
-			else if (state == State.EDIT)
-			{
-				if (_newModel != null)
-				{
-					if (_newModel.RenderForm("Save"))
-					{
-						GUI.FocusControl(null);
-						IGameDataModel model = _data.GetModelDataAt(_currentModelID, _selectedModelDataIndex);
-						if (model != null)
-						{
-							model.CopyValuesFrom(_newModel);
-							EditorUtility.SetDirty(_data);
-						}
-						_newModel = null;
-						state = State.BLANK;
-					}
-				}
+				case State.Add:
+					RenderModelAdd();
+					break;
+				case State.Edit:
+					RenderModelEdit();
+					break;
 			}
 
 			EditorGUILayout.Space();
 			EditorGUILayout.EndVertical();
+		}
+
+		private void RenderModelAdd()
+		{
+			if (_model != null)
+			{
+				EditorGUILayout.LabelField("");
+				EditorGUILayout.Space();
+
+				_model.RenderForm();
+				EditorGUILayout.Space();
+
+				EditorGUILayout.BeginHorizontal();
+
+				if (GUILayout.Button("Add", GUILayout.Width(100)))
+				{
+					_data.AddModelData(_currentModelID, _model);
+					GUI.FocusControl(null);
+					EditorUtility.SetDirty(_data);
+					_model = null;
+					_state = State.Blank;
+				}
+				else if (GUILayout.Button("Cancel", GUILayout.Width(100)))
+				{
+					GUI.FocusControl(null);
+					_model = null;
+					_state = State.Blank;
+				}
+
+				EditorGUILayout.EndHorizontal();
+			}
+		}
+
+		private void RenderModelEdit()
+		{
+			if (_model != null)
+			{
+				EditorGUILayout.LabelField(_model.ListName);
+				EditorGUILayout.Space();
+
+				_model.RenderForm();
+				EditorGUILayout.Space();
+
+				EditorGUILayout.BeginHorizontal();
+
+				if (GUILayout.Button("Save", GUILayout.Width(100)))
+				{
+					GUI.FocusControl(null);
+					IGameDataModel model = _data.GetModelDataAt(_currentModelID, _selectedModelDataIndex);
+					if (model != null)
+					{
+						model.CopyValuesFrom(_model);
+						EditorUtility.SetDirty(_data);
+					}
+					_model = null;
+					_state = State.Blank;
+				}
+				else if (GUILayout.Button("Cancel", GUILayout.Width(100)))
+				{
+					GUI.FocusControl(null);
+					_model = null;
+					_state = State.Blank;
+				}
+				else if (GUILayout.Button("Delete", GUILayout.Width(100)))
+				{
+					GUI.FocusControl(null);
+
+					if (EditorUtility.DisplayDialog("Warning!", "Are you sure you want to delete " + _model.ListName + "?", "Yes", "No"))
+					{
+						_data.RemoveModelDataAt(_currentModelID, _selectedModelDataIndex);
+						EditorUtility.SetDirty(_data);
+						_model = null;
+						_state = State.Blank;
+					}
+				}
+
+				EditorGUILayout.EndHorizontal();
+			}
 		}
 		#endregion
 
