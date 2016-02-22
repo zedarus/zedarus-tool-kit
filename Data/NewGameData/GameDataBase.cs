@@ -1,0 +1,126 @@
+﻿using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+using System.Collections;
+using System.Collections.Generic;
+
+namespace Zedarus.Toolkit.Data.New.Game
+{
+	public class GameDataBase : ScriptableObject
+	{
+		#region Settings
+		public static string DATABASE_PATH
+		{
+			get
+			{
+				return "Assets/Resources/Data/GameData.asset";
+			}
+		}
+
+		public static string DATABASE_LOCAL_PATH
+		{
+			get
+			{
+				return "Data/GameData";
+			}
+		}
+		#endregion
+
+		#region Unity Methods
+		private void OnEnable()
+		{
+			Init();
+		}
+		#endregion
+
+		#region Initialization
+		protected virtual void Init()
+		{
+			
+		}
+		#endregion
+
+		#if UNITY_EDITOR
+		#region Editor
+		private Dictionary<int, string> _models = new Dictionary<int, string>();
+
+		protected void RegisterModel(int id, string name)
+		{
+			if (!_models.ContainsKey(id))
+			{
+				_models.Add(id, name);
+			}
+			else
+				Debug.LogError("Model with this ID was already registered");
+		}
+
+		public virtual void AddModelData(int modelID, IGameDataModel modelData)
+		{
+			
+		}
+
+		public virtual string GetModelName(int id)
+		{
+			if (_models.ContainsKey(id))
+				return _models[id];
+			else
+				return "NONE";
+		}
+
+		protected virtual List<string> GetGameModelListNamesForID(int id)
+		{
+			return null;
+		}
+
+		public int RenderModelsView()
+		{
+			int selectedModelID = 0;
+			foreach (KeyValuePair<int, string> model in _models)
+			{
+				EditorGUILayout.BeginHorizontal();
+
+				if (GUILayout.Button(model.Value, "box", GUILayout.ExpandWidth(true)))
+				{
+					selectedModelID = model.Key;
+				}
+
+				EditorGUILayout.EndHorizontal();
+			}
+			return selectedModelID;
+		}
+
+		public virtual IGameDataModel CreateNewModel(int modelID)
+		{
+			return null;
+		}
+
+		public virtual IGameDataModel GetModelDataAt(int modelID, int modelDataIndex)
+		{
+			return null;
+		}
+
+		public int RenderModelsDataListView(int modelID)
+		{
+			int selectedModelDataIndex = -1;
+			List<string> modelsData = GetGameModelListNamesForID(modelID);
+			if (modelsData != null)
+			{
+				for (int i = 0; i < modelsData.Count; i++)
+				{
+					EditorGUILayout.BeginHorizontal();
+
+					if (GUILayout.Button(modelsData[i], "box", GUILayout.ExpandWidth(true)))
+					{
+						selectedModelDataIndex = i;
+					}
+
+					EditorGUILayout.EndHorizontal();
+				}
+			}
+			return selectedModelDataIndex;
+		}
+		#endregion
+		#endif
+	}
+}
