@@ -55,9 +55,11 @@ namespace Zedarus.Toolkit.Data.New.Game
 				Debug.LogError("Model with this ID was already registered");
 		}
 
-		public virtual void AddModelData(int modelID, IGameDataModel modelData)
+		public void AddModelData(int modelID, IGameDataModel modelData)
 		{
-			
+			IList list = GetListForModel(modelID);
+			if (list != null)
+				list.Add(modelData);
 		}
 
 		public virtual string GetModelName(int id)
@@ -68,9 +70,21 @@ namespace Zedarus.Toolkit.Data.New.Game
 				return "NONE";
 		}
 
-		protected virtual List<string> GetGameModelListNamesForID(int id)
+		protected List<string> GetGameModelListNamesForID(int id)
 		{
-			return null;
+			List<string> names = new List<string>();
+			IList list = GetListForModel(id);
+
+			if (list != null)
+			{
+				foreach (IGameDataModel modelData in GetListForModel(id))
+				{
+					if (modelData != null)
+						names.Add(modelData.ListName);
+				}
+			}
+
+			return names;
 		}
 
 		public int RenderModelsView()
@@ -95,14 +109,18 @@ namespace Zedarus.Toolkit.Data.New.Game
 			return null;
 		}
 
-		public virtual IGameDataModel GetModelDataAt(int modelID, int modelDataIndex)
+		public IGameDataModel GetModelDataAt(int modelID, int modelDataIndex)
 		{
-			return null;
+			IList list = GetListForModel(modelID);
+			if (list != null && modelDataIndex >= 0 && modelDataIndex < list.Count)
+				return list[modelDataIndex] as IGameDataModel;
+			else
+				return null;
 		}
 
-		public virtual void RemoveModelDataAt(int modelID, int modelDataIndex)
+		public void RemoveModelDataAt(int modelID, int modelDataIndex)
 		{
-			
+			RemoteItemFromList(GetListForModel(modelID), modelDataIndex);
 		}
 
 		public int RenderModelsDataListView(int modelID)
@@ -124,6 +142,17 @@ namespace Zedarus.Toolkit.Data.New.Game
 				}
 			}
 			return selectedModelDataIndex;
+		}
+
+		protected virtual IList GetListForModel(int modelID)
+		{
+			return null;
+		}
+
+		private void RemoteItemFromList(IList list, int index)
+		{
+			if (list != null && index >= 0 && index < list.Count)
+				list.RemoveAt(index);
 		}
 		#endregion
 		#endif

@@ -69,6 +69,7 @@ namespace Zedarus.Toolkit.Data.New.Game
 			{
 				_currentModelID = 0;
 				_selectedModelDataIndex = -1;
+				_state = State.Blank;
 			}
 		}
 
