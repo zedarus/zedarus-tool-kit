@@ -93,6 +93,7 @@ namespace Zedarus.Toolkit.Data.New.Game
 			if (modelID > 0 && modelID != _currentModelID)
 			{
 				GUI.FocusControl(null);
+				_state = State.Blank;
 				_currentModelID = modelID;
 			}
 
@@ -172,11 +173,18 @@ namespace Zedarus.Toolkit.Data.New.Game
 
 				if (GUILayout.Button("Add", GUILayout.Width(100)))
 				{
-					_data.AddModelData(_currentModelID, _model);
 					GUI.FocusControl(null);
-					EditorUtility.SetDirty(_data);
-					_model = null;
-					_state = State.Blank;
+
+					if (_data.AddModelData(_currentModelID, _model))
+					{
+						EditorUtility.SetDirty(_data);
+						_model = null;
+						_state = State.Blank;
+					}
+					else
+					{
+						EditorUtility.DisplayDialog("Error", "Model data with this ID already exists", "OK");
+					}
 				}
 				else if (GUILayout.Button("Cancel", GUILayout.Width(100)))
 				{
@@ -204,14 +212,22 @@ namespace Zedarus.Toolkit.Data.New.Game
 				if (GUILayout.Button("Save", GUILayout.Width(100)))
 				{
 					GUI.FocusControl(null);
-					IGameDataModel model = _data.GetModelDataAt(_currentModelID, _selectedModelDataIndex);
-					if (model != null)
+
+					if (!_data.IsModelIDAlreadyInUse(_currentModelID, _model.ID))
 					{
-						model.CopyValuesFrom(_model);
-						EditorUtility.SetDirty(_data);
+						IGameDataModel model = _data.GetModelDataAt(_currentModelID, _selectedModelDataIndex);
+						if (model != null)
+						{
+							model.CopyValuesFrom(_model);
+							EditorUtility.SetDirty(_data);
+						}
+						_model = null;
+						_state = State.Blank;
 					}
-					_model = null;
-					_state = State.Blank;
+					else
+					{
+						EditorUtility.DisplayDialog("Error", "Model data with this ID already exists", "OK");
+					}
 				}
 				else if (GUILayout.Button("Cancel", GUILayout.Width(100)))
 				{

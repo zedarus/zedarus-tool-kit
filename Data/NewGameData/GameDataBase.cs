@@ -9,6 +9,10 @@ namespace Zedarus.Toolkit.Data.New.Game
 {
 	public class GameDataBase : ScriptableObject
 	{
+		#region Properties
+		[SerializeField] private int _modelsIDCoutner = 0;
+		#endregion
+
 		#region Settings
 		public static string DATABASE_PATH
 		{
@@ -55,11 +59,66 @@ namespace Zedarus.Toolkit.Data.New.Game
 				Debug.LogError("Model with this ID was already registered");
 		}
 
-		public void AddModelData(int modelID, IGameDataModel modelData)
+		protected int NextModelID
 		{
+			get
+			{
+				int maxID = 0;
+
+				foreach (KeyValuePair<int, string> model in _models)
+				{
+					IList list = GetListForModel(model.Key);
+
+					if (list != null)
+					{
+						foreach (IGameDataModel modelData in list)
+						{
+							if (modelData != null && modelData.ID > maxID)
+								maxID = modelData.ID;
+						}
+					}
+				}
+
+				if (_modelsIDCoutner < maxID)
+					_modelsIDCoutner = maxID;
+
+				return ++_modelsIDCoutner;
+			}
+		}
+
+		/// <summary>
+		/// Adds the model data.
+		/// </summary>
+		/// <returns>Returns <code>false</code> if model data with this ID already exists.</returns>
+		/// <param name="modelID">Model identifier.</param>
+		/// <param name="modelData">Model data.</param>
+		public bool AddModelData(int modelID, IGameDataModel modelData)
+		{
+			if (IsModelIDAlreadyInUse(modelID, modelData.ID))
+				return false;
+			
 			IList list = GetListForModel(modelID);
+
 			if (list != null)
 				list.Add(modelData);
+
+			return true;
+		}
+
+		public bool IsModelIDAlreadyInUse(int modelID, int id)
+		{
+			IList list = GetListForModel(modelID);
+
+			if (list != null)
+			{
+				foreach (IGameDataModel existingModelData in list)
+				{
+					if (existingModelData != null && existingModelData.ID == id)
+						return true;
+				}
+			}
+
+			return false;
 		}
 
 		public virtual string GetModelName(int id)
@@ -77,7 +136,7 @@ namespace Zedarus.Toolkit.Data.New.Game
 
 			if (list != null)
 			{
-				foreach (IGameDataModel modelData in GetListForModel(id))
+				foreach (IGameDataModel modelData in list)
 				{
 					if (modelData != null)
 						names.Add(modelData.ListName);
