@@ -45,7 +45,7 @@ namespace Zedarus.Toolkit.Data.New.Game
 			GUI.enabled = true;
 		}
 
-		public virtual string ListName { get { return ID.ToString(); } }
+		public virtual string ListName { get { return "#" + ID.ToString(); } }
 
 		public virtual void CopyValuesFrom(IGameDataModel data)
 		{

@@ -212,10 +212,12 @@ namespace Zedarus.Toolkit.Data.New.Game
 				if (GUILayout.Button("Save", GUILayout.Width(100)))
 				{
 					GUI.FocusControl(null);
+					IGameDataModel model = _data.GetModelDataAt(_currentModelID, _selectedModelDataIndex);
 
-					if (!_data.IsModelIDAlreadyInUse(_currentModelID, _model.ID))
+					bool idAlreadyInUse = model.ID != _model.ID && _data.IsModelIDAlreadyInUse(_currentModelID, _model.ID);
+
+					if (!idAlreadyInUse)
 					{
-						IGameDataModel model = _data.GetModelDataAt(_currentModelID, _selectedModelDataIndex);
 						if (model != null)
 						{
 							model.CopyValuesFrom(_model);
