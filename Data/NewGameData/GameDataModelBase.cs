@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -38,6 +37,30 @@ namespace Zedarus.Toolkit.Data.New.Game
 		#endregion
 
 		#if UNITY_EDITOR
+		#region Helpers
+		protected string RenderPrefabField(string label, string value, System.Type type, int previewWidth = 100, int previewHeight = 100)
+		{
+			EditorGUILayout.BeginHorizontal();
+
+			value = EditorGUILayout.TextField(label, value);
+
+			Object prefabRef = AssetDatabase.LoadAssetAtPath<Object>(string.Concat("Assets/Resources/", value, ".prefab"));
+			prefabRef = EditorGUILayout.ObjectField(prefabRef, type, false, GUILayout.MaxWidth(150));
+			if (prefabRef != null)
+			{
+				value = AssetDatabase.GetAssetPath(prefabRef).Replace("Assets/Resources/", "").Replace(".prefab", "");
+
+				GUIContent content = new GUIContent(AssetPreview.GetAssetPreview(prefabRef));
+				EditorGUILayout.LabelField(content, GUILayout.Width(previewWidth), GUILayout.Height(previewHeight));
+
+				prefabRef = null;
+			}
+			EditorGUILayout.EndHorizontal();
+
+			return value;
+		}
+		#endregion
+
 		public virtual void RenderForm()
 		{
 			GUI.enabled = false;
