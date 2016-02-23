@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using Zedarus.ToolKit.Math;
 
 namespace Zedarus.ToolKit.PoolManagement
 {
@@ -11,7 +12,7 @@ namespace Zedarus.ToolKit.PoolManagement
 		private Transform _container;
 		private bool _autoReuse;
 
-		public PoolManager(Transform container, int size, T prefab, bool autoReuse = false)
+		public PoolManager(Transform container, int size, bool autoReuse, T[] prefabs, params int[] prefabsShuffleBag)
 		{
 			_autoReuse = autoReuse;
 			_pool = new List<T>();
@@ -25,12 +26,18 @@ namespace Zedarus.ToolKit.PoolManagement
 				_pool.Add(child);
 			}
 
-			if (_pool.Count < size && prefab != null)
+			if (_pool.Count < size && prefabs != null && prefabs.Length > 0)
 			{
+				ShuffleBag<int> bag = new ShuffleBag<int>();
+				for (int i = 0; i < prefabs.Length; i++)
+				{
+					bag.Add(i, prefabsShuffleBag.Length > i ? prefabsShuffleBag[i] : 1);
+				}
+
 				int attempts = size + 200;
 				while (_pool.Count < size && attempts > 0)
 				{
-					T newPoolObject = GameObject.Instantiate(prefab) as T;
+					T newPoolObject = GameObject.Instantiate(prefabs[bag.Next()]) as T;
 					if (newPoolObject != null)
 					{
 						newPoolObject.transform.parent = container;
@@ -40,8 +47,15 @@ namespace Zedarus.ToolKit.PoolManagement
 					else
 						attempts--;
 				}
+
+				bag.Clear();
+				bag = null;
 			}
+
+			prefabs = null;
 		}
+
+		public PoolManager(Transform container, int size, T prefab, bool autoReuse = false) : this(container, size, autoReuse, new T[] { prefab }, 1) { }
 
 		public virtual T GetItemFromPool()
 		{
