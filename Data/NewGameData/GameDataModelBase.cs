@@ -105,6 +105,8 @@ namespace Zedarus.Toolkit.Data.New.Game
 				RenderStringField(field, attribute);
 			else if (field.FieldType == typeof(int))
 				RenderIntField(field, attribute);
+			else if (field.FieldType == typeof(float))
+				RenderFloatField(field, attribute);
 			else if (field.FieldType == typeof(bool))
 				RenderBoolField(field, attribute);
 			else
@@ -148,6 +150,12 @@ namespace Zedarus.Toolkit.Data.New.Game
 		{
 			// TODO: add errors check here too
 			field.SetValue(this, EditorGUILayout.IntField(attribute.EditorLabel, int.Parse(field.GetValue(this).ToString())));
+		}
+
+		private void RenderFloatField(FieldInfo field, GameDataModelField attribute)
+		{
+			// TODO: add errors check here too
+			field.SetValue(this, EditorGUILayout.FloatField(attribute.EditorLabel, float.Parse(field.GetValue(this).ToString())));
 		}
 
 		private void RenderBoolField(FieldInfo field, GameDataModelField attribute)
