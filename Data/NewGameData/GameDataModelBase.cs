@@ -1,7 +1,9 @@
 ﻿using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
+using System.Reflection;
 #endif
+using System.Collections.Generic;
 
 namespace Zedarus.Toolkit.Data.New.Game
 {
@@ -9,7 +11,7 @@ namespace Zedarus.Toolkit.Data.New.Game
 	public class GameDataModelBase : IGameDataModel
 	{
 		#region Properties
-		[SerializeField] private int _id;
+		[SerializeField][GameDataModelField("ID", locked = true)] private int _id;
 		#endregion
 
 		#region Initalization
@@ -25,18 +27,48 @@ namespace Zedarus.Toolkit.Data.New.Game
 		public int ID
 		{
 			get { return _id; }
-			#if UNITY_EDITOR
-			set 
-			{
-				if (value < 0)
-					value = 0;
-				_id = value; 
-			}
-			#endif
 		}
 		#endregion
 
 		#if UNITY_EDITOR
+		public void RenderForm()
+		{
+			FieldInfo[] fields = GetFields(this);
+
+			foreach (FieldInfo field in fields)
+			{
+				object[] attrs = field.GetCustomAttributes(typeof(GameDataModelField), true);
+				foreach (object attr in attrs)
+				{
+					GameDataModelField fieldAttr = attr as GameDataModelField;
+					if (fieldAttr != null)
+					{
+						RenderEditorForField(field, fieldAttr);
+					}
+				}
+			}
+		}
+
+		public virtual string ListName { get { return "#" + ID.ToString(); } }
+
+		public void CopyValuesFrom(IGameDataModel data)
+		{
+			FieldInfo[] fields = GetFields(data);
+
+			foreach (FieldInfo field in fields)
+			{
+				object[] attrs = field.GetCustomAttributes(typeof(GameDataModelField), true);
+				foreach (object attr in attrs)
+				{
+					GameDataModelField fieldAttr = attr as GameDataModelField;
+					if (fieldAttr != null)
+					{
+						ReplaceValueForFieldInCurrentInstance(field, data);
+					}
+				}
+			}
+		}
+
 		#region Helpers
 		protected string RenderPrefabField(string label, string value, System.Type type, int previewWidth = 100, int previewHeight = 100)
 		{
@@ -59,24 +91,100 @@ namespace Zedarus.Toolkit.Data.New.Game
 
 			return value;
 		}
-		#endregion
 
-		public virtual void RenderForm()
+		private void RenderEditorForField(FieldInfo field, GameDataModelField attribute)
 		{
-			GUI.enabled = false;
-			ID = EditorGUILayout.IntField("ID", ID);
-			GUI.enabled = true;
+			if (attribute.locked)
+				GUI.enabled = false;
+
+			if (!attribute.autoRender)
+				RenderUnhandledEditorField(field, attribute);
+			else if (attribute.customFieldType != GameDataModelField.CustomFieldType.Default)
+				RenderCustomEditorForField(field, attribute);
+			else if (field.FieldType == typeof(string))
+				RenderStringField(field, attribute);
+			else if (field.FieldType == typeof(int))
+				RenderIntField(field, attribute);
+			else if (field.FieldType == typeof(bool))
+				RenderBoolField(field, attribute);
+			else
+				RenderUnhandledEditorField(field, attribute);
+
+			if (attribute.locked)
+				GUI.enabled = true;
 		}
 
-		public virtual string ListName { get { return "#" + ID.ToString(); } }
-
-		public virtual void CopyValuesFrom(IGameDataModel data)
+		private void RenderCustomEditorForField(FieldInfo field, GameDataModelField attribute)
 		{
-			GameDataModelBase other = data as GameDataModelBase;
-			if (other != null)
+			switch (attribute.customFieldType)
 			{
-				ID = other.ID;
+			case GameDataModelField.CustomFieldType.Prefab:
+				object value = field.GetValue(this);
+				string currentValue = "";
+				if (value != null)
+					currentValue = value.ToString();
+				currentValue = RenderPrefabField(attribute.EditorLabel, currentValue, attribute.customFieldTypeLimit);
+				field.SetValue(this, currentValue);
+				break;
 			}
+		}
+
+		protected virtual void RenderUnhandledEditorField(FieldInfo field, GameDataModelField attribute)
+		{
+			
+		}
+
+		private void RenderStringField(FieldInfo field, GameDataModelField attribute)
+		{
+			object value = field.GetValue(this);
+			string currentValue = "";
+			if (value != null)
+				currentValue = value.ToString();
+			
+			field.SetValue(this, EditorGUILayout.TextField(attribute.EditorLabel, currentValue));
+		}
+
+		private void RenderIntField(FieldInfo field, GameDataModelField attribute)
+		{
+			// TODO: add errors check here too
+			field.SetValue(this, EditorGUILayout.IntField(attribute.EditorLabel, int.Parse(field.GetValue(this).ToString())));
+		}
+
+		private void RenderBoolField(FieldInfo field, GameDataModelField attribute)
+		{
+			// TODO: add errors check here too
+			field.SetValue(this, EditorGUILayout.Toggle(attribute.EditorLabel, bool.Parse(field.GetValue(this).ToString())));
+		}
+		#endregion
+
+		private void ReplaceValueForFieldInCurrentInstance(FieldInfo field, object target)
+		{
+			FieldInfo[] fields = GetFields(this);
+
+			foreach (FieldInfo currentField in fields)
+			{
+				if (currentField.Equals(field))
+				{
+					currentField.SetValue(this, field.GetValue(target));
+				}
+			}
+		}
+
+		private FieldInfo[] GetFields(IGameDataModel target)
+		{
+			List<FieldInfo> fields = new List<FieldInfo>();
+
+			fields.AddRange(target.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance));
+
+			System.Type baseType = target.GetType().BaseType;
+
+			while (baseType != null)
+			{
+				fields.InsertRange(0, baseType.GetFields(BindingFlags.NonPublic | BindingFlags.Instance));
+				baseType = baseType.BaseType;
+			}
+
+			return fields.ToArray();
 		}
 		#endif
 	}
