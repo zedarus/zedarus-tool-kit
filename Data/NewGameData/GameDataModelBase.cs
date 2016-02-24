@@ -11,7 +11,7 @@ namespace Zedarus.Toolkit.Data.New.Game
 	public class GameDataModelBase : IGameDataModel
 	{
 		#region Properties
-		[SerializeField][GameDataModelField("ID", locked = true)] private int _id;
+		[SerializeField][DataField("ID", locked = true)] private int _id;
 		#endregion
 
 		#region Initalization
@@ -37,10 +37,10 @@ namespace Zedarus.Toolkit.Data.New.Game
 
 			foreach (FieldInfo field in fields)
 			{
-				object[] attrs = field.GetCustomAttributes(typeof(GameDataModelField), true);
+				object[] attrs = field.GetCustomAttributes(typeof(DataField), true);
 				foreach (object attr in attrs)
 				{
-					GameDataModelField fieldAttr = attr as GameDataModelField;
+					DataField fieldAttr = attr as DataField;
 					if (fieldAttr != null)
 					{
 						RenderEditorForField(field, fieldAttr);
@@ -57,10 +57,10 @@ namespace Zedarus.Toolkit.Data.New.Game
 
 			foreach (FieldInfo field in fields)
 			{
-				object[] attrs = field.GetCustomAttributes(typeof(GameDataModelField), true);
+				object[] attrs = field.GetCustomAttributes(typeof(DataField), true);
 				foreach (object attr in attrs)
 				{
-					GameDataModelField fieldAttr = attr as GameDataModelField;
+					DataField fieldAttr = attr as DataField;
 					if (fieldAttr != null)
 					{
 						ReplaceValueForFieldInCurrentInstance(field, data);
@@ -92,14 +92,14 @@ namespace Zedarus.Toolkit.Data.New.Game
 			return value;
 		}
 
-		private void RenderEditorForField(FieldInfo field, GameDataModelField attribute)
+		private void RenderEditorForField(FieldInfo field, DataField attribute)
 		{
 			if (attribute.locked)
 				GUI.enabled = false;
 
 			if (!attribute.autoRender)
 				RenderUnhandledEditorField(field, attribute);
-			else if (attribute.customFieldType != GameDataModelField.CustomFieldType.Default)
+			else if (attribute.customFieldType != DataField.CustomFieldType.Default)
 				RenderCustomEditorForField(field, attribute);
 			else if (field.FieldType == typeof(string))
 				RenderStringField(field, attribute);
@@ -111,16 +111,18 @@ namespace Zedarus.Toolkit.Data.New.Game
 				RenderBoolField(field, attribute);
 			else
 				RenderUnhandledEditorField(field, attribute);
+			
+			ValidateField(field);
 
 			if (attribute.locked)
 				GUI.enabled = true;
 		}
 
-		private void RenderCustomEditorForField(FieldInfo field, GameDataModelField attribute)
+		private void RenderCustomEditorForField(FieldInfo field, DataField attribute)
 		{
 			switch (attribute.customFieldType)
 			{
-			case GameDataModelField.CustomFieldType.Prefab:
+			case DataField.CustomFieldType.Prefab:
 				object value = field.GetValue(this);
 				string currentValue = "";
 				if (value != null)
@@ -131,12 +133,12 @@ namespace Zedarus.Toolkit.Data.New.Game
 			}
 		}
 
-		protected virtual void RenderUnhandledEditorField(FieldInfo field, GameDataModelField attribute)
+		protected virtual void RenderUnhandledEditorField(FieldInfo field, DataField attribute)
 		{
 			
 		}
 
-		private void RenderStringField(FieldInfo field, GameDataModelField attribute)
+		private void RenderStringField(FieldInfo field, DataField attribute)
 		{
 			object value = field.GetValue(this);
 			string currentValue = "";
@@ -146,22 +148,38 @@ namespace Zedarus.Toolkit.Data.New.Game
 			field.SetValue(this, EditorGUILayout.TextField(attribute.EditorLabel, currentValue));
 		}
 
-		private void RenderIntField(FieldInfo field, GameDataModelField attribute)
+		private void RenderIntField(FieldInfo field, DataField attribute)
 		{
 			// TODO: add errors check here too
 			field.SetValue(this, EditorGUILayout.IntField(attribute.EditorLabel, int.Parse(field.GetValue(this).ToString())));
 		}
 
-		private void RenderFloatField(FieldInfo field, GameDataModelField attribute)
+		private void RenderFloatField(FieldInfo field, DataField attribute)
 		{
 			// TODO: add errors check here too
 			field.SetValue(this, EditorGUILayout.FloatField(attribute.EditorLabel, float.Parse(field.GetValue(this).ToString())));
 		}
 
-		private void RenderBoolField(FieldInfo field, GameDataModelField attribute)
+		private void RenderBoolField(FieldInfo field, DataField attribute)
 		{
 			// TODO: add errors check here too
 			field.SetValue(this, EditorGUILayout.Toggle(attribute.EditorLabel, bool.Parse(field.GetValue(this).ToString())));
+		}
+
+		private void ValidateField(FieldInfo field)
+		{
+			object[] attrs = field.GetCustomAttributes(typeof(DataValidateClamp), true);
+			foreach (object attr in attrs)
+			{
+				DataValidateClamp fieldAttr = attr as DataValidateClamp;
+				if (fieldAttr != null)
+				{
+					if (field.FieldType == typeof(int))
+						field.SetValue(this, Mathf.Clamp(int.Parse(field.GetValue(this).ToString()), fieldAttr.Min, fieldAttr.Max));
+					else if (field.FieldType == typeof(float))
+						field.SetValue(this, Mathf.Clamp(float.Parse(field.GetValue(this).ToString()), fieldAttr.MinFloat, fieldAttr.MaxFloat));
+				}
+			}
 		}
 		#endregion
 
@@ -174,6 +192,7 @@ namespace Zedarus.Toolkit.Data.New.Game
 				if (currentField.Equals(field))
 				{
 					currentField.SetValue(this, field.GetValue(target));
+					ValidateField(currentField);
 				}
 			}
 		}
