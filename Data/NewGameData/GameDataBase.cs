@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
+using System.Reflection;
 #endif
 using System.Collections;
 using System.Collections.Generic;
@@ -41,33 +42,45 @@ namespace Zedarus.Toolkit.Data.New.Game
 		#region Initialization
 		protected virtual void Init()
 		{
-			
+			#if UNITY_EDITOR
+			LoadTables();
+			#endif
 		}
 		#endregion
 
 		#if UNITY_EDITOR
 		#region Editor
-		private Dictionary<int, string> _models = new Dictionary<int, string>();
+		private Dictionary<int, FieldInfo> _tables = new Dictionary<int, FieldInfo>();
 
-		protected void RegisterModel(int id, string name)
+		private void LoadTables()
 		{
-			if (!_models.ContainsKey(id))
+			FieldInfo[] fields = GetFields(this);
+
+			foreach (FieldInfo field in fields)
 			{
-				_models.Add(id, name);
+				DataTable attr = GetTableAttributeForField(field);
+				if (attr != null)
+				{
+					if (field.GetValue(this) == null)
+					{
+						field.SetValue(this, System.Activator.CreateInstance(field.FieldType));
+					}
+
+					_tables.Add(attr.ID, field);
+				}
 			}
-			else
-				Debug.LogError("Model with this ID was already registered");
 		}
 
-		protected int NextModelID
+		private int NextModelID
 		{
 			get
 			{
 				int maxID = 0;
+				_modelsIDCoutner = 0;
 
-				foreach (KeyValuePair<int, string> model in _models)
+				foreach (KeyValuePair<int, FieldInfo> table in _tables)
 				{
-					IList list = GetListForModel(model.Key);
+					IList list = GetListForTable(table.Key);
 
 					if (list != null)
 					{
@@ -90,14 +103,14 @@ namespace Zedarus.Toolkit.Data.New.Game
 		/// Adds the model data.
 		/// </summary>
 		/// <returns>Returns <code>false</code> if model data with this ID already exists.</returns>
-		/// <param name="modelID">Model identifier.</param>
+		/// <param name="tableID">Model identifier.</param>
 		/// <param name="modelData">Model data.</param>
-		public bool AddModelData(int modelID, IGameDataModel modelData)
+		public bool AddModelData(int tableID, IGameDataModel modelData)
 		{
-			if (IsModelIDAlreadyInUse(modelID, modelData.ID))
+			if (IsModelIDAlreadyInUse(tableID, modelData.ID))
 				return false;
 			
-			IList list = GetListForModel(modelID);
+			IList list = GetListForTable(tableID);
 
 			if (list != null)
 				list.Add(modelData);
@@ -105,9 +118,9 @@ namespace Zedarus.Toolkit.Data.New.Game
 			return true;
 		}
 
-		public bool IsModelIDAlreadyInUse(int modelID, int id)
+		public bool IsModelIDAlreadyInUse(int tableID, int id)
 		{
-			IList list = GetListForModel(modelID);
+			IList list = GetListForTable(tableID);
 
 			if (list != null)
 			{
@@ -121,18 +134,22 @@ namespace Zedarus.Toolkit.Data.New.Game
 			return false;
 		}
 
-		public virtual string GetModelName(int id)
+		public string GetTableName(int id)
 		{
-			if (_models.ContainsKey(id))
-				return _models[id];
-			else
-				return "NONE";
+			if (_tables.ContainsKey(id))
+			{
+				DataTable table = GetTableAttributeForField(_tables[id]);
+				if (table != null)
+					return table.Name;
+			}
+
+			return "NONE";
 		}
 
-		protected List<string> GetGameModelListNamesForID(int id)
+		private List<string> GetGameModelListNamesForID(int id)
 		{
 			List<string> names = new List<string>();
-			IList list = GetListForModel(id);
+			IList list = GetListForTable(id);
 
 			if (list != null)
 			{
@@ -149,13 +166,13 @@ namespace Zedarus.Toolkit.Data.New.Game
 		public int RenderModelsView()
 		{
 			int selectedModelID = 0;
-			foreach (KeyValuePair<int, string> model in _models)
+			foreach (KeyValuePair<int, FieldInfo> table in _tables)
 			{
 				EditorGUILayout.BeginHorizontal();
 
-				if (GUILayout.Button(model.Value, "box", GUILayout.ExpandWidth(true)))
+				if (GUILayout.Button(GetTableName(table.Key), "box", GUILayout.ExpandWidth(true)))
 				{
-					selectedModelID = model.Key;
+					selectedModelID = table.Key;
 				}
 
 				EditorGUILayout.EndHorizontal();
@@ -163,23 +180,32 @@ namespace Zedarus.Toolkit.Data.New.Game
 			return selectedModelID;
 		}
 
-		public virtual IGameDataModel CreateNewModel(int modelID)
+		public IGameDataModel CreateNewModel(int tableID)
 		{
+			if (_tables.ContainsKey(tableID))
+			{
+				DataTable table = GetTableAttributeForField(_tables[tableID]);
+				if (table != null)
+				{
+					return System.Activator.CreateInstance(table.Type, NextModelID) as IGameDataModel;
+				}
+			}
+
 			return null;
 		}
 
-		public IGameDataModel GetModelDataAt(int modelID, int modelDataIndex)
+		public IGameDataModel GetModelDataAt(int tableID, int modelDataIndex)
 		{
-			IList list = GetListForModel(modelID);
+			IList list = GetListForTable(tableID);
 			if (list != null && modelDataIndex >= 0 && modelDataIndex < list.Count)
 				return list[modelDataIndex] as IGameDataModel;
 			else
 				return null;
 		}
 
-		public void RemoveModelDataAt(int modelID, int modelDataIndex)
+		public void RemoveModelDataAt(int tableID, int modelDataIndex)
 		{
-			RemoteItemFromList(GetListForModel(modelID), modelDataIndex);
+			RemoteItemFromList(GetListForTable(tableID), modelDataIndex);
 		}
 
 		public int RenderModelsDataListView(int modelID)
@@ -203,9 +229,15 @@ namespace Zedarus.Toolkit.Data.New.Game
 			return selectedModelDataIndex;
 		}
 
-		protected virtual IList GetListForModel(int modelID)
+		private IList GetListForTable(int tableID)
 		{
-			return null;
+			if (_tables.ContainsKey(tableID))
+			{
+				FieldInfo field = _tables[tableID];
+				return field.GetValue(this) as IList;
+			}
+			else
+				return null;
 		}
 
 		private void RemoteItemFromList(IList list, int index)
@@ -213,7 +245,41 @@ namespace Zedarus.Toolkit.Data.New.Game
 			if (list != null && index >= 0 && index < list.Count)
 				list.RemoveAt(index);
 		}
+
+		private FieldInfo[] GetFields(GameDataBase target)
+		{
+			List<FieldInfo> fields = new List<FieldInfo>();
+
+			fields.AddRange(target.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance));
+
+			System.Type baseType = target.GetType().BaseType;
+
+			while (baseType != null)
+			{
+				fields.InsertRange(0, baseType.GetFields(BindingFlags.NonPublic | BindingFlags.Instance));
+				baseType = baseType.BaseType;
+			}
+
+			return fields.ToArray();
+		}
+
+		private DataTable GetTableAttributeForField(FieldInfo field)
+		{
+			object[] attrs = field.GetCustomAttributes(typeof(DataTable), true);
+			foreach (object attr in attrs)
+			{
+				DataTable fieldAttr = attr as DataTable;
+				if (fieldAttr != null)
+				{
+					return fieldAttr;
+				}
+			}
+
+			return null;
+		}
 		#endregion
 		#endif
 	}
+
+
 }

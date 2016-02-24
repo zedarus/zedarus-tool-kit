@@ -4,6 +4,36 @@ using System.Collections;
 namespace Zedarus.Toolkit.Data.New.Game
 {
 	[System.AttributeUsage(System.AttributeTargets.Field)]
+	public class DataTable : System.Attribute
+	{
+		private int _id;
+		private string _name;
+		private System.Type _type;
+
+		public DataTable(int id, string name, System.Type type)
+		{
+			_id = id;
+			_name = name;
+			_type = type;
+		}
+
+		public int ID
+		{
+			get { return _id; }
+		}
+
+		public string Name
+		{
+			get { return _name; }
+		}
+
+		public System.Type Type
+		{
+			get { return _type; }
+		}
+	}
+
+	[System.AttributeUsage(System.AttributeTargets.Field)]
 	public class DataField : System.Attribute
 	{
 		public enum CustomFieldType

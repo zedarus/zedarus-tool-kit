@@ -109,7 +109,7 @@ namespace Zedarus.Toolkit.Data.New.Game
 			{
 				EditorGUILayout.BeginVertical(GUILayout.Width(250));
 				EditorGUILayout.Space();
-				EditorGUILayout.LabelField(_data.GetModelName(_currentModelID));
+				EditorGUILayout.LabelField(_data.GetTableName(_currentModelID));
 
 				_modelsListViewScrollPos = EditorGUILayout.BeginScrollView(_modelsListViewScrollPos, "box", GUILayout.ExpandHeight(true));
 				int modelIndex = _data.RenderModelsDataListView(_currentModelID);
@@ -147,12 +147,12 @@ namespace Zedarus.Toolkit.Data.New.Game
 
 			switch (_state)
 			{
-				case State.Add:
-					RenderModelAdd();
-					break;
-				case State.Edit:
-					RenderModelEdit();
-					break;
+			case State.Add:
+				RenderModelAdd();
+				break;
+			case State.Edit:
+				RenderModelEdit();
+				break;
 			}
 
 			EditorGUILayout.Space();
@@ -256,7 +256,7 @@ namespace Zedarus.Toolkit.Data.New.Game
 		#endregion
 
 		#region Helpers
-		private bool DataLoaded 
+		private bool DataLoaded
 		{
 			get { return _data != null; }
 		}
