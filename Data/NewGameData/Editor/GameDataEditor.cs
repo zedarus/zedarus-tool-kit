@@ -55,6 +55,7 @@ namespace Zedarus.Toolkit.Data.New.Game
 		#region UI Rendering
 		private void RenderUI()
 		{
+			EditorGUILayout.Space();
 			RenderDataBase();
 
 			if (DataLoaded)
