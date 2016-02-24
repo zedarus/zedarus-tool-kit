@@ -144,7 +144,7 @@ namespace Zedarus.ToolKit.Events
 						if (listener.Expired)
 							_listeners.RemoveAt(l);
 
-						if (listener.Consume)
+						if (listener.Consume && _events.Count > e)
 						{
 							_events.RemoveAt(e);
 							break;
