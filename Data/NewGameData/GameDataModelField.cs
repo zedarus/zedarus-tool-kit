@@ -46,6 +46,7 @@ namespace Zedarus.Toolkit.Data.New.Game
 		public bool locked = false;
 		public CustomFieldType customFieldType = CustomFieldType.Default;
 		public System.Type customFieldTypeLimit = null;
+		public bool customFieldPreview = true;
 		public bool autoRender = true;
 
 		public DataField(string editorLabel)

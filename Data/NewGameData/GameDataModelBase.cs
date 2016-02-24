@@ -70,7 +70,7 @@ namespace Zedarus.Toolkit.Data.New.Game
 		}
 
 		#region Helpers
-		protected string RenderPrefabField(string label, string value, System.Type type, int previewWidth = 100, int previewHeight = 100)
+		protected string RenderPrefabField(string label, string value, System.Type type, bool includePreview, int previewWidth = 100, int previewHeight = 100)
 		{
 			EditorGUILayout.BeginHorizontal();
 
@@ -82,8 +82,11 @@ namespace Zedarus.Toolkit.Data.New.Game
 			{
 				value = AssetDatabase.GetAssetPath(prefabRef).Replace("Assets/Resources/", "").Replace(".prefab", "");
 
-				GUIContent content = new GUIContent(AssetPreview.GetAssetPreview(prefabRef));
-				EditorGUILayout.LabelField(content, GUILayout.Width(previewWidth), GUILayout.Height(previewHeight));
+				if (includePreview)
+				{
+					GUIContent content = new GUIContent(AssetPreview.GetAssetPreview(prefabRef));
+					EditorGUILayout.LabelField(content, GUILayout.Width(previewWidth), GUILayout.Height(previewHeight));
+				}
 
 				prefabRef = null;
 			}
@@ -127,7 +130,7 @@ namespace Zedarus.Toolkit.Data.New.Game
 				string currentValue = "";
 				if (value != null)
 					currentValue = value.ToString();
-				currentValue = RenderPrefabField(attribute.EditorLabel, currentValue, attribute.customFieldTypeLimit);
+				currentValue = RenderPrefabField(attribute.EditorLabel, currentValue, attribute.customFieldTypeLimit, attribute.customFieldPreview);
 				field.SetValue(this, currentValue);
 				break;
 			}
