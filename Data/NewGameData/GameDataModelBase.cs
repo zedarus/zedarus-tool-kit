@@ -95,6 +95,16 @@ namespace Zedarus.Toolkit.Data.New.Game
 			return value;
 		}
 
+		protected void RenderPrefabPreview(string path, int width, int height)
+		{
+			if (path != null)
+			{
+				Object prefabRef = AssetDatabase.LoadAssetAtPath<Object>(string.Concat("Assets/Resources/", path, ".prefab"));
+				GUIContent content = new GUIContent(AssetPreview.GetAssetPreview(prefabRef));
+				EditorGUILayout.LabelField(content, GUILayout.Width(width), GUILayout.Height(height));
+			}
+		}
+
 		private void RenderEditorForField(FieldInfo field, DataField attribute)
 		{
 			if (attribute.locked)
@@ -194,7 +204,8 @@ namespace Zedarus.Toolkit.Data.New.Game
 			{
 				if (currentField.Equals(field))
 				{
-					currentField.SetValue(this, field.GetValue(target));
+					object value = field.GetValue(target);
+					currentField.SetValue(this, value);
 					ValidateField(currentField);
 				}
 			}
