@@ -61,6 +61,60 @@ namespace Zedarus.Toolkit.Data.New.Game
 	}
 
 	[System.AttributeUsage(System.AttributeTargets.Field)]
+	public class DataValidateMin : System.Attribute
+	{
+		private int _min = 0;
+		private float _minFloat = 0f;
+
+		public DataValidateMin(int min)
+		{
+			_min = min;
+		}
+
+		public DataValidateMin(float min)
+		{
+			_minFloat = min;
+		}
+
+		public int Min
+		{
+			get { return _min; }
+		}
+
+		public float MinFloat
+		{
+			get { return _minFloat; }
+		}
+	}
+
+	[System.AttributeUsage(System.AttributeTargets.Field)]
+	public class DataValidateMax : System.Attribute
+	{
+		private int _max = 0;
+		private float _maxFloat = 0f;
+
+		public DataValidateMax(int max)
+		{
+			_max = max;
+		}
+
+		public DataValidateMax(float max)
+		{
+			_maxFloat = max;
+		}
+
+		public int Max
+		{
+			get { return _max; }
+		}
+
+		public float MaxFloat
+		{
+			get { return _maxFloat; }
+		}
+	}
+
+	[System.AttributeUsage(System.AttributeTargets.Field)]
 	public class DataValidateClamp : System.Attribute
 	{
 		private int _min = 0;
@@ -98,6 +152,22 @@ namespace Zedarus.Toolkit.Data.New.Game
 		public float MaxFloat
 		{
 			get { return _maxFloat; }
+		}
+	}
+
+	[System.AttributeUsage(System.AttributeTargets.Field)]
+	public class DataGroup : System.Attribute
+	{
+		private string _title = "";
+
+		public DataGroup(string title)
+		{
+			_title = title;
+		}
+
+		public string Title
+		{
+			get { return _title; }
 		}
 	}
 }

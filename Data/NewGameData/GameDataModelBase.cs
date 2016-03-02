@@ -34,10 +34,24 @@ namespace Zedarus.Toolkit.Data.New.Game
 		public void RenderForm()
 		{
 			FieldInfo[] fields = GetFields(this);
+			object[] attrs = null;
+
+			int fieldCount = 0;
 
 			foreach (FieldInfo field in fields)
 			{
-				object[] attrs = field.GetCustomAttributes(typeof(DataField), true);
+				attrs = field.GetCustomAttributes(typeof(DataGroup), true);
+				foreach (object attr in attrs)
+				{
+					DataGroup fieldAttr = attr as DataGroup;
+					if (fieldAttr != null)
+					{
+						if (fieldCount > 0) EditorGUILayout.Space();
+						EditorGUILayout.LabelField(fieldAttr.Title, EditorStyles.boldLabel);
+					}
+				}
+
+				attrs = field.GetCustomAttributes(typeof(DataField), true);
 				foreach (object attr in attrs)
 				{
 					DataField fieldAttr = attr as DataField;
@@ -46,6 +60,8 @@ namespace Zedarus.Toolkit.Data.New.Game
 						RenderEditorForField(field, fieldAttr);
 					}
 				}
+
+				fieldCount++;
 			}
 		}
 
@@ -181,7 +197,9 @@ namespace Zedarus.Toolkit.Data.New.Game
 
 		private void ValidateField(FieldInfo field)
 		{
-			object[] attrs = field.GetCustomAttributes(typeof(DataValidateClamp), true);
+			object[] attrs = null;
+
+			attrs = field.GetCustomAttributes(typeof(DataValidateClamp), true);
 			foreach (object attr in attrs)
 			{
 				DataValidateClamp fieldAttr = attr as DataValidateClamp;
@@ -191,6 +209,32 @@ namespace Zedarus.Toolkit.Data.New.Game
 						field.SetValue(this, Mathf.Clamp(int.Parse(field.GetValue(this).ToString()), fieldAttr.Min, fieldAttr.Max));
 					else if (field.FieldType == typeof(float))
 						field.SetValue(this, Mathf.Clamp(float.Parse(field.GetValue(this).ToString()), fieldAttr.MinFloat, fieldAttr.MaxFloat));
+				}
+			}
+
+			attrs = field.GetCustomAttributes(typeof(DataValidateMin), true);
+			foreach (object attr in attrs)
+			{
+				DataValidateMin fieldAttr = attr as DataValidateMin;
+				if (fieldAttr != null)
+				{
+					if (field.FieldType == typeof(int))
+						field.SetValue(this, Mathf.Max(int.Parse(field.GetValue(this).ToString()), fieldAttr.Min));
+					else if (field.FieldType == typeof(float))
+						field.SetValue(this, Mathf.Max(float.Parse(field.GetValue(this).ToString()), fieldAttr.MinFloat));
+				}
+			}
+
+			attrs = field.GetCustomAttributes(typeof(DataValidateMax), true);
+			foreach (object attr in attrs)
+			{
+				DataValidateMax fieldAttr = attr as DataValidateMax;
+				if (fieldAttr != null)
+				{
+					if (field.FieldType == typeof(int))
+						field.SetValue(this, Mathf.Min(int.Parse(field.GetValue(this).ToString()), fieldAttr.Max));
+					else if (field.FieldType == typeof(float))
+						field.SetValue(this, Mathf.Min(float.Parse(field.GetValue(this).ToString()), fieldAttr.MaxFloat));
 				}
 			}
 		}
