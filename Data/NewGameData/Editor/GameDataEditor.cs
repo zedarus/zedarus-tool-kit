@@ -28,6 +28,7 @@ namespace Zedarus.Toolkit.Data.New.Game
 
 		private Vector2 _modelsViewScrollPos = Vector2.zero;
 		private Vector2 _modelsListViewScrollPos = Vector2.zero;
+		private Vector2 _editViewScrollPos = Vector2.zero;
 		#endregion
 
 		#region Initialization
@@ -125,6 +126,7 @@ namespace Zedarus.Toolkit.Data.New.Game
 						_model = _data.CreateNewModel(_currentModelID);
 						_model.CopyValuesFrom(selectedModel);
 						_selectedModelDataIndex = modelIndex;
+						_editViewScrollPos = Vector2.zero;
 						_state = State.Edit;
 					}
 				}
@@ -133,6 +135,7 @@ namespace Zedarus.Toolkit.Data.New.Game
 				{
 					GUI.FocusControl(null);
 					_model = _data.CreateNewModel(_currentModelID);
+					_editViewScrollPos = Vector2.zero;
 					_state = State.Add;
 				}
 
@@ -145,6 +148,10 @@ namespace Zedarus.Toolkit.Data.New.Game
 		{
 			EditorGUILayout.BeginVertical(GUILayout.ExpandWidth(true));
 			EditorGUILayout.Space();
+			EditorGUILayout.LabelField( _model != null ? _model.ListName : "" );
+			//EditorGUILayout.Space();
+
+			_editViewScrollPos = EditorGUILayout.BeginScrollView(_editViewScrollPos, "box", GUILayout.ExpandHeight(true));
 
 			switch (_state)
 			{
@@ -154,7 +161,11 @@ namespace Zedarus.Toolkit.Data.New.Game
 			case State.Edit:
 				RenderModelEdit();
 				break;
+			default:
+				EditorGUILayout.EndScrollView();
+				break;
 			}
+
 
 			EditorGUILayout.Space();
 			EditorGUILayout.EndVertical();
@@ -164,13 +175,16 @@ namespace Zedarus.Toolkit.Data.New.Game
 		{
 			if (_model != null)
 			{
-				EditorGUILayout.LabelField("");
-				EditorGUILayout.Space();
+				//EditorGUILayout.LabelField("");
+				//EditorGUILayout.Space();
 
 				_model.RenderForm(false);
-				EditorGUILayout.Space();
+				//EditorGUILayout.Space();
+				EditorGUILayout.EndScrollView();
 
 				EditorGUILayout.BeginHorizontal();
+
+				GUILayout.FlexibleSpace();
 
 				if (GUILayout.Button("Add", GUILayout.Width(100)))
 				{
@@ -202,13 +216,16 @@ namespace Zedarus.Toolkit.Data.New.Game
 		{
 			if (_model != null)
 			{
-				EditorGUILayout.LabelField(_model.ListName);
-				EditorGUILayout.Space();
+				//EditorGUILayout.LabelField(_model.ListName);
+				//EditorGUILayout.Space();
 
 				_model.RenderForm(false);
-				EditorGUILayout.Space();
+				//EditorGUILayout.Space();
+				EditorGUILayout.EndScrollView();
 
 				EditorGUILayout.BeginHorizontal();
+
+				GUILayout.FlexibleSpace();
 
 				if (GUILayout.Button("Save", GUILayout.Width(100)))
 				{
