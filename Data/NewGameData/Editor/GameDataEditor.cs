@@ -167,7 +167,7 @@ namespace Zedarus.Toolkit.Data.New.Game
 				EditorGUILayout.LabelField("");
 				EditorGUILayout.Space();
 
-				_model.RenderForm();
+				_model.RenderForm(false);
 				EditorGUILayout.Space();
 
 				EditorGUILayout.BeginHorizontal();
@@ -205,7 +205,7 @@ namespace Zedarus.Toolkit.Data.New.Game
 				EditorGUILayout.LabelField(_model.ListName);
 				EditorGUILayout.Space();
 
-				_model.RenderForm();
+				_model.RenderForm(false);
 				EditorGUILayout.Space();
 
 				EditorGUILayout.BeginHorizontal();

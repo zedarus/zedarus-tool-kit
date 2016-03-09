@@ -11,7 +11,7 @@ namespace Zedarus.Toolkit.Data.New.Game
 	public class GameDataModelBase : IGameDataModel
 	{
 		#region Properties
-		[SerializeField][DataField("ID", locked = true)] private int _id;
+		[SerializeField][DataField("ID", locked = true, renderWhenIncluded = false)] private int _id;
 		#endregion
 
 		#region Initalization
@@ -31,7 +31,7 @@ namespace Zedarus.Toolkit.Data.New.Game
 		#endregion
 
 		#if UNITY_EDITOR
-		public void RenderForm()
+		public void RenderForm(bool included)
 		{
 			FieldInfo[] fields = GetFields(this);
 			object[] attrs = null;
@@ -57,7 +57,7 @@ namespace Zedarus.Toolkit.Data.New.Game
 					DataField fieldAttr = attr as DataField;
 					if (fieldAttr != null)
 					{
-						RenderEditorForField(field, fieldAttr);
+						RenderEditorForField(field, fieldAttr, fieldCount, included);
 					}
 				}
 
@@ -121,8 +121,11 @@ namespace Zedarus.Toolkit.Data.New.Game
 			}
 		}
 
-		private void RenderEditorForField(FieldInfo field, DataField attribute)
+		private void RenderEditorForField(FieldInfo field, DataField attribute, int fieldCount, bool included)
 		{
+			if (included && !attribute.renderWhenIncluded)
+				return;
+
 			if (attribute.locked)
 				GUI.enabled = false;
 
@@ -138,6 +141,8 @@ namespace Zedarus.Toolkit.Data.New.Game
 				RenderFloatField(field, attribute);
 			else if (field.FieldType == typeof(bool))
 				RenderBoolField(field, attribute);
+			else if (field.FieldType.GetInterface(typeof(IGameDataModel).Name) != null)
+				RenderIGameDataModelField(field, attribute, fieldCount);
 			else
 				RenderUnhandledEditorField(field, attribute);
 			
@@ -145,6 +150,20 @@ namespace Zedarus.Toolkit.Data.New.Game
 
 			if (attribute.locked)
 				GUI.enabled = true;
+		}
+
+		private void RenderIGameDataModelField(FieldInfo field, DataField attribute, int fieldCount)
+		{
+			if (fieldCount > 0) EditorGUILayout.Space();
+
+			//EditorGUILayout.Foldout(true, "hello");
+
+			EditorGUILayout.LabelField(attribute.EditorLabel, EditorStyles.boldLabel);
+
+			IGameDataModel model = field.GetValue(this) as IGameDataModel;
+			model.RenderForm(true);
+
+			//EditorGUILayout.EndToggleGroup();
 		}
 
 		private void RenderCustomEditorForField(FieldInfo field, DataField attribute)
