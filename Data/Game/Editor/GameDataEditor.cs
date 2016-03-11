@@ -2,7 +2,7 @@
 using UnityEditor;
 using System.Collections;
 
-namespace Zedarus.Toolkit.Data.New.Game
+namespace Zedarus.Toolkit.Data.Game
 {
 	public class GameDataEditor : EditorWindow
 	{
@@ -23,7 +23,7 @@ namespace Zedarus.Toolkit.Data.New.Game
 		private int _currentModelID = 0;
 		private int _selectedModelDataIndex = -1;
 
-		private GameDataBase _data = null;
+		private GameData _data = null;
 		private IGameDataModel _model = null;
 
 		private Vector2 _modelsViewScrollPos = Vector2.zero;
@@ -79,7 +79,7 @@ namespace Zedarus.Toolkit.Data.New.Game
 		{
 			EditorGUILayout.BeginVertical();
 			if (!DataLoaded) EditorGUILayout.LabelField("No database found. Please drag a database instance reference from Project view here");
-			_data = EditorGUILayout.ObjectField("Database", _data, typeof(GameDataBase), false) as GameDataBase;
+			_data = EditorGUILayout.ObjectField("Database", _data, typeof(GameData), false) as GameData;
 			EditorGUILayout.EndVertical();
 		}
 
@@ -148,7 +148,7 @@ namespace Zedarus.Toolkit.Data.New.Game
 		{
 			EditorGUILayout.BeginVertical(GUILayout.ExpandWidth(true));
 			EditorGUILayout.Space();
-			EditorGUILayout.LabelField( _model != null ? _model.ListName : "" );
+			EditorGUILayout.LabelField(_model != null ? _model.ListName : "");
 			//EditorGUILayout.Space();
 
 			_editViewScrollPos = EditorGUILayout.BeginScrollView(_editViewScrollPos, "box", GUILayout.ExpandHeight(true));

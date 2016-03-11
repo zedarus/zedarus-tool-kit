@@ -1,216 +1,285 @@
-using UnityEngine;
-using System;
+﻿using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
 using System.Reflection;
+#endif
 using System.Collections;
 using System.Collections.Generic;
-using Zedarus.ToolKit;
-using Zedarus.ToolKit.Helpers;
-using Zedarus.ToolKit.Data.Adapters;
-using Zedarus.ToolKit.Data.Game;
-#if ZTK_DATA_SQL
-using SimpleSQL;
-#endif
 
-namespace Zedarus.ToolKit.Data.Game
+namespace Zedarus.Toolkit.Data.Game
 {
-	public class GameData
+	public class GameData : ScriptableObject
 	{
 		#region Properties
-		private DateTime _date;
-		private int _version;
-		private bool _loaded;
+		[SerializeField] private int _modelsIDCoutner = 0;
 		#endregion
 
-		#region Models
-		private Dictionary<Type, IGameDataModelCollection> _collections;
-		#endregion
-
-		#region Init
-		public GameData()
+		#region Settings
+		public static string DATABASE_PATH
 		{
-			_collections = new Dictionary<Type, IGameDataModelCollection>();
-			_version = 0;
-			_loaded = false;
-		}
-
-		public void AddModel<T>() where T : GameDataModel
-		{
-			if (_loaded)
+			get
 			{
-				Debug.LogWarning("Can't add model after data was loaded");
-				return;
+				return "Assets/Resources/Data/GameData.asset";
 			}
+		}
 
-			_collections.Add(typeof(T), new GameDataModelCollection<T>());
+		public static string DATABASE_LOCAL_PATH
+		{
+			get
+			{
+				return "Data/GameData";
+			}
 		}
 		#endregion
 
-		#region Loading Data
-		public void Load()
+		#region Unity Methods
+		private void OnEnable()
 		{
-			if (_loaded)
-			{
-				Debug.LogWarning("Game data already loaded");
-				return;
-			}
-
-			LoadVersionData();
-
-			foreach (KeyValuePair<Type, IGameDataModelCollection> v in _collections)
-				v.Value.LoadFromDB();
-
-			_loaded = true;
+			Init();
 		}
+		#endregion
 
-		private void LoadVersionData()
+		#region Initialization
+		protected virtual void Init()
 		{
-			#if ZTK_DATA_SQL
-			SimpleDataTable result = SQLiteAdapter.Manager.QueryGeneric("SELECT * FROM version");
-			string version = result.rows[0].fields[1].ToString();
-			string date = result.rows[0].fields[2].ToString();
-			
-			int.TryParse(version, out _version);
-			_date = GeneralHelper.ParseTime(date);
-			#else
-			_date = DateTime.Now;
+			#if UNITY_EDITOR
+			LoadTables();
 			#endif
 		}
 		#endregion
 
-		#region Saving Data
-		// TODO: implement data save
-		/*protected virtual void Save()
-		{
-			SaveVersionData();
+		#if UNITY_EDITOR
+		#region Editor
+		private Dictionary<int, FieldInfo> _tables = new Dictionary<int, FieldInfo>();
 
-			foreach (KeyValuePair<Type, IModelCollection> v in _collections)
+		private void LoadTables()
+		{
+			FieldInfo[] fields = GetFields(this);
+
+			foreach (FieldInfo field in fields)
 			{
-				Type modelType = v.Key;
-				if (modelType != null)
+				DataTable attr = GetTableAttributeForField(field);
+				if (attr != null)
 				{
-					MethodInfo method = modelType.GetMethod("GetDBTable");
-					if (method != null)
+					if (field.GetValue(this) == null)
 					{
-						string result = method.Invoke(null, null) as string;
-						Debug.Log(result);
-						
-						Type thisType = typeof(GameData);
-						MethodInfo loadMethod = thisType.GetMethod("SaveToDB");
-						MethodInfo loadMethodGeneric = loadMethod.MakeGenericMethod(modelType);
-						loadMethodGeneric.Invoke(null, new object[] { v.Value, result });
+						field.SetValue(this, System.Activator.CreateInstance(field.FieldType));
 					}
-					else
-						Debug.LogWarning("Can't invoke GetDBTable() static method on model: " + modelType.Name); 
+
+					_tables.Add(attr.ID, field);
 				}
-				else
-					Debug.LogWarning("Can't get model type for collection with key: " + v.Key);
 			}
-
-			SaveToDB<Enemy>(_enemies, Enemy.GetDBTable());
 		}
 
-		protected virtual void SaveVersionData()
+		private int NextModelID
 		{
-			string query = "UPDATE version SET version = ?, date = ? WHERE id = 1";
-			SQLiteAdapter.Manager.Execute(query, _version.ToString(), _date.ToString("yyyy-MM-dd HH:mm:ss"));
-		}
-
-		public static void SaveToDB<T>(ModelCollection<T> collection, string table) where T : Model
-		{
-			string fullTableName = table + TableNameSuffix;
-			ClearTable(fullTableName);
-
-			foreach (KeyValuePair<int, T> item in collection)
-				SaveModelToDB(item.Value, fullTableName);
-		}
-
-		protected static void SaveModelToDB(Model model, string table)
-		{
-			SimpleDataTable result = SQLiteAdapter.Manager.QueryGeneric("SELECT * FROM " + table + " WHERE id = " + model.ID);
-			if (result.rows.Count > 0)
-				SQLiteAdapter.Manager.Execute(model.GetUpdateQuery(table));
-			else
-				SQLiteAdapter.Manager.Execute(model.GetInsertQuery(table));
-		}
-
-		protected static void ClearTable(string table)
-		{
-			// TODO: this potentially might lead to data corruption if interrupted
-			string query = "DELETE FROM " + table + " WHERE 1 = 1";
-			SQLiteAdapter.Manager.Execute(query);
-		}*/
-		#endregion
-
-		#region Merge
-		// TODO: implement merge later
-		/*public void Merge(GameData data)
-		{
-			if (_version < data.Version)
-				ApplyNewVersion(data);
-			Save();
-		}
-
-		private void ApplyNewVersion(GameData data)
-		{
-			_version = data.Version;
-			_date = data.Date;
-
-			MergeModels<Enemy>(_enemies, data.Enemies);
-		}
-
-		private void MergeModels<T>(ModelCollection<T> oldModels, ModelCollection<T> newModels) where T : Model
-		{
-			foreach (KeyValuePair<int, T> newModel in newModels)
-				oldModels[newModel.Key] = newModel.Value;
-
-			oldModels.Reindex();
-		}*/
-		#endregion
-
-		#region Queries
-		public GameDataModelCollection<T> GetModel<T>() where T : GameDataModel
-		{
-			if (!_loaded)
+			get
 			{
-				Debug.LogWarning("Can't get model because data was not loaded yet");
-				return null;
+				int maxID = 0;
+				_modelsIDCoutner = 0;
+
+				foreach (KeyValuePair<int, FieldInfo> table in _tables)
+				{
+					IList list = GetListForTable(table.Key);
+
+					if (list != null)
+					{
+						foreach (IGameDataModel modelData in list)
+						{
+							if (modelData != null && modelData.ID > maxID)
+								maxID = modelData.ID;
+						}
+					}
+				}
+
+				if (_modelsIDCoutner < maxID)
+					_modelsIDCoutner = maxID;
+
+				return ++_modelsIDCoutner;
 			}
-
-			Type key = typeof(T);
-			if (_collections.ContainsKey(key))
-				return _collections[key] as GameDataModelCollection<T>;
-			else
-				return null;
 		}
-		#endregion
-
-		#region Getters
-		public int Version
-		{
-			get { return _version; }
-		}
-
-		public DateTime Date
-		{
-			get { return _date; }
-		}
-		#endregion
 
 		/// <summary>
-		/// This method is used to fix AOT bug on iOS/Android.
-		/// DO NOT CALL THIS METHOD ANYWHERE IN YOUR CODE!
+		/// Adds the model data.
 		/// </summary>
-		private void AOTBugFix()
+		/// <returns>Returns <code>false</code> if model data with this ID already exists.</returns>
+		/// <param name="tableID">Model identifier.</param>
+		/// <param name="modelData">Model data.</param>
+		public bool AddModelData(int tableID, IGameDataModel modelData)
 		{
-			/*Dictionary<int, Enemy> o6 = new Dictionary<int, Enemy>();
-			Debug.Log(o6);
-			ModelCollectionIndex<string, Enemy> a6 = new ModelCollectionIndex<string, Enemy>(null);
-			Debug.Log(a6);
-			ModelCollectionIndex<int, Enemy> b6 = new ModelCollectionIndex<int, Enemy>(null);
-			Debug.Log(b6);
-			ModelCollectionIndex<float, Enemy> c6 = new ModelCollectionIndex<float, Enemy>(null);
-			Debug.Log(c6);*/
-		}
-	}
-}
+			if (IsModelIDAlreadyInUse(tableID, modelData.ID))
+				return false;
+			
+			IList list = GetListForTable(tableID);
 
+			if (list != null)
+				list.Add(modelData);
+
+			return true;
+		}
+
+		public bool IsModelIDAlreadyInUse(int tableID, int id)
+		{
+			IList list = GetListForTable(tableID);
+
+			if (list != null)
+			{
+				foreach (IGameDataModel existingModelData in list)
+				{
+					if (existingModelData != null && existingModelData.ID == id)
+						return true;
+				}
+			}
+
+			return false;
+		}
+
+		public string GetTableName(int id)
+		{
+			if (_tables.ContainsKey(id))
+			{
+				DataTable table = GetTableAttributeForField(_tables[id]);
+				if (table != null)
+					return table.Name;
+			}
+
+			return "NONE";
+		}
+
+		private List<string> GetGameModelListNamesForID(int id)
+		{
+			List<string> names = new List<string>();
+			IList list = GetListForTable(id);
+
+			if (list != null)
+			{
+				foreach (IGameDataModel modelData in list)
+				{
+					if (modelData != null)
+						names.Add(modelData.ListName);
+				}
+			}
+
+			return names;
+		}
+
+		public int RenderModelsView()
+		{
+			int selectedModelID = 0;
+			foreach (KeyValuePair<int, FieldInfo> table in _tables)
+			{
+				EditorGUILayout.BeginHorizontal();
+
+				if (GUILayout.Button(GetTableName(table.Key), "box", GUILayout.ExpandWidth(true)))
+				{
+					selectedModelID = table.Key;
+				}
+
+				EditorGUILayout.EndHorizontal();
+			}
+			return selectedModelID;
+		}
+
+		public IGameDataModel CreateNewModel(int tableID)
+		{
+			if (_tables.ContainsKey(tableID))
+			{
+				DataTable table = GetTableAttributeForField(_tables[tableID]);
+				if (table != null)
+				{
+					return System.Activator.CreateInstance(table.Type, NextModelID) as IGameDataModel;
+				}
+			}
+
+			return null;
+		}
+
+		public IGameDataModel GetModelDataAt(int tableID, int modelDataIndex)
+		{
+			IList list = GetListForTable(tableID);
+			if (list != null && modelDataIndex >= 0 && modelDataIndex < list.Count)
+				return list[modelDataIndex] as IGameDataModel;
+			else
+				return null;
+		}
+
+		public void RemoveModelDataAt(int tableID, int modelDataIndex)
+		{
+			RemoteItemFromList(GetListForTable(tableID), modelDataIndex);
+		}
+
+		public int RenderModelsDataListView(int modelID)
+		{
+			int selectedModelDataIndex = -1;
+			List<string> modelsData = GetGameModelListNamesForID(modelID);
+			if (modelsData != null)
+			{
+				for (int i = 0; i < modelsData.Count; i++)
+				{
+					EditorGUILayout.BeginHorizontal();
+
+					if (GUILayout.Button(modelsData[i], "box", GUILayout.ExpandWidth(true)))
+					{
+						selectedModelDataIndex = i;
+					}
+
+					EditorGUILayout.EndHorizontal();
+				}
+			}
+			return selectedModelDataIndex;
+		}
+
+		private IList GetListForTable(int tableID)
+		{
+			if (_tables.ContainsKey(tableID))
+			{
+				FieldInfo field = _tables[tableID];
+				return field.GetValue(this) as IList;
+			}
+			else
+				return null;
+		}
+
+		private void RemoteItemFromList(IList list, int index)
+		{
+			if (list != null && index >= 0 && index < list.Count)
+				list.RemoveAt(index);
+		}
+
+		private FieldInfo[] GetFields(GameData target)
+		{
+			List<FieldInfo> fields = new List<FieldInfo>();
+
+			fields.AddRange(target.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance));
+
+			System.Type baseType = target.GetType().BaseType;
+
+			while (baseType != null)
+			{
+				fields.InsertRange(0, baseType.GetFields(BindingFlags.NonPublic | BindingFlags.Instance));
+				baseType = baseType.BaseType;
+			}
+
+			return fields.ToArray();
+		}
+
+		private DataTable GetTableAttributeForField(FieldInfo field)
+		{
+			object[] attrs = field.GetCustomAttributes(typeof(DataTable), true);
+			foreach (object attr in attrs)
+			{
+				DataTable fieldAttr = attr as DataTable;
+				if (fieldAttr != null)
+				{
+					return fieldAttr;
+				}
+			}
+
+			return null;
+		}
+		#endregion
+		#endif
+	}
+
+
+}

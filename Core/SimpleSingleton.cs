@@ -20,7 +20,7 @@ namespace Zedarus.ToolKit
 			}
 		}
 		
-		private static void CreateInstance()
+		protected static void CreateInstance()
 		{
 			if (_instance == null)
 			{

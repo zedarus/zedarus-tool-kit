@@ -2,23 +2,32 @@
 using System.Collections;
 using Zedarus.ToolKit.API;
 using Zedarus.ToolKit.Data;
+using Zedarus.ToolKit.Data.Player;
+using Zedarus.Toolkit.Data.Game;
 
 namespace Zedarus.ToolKit
 {
-	public class AppController : MonoBehaviour
+	public class AppController<GameDataClass, PlayerDataClass> : SimpleSingleton<AppController<GameDataClass, PlayerDataClass>> 
+		where GameDataClass : GameData where PlayerDataClass : PlayerData
 	{
 		#region Properties
 		static private bool initialized = false;
+		private DataManager<GameDataClass, PlayerDataClass> _data;
 		#endregion
 
 		#region Unity Methods
-		private void Start()
+		public static void Start()
+		{
+			CreateInstance();
+		}
+
+		public AppController()
 		{
 			if (!initialized)
 				Init();
 
 			Launch();
-			Destroy(gameObject);
+			//Destroy(gameObject);
 		}
 		#endregion
 
@@ -47,23 +56,30 @@ namespace Zedarus.ToolKit
 
 		protected virtual void InitGameData()
 		{
-
+			_data = new DataManager<GameDataClass, PlayerDataClass>();
 		}
 
 		protected virtual void InitPlayerData(string filename, APIState customAPIState = null)
 		{
-			DataManager.Instance.Load(filename);
+			/*DataManager.Instance.Load(filename);
 			if (customAPIState == null)
 			{
 				DataManager.Instance.Player.AddModel<APIState>();
 				customAPIState = DataManager.Instance.Player.GetModel<APIState>();
 			}
-			APIManager.Instance.UseState(customAPIState);
+			APIManager.Instance.UseState(customAPIState);*/
 		}
 
 		protected virtual void Launch()
 		{
 			
+		}
+		#endregion
+
+		#region Getters
+		public DataManager<GameDataClass, PlayerDataClass> Data
+		{
+			get { return _data; }
 		}
 		#endregion
 	}

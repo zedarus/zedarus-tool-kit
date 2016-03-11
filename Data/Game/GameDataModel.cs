@@ -1,238 +1,296 @@
 ﻿using UnityEngine;
-using System;
-using System.Collections;
+#if UNITY_EDITOR
+using UnityEditor;
+using System.Reflection;
+#endif
 using System.Collections.Generic;
-using System.Globalization;
-using Zedarus.ToolKit.Helpers;
-#if ZTK_DATA_JSON
-using LitJson;
-#endif
-#if ZTK_DATA_SQL
-using SimpleSQL;
-#endif
 
-namespace Zedarus.ToolKit.Data.Game
+namespace Zedarus.Toolkit.Data.Game
 {
-	public class GameDataModel
+	[System.Serializable]
+	public class GameDataModel : IGameDataModel
 	{
-		protected int _id;
-		protected bool _enabled;
-		protected List<string> _indexes;
+		#region Properties
+		[SerializeField][DataField("ID", locked = true, renderWhenIncluded = false)] private int _id;
+		#endregion
 
-		public GameDataModel() 
-		{
-		}
+		#region Initalization
+		public GameDataModel() : this(0) { }
 
-		public GameDataModel(int id, bool enabled)
+		public GameDataModel(int id)
 		{
 			_id = id;
-			_enabled = enabled;
 		}
-
-		#if ZTK_DATA_JSON
-		public GameDataModel(JsonData json)
-		{
-			if (json != null)
-			{
-				_id = GetInt(json, "id");
-				_enabled = GetBool(json, "enabled");
-			}
-		}
-		#endif
-
-		#if ZTK_DATA_SQL
-		public GameDataModel(List<SimpleDataColumn> columns, SimpleDataRow row)
-		{
-			if (columns != null && row != null)
-			{
-				_id = GetInt(columns, row, "id");
-				_enabled = GetBool(columns, row, "enabled");
-			}
-		}
-		#endif
-
-		public virtual string[] GetIndexes()
-		{
-			return new string[] {};
-		}
+		#endregion
 
 		#region Getters
 		public int ID
 		{
 			get { return _id; }
 		}
-
-		public bool Enabled
-		{
-			get { return _enabled; }
-		}
-
-		public string[] Indexes
-		{
-			get { return _indexes.ToArray(); }
-		}
 		#endregion
 
-		#region JSON
-		#if ZTK_DATA_JSON
-		protected string GetString(JsonData json, string field)
+		#if UNITY_EDITOR
+		public void RenderForm(bool included)
 		{
-			if (json[field] != null)
-				return json[field].ToString();
-			else
-				return null;
-		}
+			FieldInfo[] fields = GetFields(this);
+			object[] attrs = null;
 
-		protected int GetInt(JsonData json, string field)
-		{
-			int result;
-			if (int.TryParse(GetString(json, field), out result))
-				return result;
-			else
-				return 0;
-		}
+			int fieldCount = 0;
 
-		protected float GetFloat(JsonData json, string field)
-		{
-			float result;
-			if (float.TryParse(GetString(json, field), out result))
-				return result;
-			else
-				return 0f;
-		}
-
-		protected bool GetBool(JsonData json, string field)
-		{
-			return GetInt(json, field) > 0;
-		}
-		
-		protected DateTime ParseTime(JsonData json, string field)
-		{
-			return GeneralHelper.ParseTime(GetString(json, field));
-		}
-		#endif
-		#endregion
-
-		#region SQLite
-		#if ZTK_DATA_SQL
-		protected object GetObject(List<SimpleDataColumn> columns, SimpleDataRow row, string field)
-		{
-			int index = 0;
-			for (int i = 0; i < columns.Count; i++)
+			foreach (FieldInfo field in fields)
 			{
-				if (columns[i].name.Equals(field))
+				attrs = field.GetCustomAttributes(typeof(DataGroup), true);
+				foreach (object attr in attrs)
 				{
-					index = i;
-					break;
+					DataGroup fieldAttr = attr as DataGroup;
+					if (fieldAttr != null)
+					{
+						if (fieldCount > 0) EditorGUILayout.Space();
+						EditorGUILayout.LabelField(fieldAttr.Title, EditorStyles.boldLabel);
+					}
+				}
+
+				attrs = field.GetCustomAttributes(typeof(DataField), true);
+				foreach (object attr in attrs)
+				{
+					DataField fieldAttr = attr as DataField;
+					if (fieldAttr != null)
+					{
+						RenderEditorForField(field, fieldAttr, fieldCount, included);
+					}
+				}
+
+				fieldCount++;
+			}
+		}
+
+		public virtual string ListName { get { return "#" + ID.ToString(); } }
+
+		public void CopyValuesFrom(IGameDataModel data)
+		{
+			FieldInfo[] fields = GetFields(data);
+
+			foreach (FieldInfo field in fields)
+			{
+				object[] attrs = field.GetCustomAttributes(typeof(DataField), true);
+				foreach (object attr in attrs)
+				{
+					DataField fieldAttr = attr as DataField;
+					if (fieldAttr != null)
+					{
+						ReplaceValueForFieldInCurrentInstance(field, data);
+					}
 				}
 			}
-			return row[index];
 		}
 
-		protected string GetString(List<SimpleDataColumn> columns, SimpleDataRow row, string field)
+		#region Helpers
+		protected string RenderPrefabField(string label, string value, System.Type type, bool includePreview, int previewWidth = 100, int previewHeight = 100)
 		{
-			object o = GetObject(columns, row, field);
-			if (o != null)
-				return o.ToString();
-			else
-				return null;
-		}
+			EditorGUILayout.BeginHorizontal();
 
-		protected int GetInt(List<SimpleDataColumn> columns, SimpleDataRow row, string field)
-		{
-			int result;
-			if (int.TryParse(GetString(columns, row, field), out result))
-				return result;
-			else
-				return 0;
-		}
-		
-		protected float GetFloat(List<SimpleDataColumn> columns, SimpleDataRow row, string field)
-		{
-			float result;
-			if (float.TryParse(GetString(columns, row, field), out result))
-				return result;
-			else
-				return 0f;
-		}
-		
-		protected bool GetBool(List<SimpleDataColumn> columns, SimpleDataRow row, string field)
-		{
-			return GetInt(columns, row, field) > 0;
-		}
+			value = EditorGUILayout.TextField(label, value);
 
-		public string GetInsertQuery(string table, string[] additionalFields = null, string[] additionalValues = null)
-		{
-			string[] fields = GetDBFields();
-			string[] values = GetDBValues();
-			if (additionalFields != null) fields = AddToArray(fields, additionalFields);
-			if (additionalValues != null) values = AddToArray(values, additionalValues);
-			return "INSERT INTO " + table + " (" + string.Join(",", fields) + ") VALUES (" + string.Join(",", EscapeDVValues(values)) + ")";
-		}
-
-		public string GetUpdateQuery(string table, string[] additionalFields = null, string[] additionalValues = null, string additionalSearchQuery = null)
-		{
-			string[] fields = GetDBFields();
-			string[] values = GetDBValues();
-			if (additionalFields != null) fields = AddToArray(fields, additionalFields);
-			if (additionalValues != null) values = AddToArray(values, additionalValues);
-			values = EscapeDVValues(values);
-			string[] updates = new string[fields.Length];
-			for (int i = 0; i < updates.Length; i++)
+			Object prefabRef = AssetDatabase.LoadAssetAtPath<Object>(string.Concat("Assets/Resources/", value, ".prefab"));
+			prefabRef = EditorGUILayout.ObjectField(prefabRef, type, false, GUILayout.MaxWidth(150));
+			if (prefabRef != null)
 			{
-				updates[i] = fields[i] + " = " + values[i];
+				value = AssetDatabase.GetAssetPath(prefabRef).Replace("Assets/Resources/", "").Replace(".prefab", "");
+
+				if (includePreview)
+				{
+					GUIContent content = new GUIContent(AssetPreview.GetAssetPreview(prefabRef));
+					EditorGUILayout.LabelField(content, GUILayout.Width(previewWidth), GUILayout.Height(previewHeight));
+				}
+
+				prefabRef = null;
 			}
-			return "UPDATE " + table + " SET " + string.Join(",", updates) +  " WHERE id = " + _id.ToString() + (additionalSearchQuery != null ? (" AND " + additionalSearchQuery) : "");
+			EditorGUILayout.EndHorizontal();
+
+			return value;
 		}
 
-		protected virtual string[] GetDBFields()
+		protected void RenderPrefabPreview(string path, int width, int height)
 		{
-			return new string[] {"id", "enabled"};
-		}
-
-		protected virtual string[] GetDBValues()
-		{
-			return new string[] {_id.ToString(), BoolToString(_enabled)};
-		}
-
-		protected string BoolToString(bool value)
-		{
-			return (value ? 1 : 0).ToString();
-		}
-
-		public virtual string GetDBTable()
-		{
-			return "table";
-		}
-
-		protected string[] EscapeDVValues(string[] values)
-		{
-			for (int i = 0; i < values.Length; i++)
+			if (path != null)
 			{
-				string v = values[i];
-				values[i] = "\"";
-				if (v != null) values[i] += v.Replace("\"", "\"\"");
-				values[i] += "\"";
+				Object prefabRef = AssetDatabase.LoadAssetAtPath<Object>(string.Concat("Assets/Resources/", path, ".prefab"));
+				GUIContent content = new GUIContent(AssetPreview.GetAssetPreview(prefabRef));
+				EditorGUILayout.LabelField(content, GUILayout.Width(width), GUILayout.Height(height));
 			}
-			return values;
-		}
-		
-		protected string[] AddToArray(string[] oldFields, params string[] newFields)
-		{
-			string[] fields = new string[oldFields.Length + newFields.Length];
-			oldFields.CopyTo(fields, 0);
-			newFields.CopyTo(fields, oldFields.Length);
-			return fields;
 		}
 
-		protected string[] AddArrayToArray(string[] oldFields, string[] newFields)
+		private void RenderEditorForField(FieldInfo field, DataField attribute, int fieldCount, bool included)
 		{
-			string[] fields = new string[oldFields.Length + newFields.Length];
-			oldFields.CopyTo(fields, 0);
-			newFields.CopyTo(fields, oldFields.Length);
-			return fields;
+			if (included && !attribute.renderWhenIncluded)
+				return;
+
+			if (attribute.locked)
+				GUI.enabled = false;
+
+			if (!attribute.autoRender)
+				RenderUnhandledEditorField(field, attribute);
+			else if (attribute.customFieldType != DataField.CustomFieldType.Default)
+				RenderCustomEditorForField(field, attribute);
+			else if (field.FieldType == typeof(string))
+				RenderStringField(field, attribute);
+			else if (field.FieldType == typeof(int))
+				RenderIntField(field, attribute);
+			else if (field.FieldType == typeof(float))
+				RenderFloatField(field, attribute);
+			else if (field.FieldType == typeof(bool))
+				RenderBoolField(field, attribute);
+			else if (field.FieldType.GetInterface(typeof(IGameDataModel).Name) != null)
+				RenderIGameDataModelField(field, attribute, fieldCount);
+			else
+				RenderUnhandledEditorField(field, attribute);
+			
+			ValidateField(field);
+
+			if (attribute.locked)
+				GUI.enabled = true;
+		}
+
+		private void RenderIGameDataModelField(FieldInfo field, DataField attribute, int fieldCount)
+		{
+			if (fieldCount > 0) EditorGUILayout.Space();
+
+			//EditorGUILayout.Foldout(true, "hello");
+
+			EditorGUILayout.LabelField(attribute.EditorLabel, EditorStyles.boldLabel);
+
+			IGameDataModel model = field.GetValue(this) as IGameDataModel;
+			model.RenderForm(true);
+
+			//EditorGUILayout.EndToggleGroup();
+		}
+
+		private void RenderCustomEditorForField(FieldInfo field, DataField attribute)
+		{
+			switch (attribute.customFieldType)
+			{
+			case DataField.CustomFieldType.Prefab:
+				object value = field.GetValue(this);
+				string currentValue = "";
+				if (value != null)
+					currentValue = value.ToString();
+				currentValue = RenderPrefabField(attribute.EditorLabel, currentValue, attribute.customFieldTypeLimit, attribute.customFieldPreview);
+				field.SetValue(this, currentValue);
+				break;
+			}
+		}
+
+		protected virtual void RenderUnhandledEditorField(FieldInfo field, DataField attribute)
+		{
+			
+		}
+
+		private void RenderStringField(FieldInfo field, DataField attribute)
+		{
+			object value = field.GetValue(this);
+			string currentValue = "";
+			if (value != null)
+				currentValue = value.ToString();
+			
+			field.SetValue(this, EditorGUILayout.TextField(attribute.EditorLabel, currentValue));
+		}
+
+		private void RenderIntField(FieldInfo field, DataField attribute)
+		{
+			// TODO: add errors check here too
+			field.SetValue(this, EditorGUILayout.IntField(attribute.EditorLabel, int.Parse(field.GetValue(this).ToString())));
+		}
+
+		private void RenderFloatField(FieldInfo field, DataField attribute)
+		{
+			// TODO: add errors check here too
+			field.SetValue(this, EditorGUILayout.FloatField(attribute.EditorLabel, float.Parse(field.GetValue(this).ToString())));
+		}
+
+		private void RenderBoolField(FieldInfo field, DataField attribute)
+		{
+			// TODO: add errors check here too
+			field.SetValue(this, EditorGUILayout.Toggle(attribute.EditorLabel, bool.Parse(field.GetValue(this).ToString())));
+		}
+
+		private void ValidateField(FieldInfo field)
+		{
+			object[] attrs = null;
+
+			attrs = field.GetCustomAttributes(typeof(DataValidateClamp), true);
+			foreach (object attr in attrs)
+			{
+				DataValidateClamp fieldAttr = attr as DataValidateClamp;
+				if (fieldAttr != null)
+				{
+					if (field.FieldType == typeof(int))
+						field.SetValue(this, Mathf.Clamp(int.Parse(field.GetValue(this).ToString()), fieldAttr.Min, fieldAttr.Max));
+					else if (field.FieldType == typeof(float))
+						field.SetValue(this, Mathf.Clamp(float.Parse(field.GetValue(this).ToString()), fieldAttr.MinFloat, fieldAttr.MaxFloat));
+				}
+			}
+
+			attrs = field.GetCustomAttributes(typeof(DataValidateMin), true);
+			foreach (object attr in attrs)
+			{
+				DataValidateMin fieldAttr = attr as DataValidateMin;
+				if (fieldAttr != null)
+				{
+					if (field.FieldType == typeof(int))
+						field.SetValue(this, Mathf.Max(int.Parse(field.GetValue(this).ToString()), fieldAttr.Min));
+					else if (field.FieldType == typeof(float))
+						field.SetValue(this, Mathf.Max(float.Parse(field.GetValue(this).ToString()), fieldAttr.MinFloat));
+				}
+			}
+
+			attrs = field.GetCustomAttributes(typeof(DataValidateMax), true);
+			foreach (object attr in attrs)
+			{
+				DataValidateMax fieldAttr = attr as DataValidateMax;
+				if (fieldAttr != null)
+				{
+					if (field.FieldType == typeof(int))
+						field.SetValue(this, Mathf.Min(int.Parse(field.GetValue(this).ToString()), fieldAttr.Max));
+					else if (field.FieldType == typeof(float))
+						field.SetValue(this, Mathf.Min(float.Parse(field.GetValue(this).ToString()), fieldAttr.MaxFloat));
+				}
+			}
+		}
+		#endregion
+
+		private void ReplaceValueForFieldInCurrentInstance(FieldInfo field, object target)
+		{
+			FieldInfo[] fields = GetFields(this);
+
+			foreach (FieldInfo currentField in fields)
+			{
+				if (currentField.Equals(field))
+				{
+					object value = field.GetValue(target);
+					currentField.SetValue(this, value);
+					ValidateField(currentField);
+				}
+			}
+		}
+
+		private FieldInfo[] GetFields(IGameDataModel target)
+		{
+			List<FieldInfo> fields = new List<FieldInfo>();
+
+			fields.AddRange(target.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance));
+
+			System.Type baseType = target.GetType().BaseType;
+
+			while (baseType != null)
+			{
+				fields.InsertRange(0, baseType.GetFields(BindingFlags.NonPublic | BindingFlags.Instance));
+				baseType = baseType.BaseType;
+			}
+
+			return fields.ToArray();
 		}
 		#endif
-		#endregion
 	}
 }
+

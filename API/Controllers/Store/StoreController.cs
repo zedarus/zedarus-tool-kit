@@ -118,7 +118,8 @@ namespace Zedarus.ToolKit.API
 		{
 			APIManager.Instance.State.RemoveAds();
 			APIManager.Instance.BannerAds.DisableAds();
-			DataManager.Instance.Save();
+			// TODO: use event here instead
+			//DataManager.Instance.Save();
 			if (OnDisableAds != null)
 				OnDisableAds();
 		}

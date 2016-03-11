@@ -5,50 +5,54 @@ using System.Collections.Generic;
 using Zedarus.ToolKit;
 using Zedarus.ToolKit.Helpers;
 using Zedarus.ToolKit.Data;
-using Zedarus.ToolKit.Data.Adapters;
-using Zedarus.ToolKit.Data.Game;
 using Zedarus.ToolKit.Data.Player;
+using Zedarus.Toolkit.Data.Game;
 
 namespace Zedarus.ToolKit.Data
 {
-	public class DataManager : SimpleSingleton<DataManager>
+	public class DataManager<GD, PD> where GD : GameData where PD : PlayerData
 	{
 		#region Data
-		private GameData _gameData;
-		private PlayerData _playerData;
+		private GD _gameData;
+		private PD _playerData;
 		private string _playerDataFilename;
 		#endregion
 
 		private Action _dataLoadedCallback;
 
 		#region Init
-		public DataManager()
-		{
-			_gameData = new GameData();
-		}
+		public DataManager() { }
 		#endregion
 
 		#region Controls
 		public void Load(string playerDataFilename)
 		{
 			_playerDataFilename = playerDataFilename;
-			_gameData.Load();
-			_playerData = PlayerData.Load(_playerDataFilename);
+			_gameData = Resources.Load<GD>(GameData.DATABASE_LOCAL_PATH);
+			//_playerData = PD.Load(_playerDataFilename);
 		}
 
 		public void Save()
 		{
-			PlayerData.Save(_playerData, _playerDataFilename);	
+			//PD.Save(_playerData, _playerDataFilename);	
 		}
 		#endregion
 
 		#region Queries
-		public GameData Game 
+		public GD Game
 		{
-			get { return _gameData; }
+			get
+			{
+				if (_gameData == null)
+				{
+					_gameData = Resources.Load<GD>(GameData.DATABASE_LOCAL_PATH);
+				}
+
+				return _gameData;
+			}
 		}
 
-		public PlayerData Player
+		public PD Player
 		{
 			get { return _playerData; }
 		}

@@ -5,13 +5,8 @@ using System.Collections.Generic;
 using Zedarus.ToolKit;
 using Zedarus.ToolKit.Helpers;
 using Zedarus.ToolKit.Data;
-using Zedarus.ToolKit.Data.Adapters;
 using Zedarus.ToolKit.Data.Player;
 using Zedarus.ToolKit.API;
-#if ZTK_DATA_SERIALIZATION
-using Serialization;
-#endif
-//using LitJson;
 
 namespace Zedarus.ToolKit.Data.Player
 {
@@ -44,10 +39,6 @@ namespace Zedarus.ToolKit.Data.Player
 		private bool _askedToUseSync;   // do not sync this
 		private Dictionary<string, PlayerDataModel> _models;
 		#endif
-		#endregion
-		
-		#region Readers
-		private static DataReader<PlayerData, SerializedPersistentFileAdapter> _playerDataReader;
 		#endregion
 
 		#region Init
@@ -93,16 +84,18 @@ namespace Zedarus.ToolKit.Data.Player
 		#region Loading Data
 		public static PlayerData Load(string filename)
 		{
-			PlayerData playerData = Reader.Load(filename);
+			/*PlayerData playerData = Reader.Load(filename);
 			if (playerData == null) playerData = new PlayerData();
-			return playerData;
+			return playerData;*/
+			return null;
 		}
 		#endregion
 
 		#region Saving Data
 		public static void Save(PlayerData data, string filename)
 		{
-			Reader.Save(data, filename);
+			// TODO: save
+			//Reader.Save(data, filename);
 		}
 		#endregion
 
@@ -227,15 +220,6 @@ namespace Zedarus.ToolKit.Data.Player
 		public void MarkAsAskedToUseSync()
 		{
 			_askedToUseSync = true;
-		}
-
-		private static DataReader<PlayerData, SerializedPersistentFileAdapter> Reader
-		{
-			get
-			{
-				if (_playerDataReader == null) _playerDataReader = new DataReader<PlayerData, SerializedPersistentFileAdapter>();
-				return _playerDataReader;
-			}
 		}
 		#endregion
 	}
