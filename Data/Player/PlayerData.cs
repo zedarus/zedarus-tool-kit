@@ -18,34 +18,42 @@ namespace Zedarus.ToolKit.Data.Player
 	public class PlayerData
 	{
 		#region Build Info
-		[SerializeField] private string _gameVersion;
 		[SerializeField] private int _buildNumber = 0;
 		[SerializeField] private DateTime _timestamp;
 		#endregion
 
-		#region Parameters
-		//[SerializeThis] private string _uuid;
-		#endregion
-
 		#region Models
-		[SerializeField] private bool _useDataSync;   // do not sync this
-		[SerializeField] private bool _askedToUseSync;   // do not sync this
 		[SerializeField] private Dictionary<string, IPlayerDataModel> _models;
 		#endregion
 
 		#region Init
 		public PlayerData()
 		{
-			//_uuid = System.Guid.NewGuid().ToString();
-			//_idsTable = new Dictionary<Type, int>();
 			_models = new Dictionary<string, IPlayerDataModel>();
-			_useDataSync = false;
-			_askedToUseSync = false;
 		}
 
-		protected virtual void CustomizeModels()
+		protected virtual void SetupModelsList()
 		{
 			
+		}
+		#endregion
+
+		#region Merging
+		private void MergeData(PlayerData dataToMerge)
+		{
+			if (dataToMerge != null)
+			{
+				if (DateTime.Compare(dataToMerge.Timestamp, Timestamp) > 0)
+				{
+					foreach (KeyValuePair<string, IPlayerDataModel> model in dataToMerge._models)
+					{
+						if (model.Value != null && _models.ContainsKey(model.Key))
+						{
+							_models[model.Key].Merge(model.Value);
+						}
+					}
+				}
+			}
 		}
 		#endregion
 
@@ -54,11 +62,7 @@ namespace Zedarus.ToolKit.Data.Player
 		{
 			string t = typeof(T).FullName;
 
-			if (_models.ContainsKey(t))
-			{
-				Debug.Log("Model with this id (" + t + ") already added to player data");
-			}
-			else
+			if (!_models.ContainsKey(t))
 			{
 				_models.Add(t, (T)Activator.CreateInstance(typeof(T)));
 			}
@@ -67,7 +71,6 @@ namespace Zedarus.ToolKit.Data.Player
 		public void UpdateVersionAndTimestamp(string version, int build)
 		{
 			_buildNumber = build;
-			_gameVersion = version;
 			_timestamp = DateTime.UtcNow;
 		}
 		#endregion
@@ -120,7 +123,7 @@ namespace Zedarus.ToolKit.Data.Player
 			}
 
 			if (data != null)
-				data.CustomizeModels();
+				data.SetupModelsList();
 
 			return data;
 		}
@@ -152,95 +155,6 @@ namespace Zedarus.ToolKit.Data.Player
 		private static string GetSavePath(string name)
 		{
 			return Path.Combine(Application.persistentDataPath, name);
-		}
-		#endregion
-
-		#region Event Listeners
-		private void CreateEventListeners() 
-		{
-			APIManager.Instance.Sync.SyncFinished += OnSyncFinished;
-		}
-		
-		private void RemoveEventListeners() 
-		{
-			APIManager.Instance.Sync.SyncFinished -= OnSyncFinished;
-		}
-		#endregion
-
-		#region Event Handlers
-		private void OnSyncFinished()
-		{	
-			ZedLogger.Log("OnSyncFinished", LoggerContext.iCloud);
-			DownloadData();
-		}
-		#endregion
-
-		#region Syncing
-		private void UploadData()
-		{
-			if (UseDataSync)
-				APIManager.Instance.Sync.SetData<PlayerData>(this);
-		}
-		
-		private void DownloadData()
-		{
-			ZedLogger.Log("DownloadData, use data sync: " + UseDataSync, LoggerContext.iCloud);
-			if (UseDataSync)
-			{
-				MergeData(APIManager.Instance.Sync.GetData<PlayerData>());
-			}
-			else if (!AskedToUseSync)
-			{
-				// TODO: use events to display popup
-				//PopupManager.Instance.ShowUseICloudDataConfirmPopup(OniCloudConfirmPopupConfirm, OniCloudConfirmPopupCancel);
-				MarkAsAskedToUseSync();
-			}
-		}
-		
-		private void MergeData(PlayerData dataToMerge)
-		{
-			ZedLogger.Log("MergeData, dataToMerge: " + dataToMerge, LoggerContext.iCloud);
-			if (dataToMerge != null)
-			{
-				ZedLogger.Log("MergeData, step 2", LoggerContext.iCloud);
-				//ZedLogger.Log("Merging data: " + dataToMerge.GameVersion + ", build: " + dataToMerge.BuildNumber + ", " + dataToMerge.GetCurrentLanguage(), LoggerContext.iCloud);
-				//MigrateDataBetweenVersions(dataToMerge);
-				MergeOnSync(dataToMerge);
-				dataToMerge = null;
-
-				// TODO: use ZTK events here
-				//if (DataUpdated != null)
-				//	DataUpdated();
-			}
-		}
-		
-		private void MergeOnSync(PlayerData mergeData)
-		{
-			Debug.Log("Merge with: " + mergeData);
-			// TODO: get list of models in current data and new data
-		}
-		#endregion
-
-		#region Helpers
-		private bool UseDataSync
-		{
-			get { return _useDataSync; }
-		}
-
-		public bool AskedToUseSync
-		{
-			get { return _askedToUseSync; }
-		}
-
-		public void SetUseDataSync(bool use)
-		{
-			APIManager.Instance.Analytics.LogDataSyncStatusChange(use);
-			_useDataSync = use;
-		}
-
-		public void MarkAsAskedToUseSync()
-		{
-			_askedToUseSync = true;
 		}
 		#endregion
 	}
