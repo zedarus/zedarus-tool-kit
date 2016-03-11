@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using Zedarus.ToolKit;
 using Zedarus.ToolKit.Helpers;
 using Zedarus.ToolKit.Data;
@@ -29,13 +30,16 @@ namespace Zedarus.ToolKit.Data
 		{
 			_playerDataFilename = playerDataFilename;
 			_gameData = Resources.Load<GD>(GameData.DATABASE_LOCAL_PATH);
-			_playerData = (PD) typeof(PD).GetMethod("Load").Invoke(null, new object[] { _playerDataFilename });
+
+			_playerData = PlayerData.Load<PD>(_playerDataFilename);
+			//_playerData = typeof(PD).GetMethod("Load",BindingFlags.FlattenHierarchy | BindingFlags.Static | BindingFlags.Public).Invoke(null, new object[] { _playerDataFilename }) as PD;
 		}
 
 		public void Save()
 		{
-			_playerData.MigrateVersion("0.0.0", 20);	// TODO: use actial values here
-			typeof(PD).GetMethod("Save").Invoke(null, new object[] { _playerData, _playerDataFilename });
+			_playerData.UpdateVersionAndTimestamp("0.0.0", 20);  // TODO: use actial values here
+			PlayerData.Save<PD>(_playerData, _playerDataFilename);
+			//typeof(PD).GetMethod("Save", BindingFlags.FlattenHierarchy | BindingFlags.Static | BindingFlags.Public).Invoke(null, new object[] { _playerData, _playerDataFilename });
 		}
 		#endregion
 

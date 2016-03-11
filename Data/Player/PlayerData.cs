@@ -3,7 +3,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Reflection;
 using Zedarus.ToolKit;
 using Zedarus.ToolKit.Helpers;
 using Zedarus.ToolKit.Data;
@@ -40,6 +42,11 @@ namespace Zedarus.ToolKit.Data.Player
 			_useDataSync = false;
 			_askedToUseSync = false;
 		}
+
+		protected virtual void CustomizeModels()
+		{
+			
+		}
 		#endregion
 
 		#region Controls
@@ -57,8 +64,10 @@ namespace Zedarus.ToolKit.Data.Player
 			}
 		}
 
-		public void UpdateTimestamp()
+		public void UpdateVersionAndTimestamp(string version, int build)
 		{
+			_buildNumber = build;
+			_gameVersion = version;
 			_timestamp = DateTime.UtcNow;
 		}
 		#endregion
@@ -85,28 +94,38 @@ namespace Zedarus.ToolKit.Data.Player
 		#endregion
 
 		#region Loading & Saving Data
-		public static PlayerData Load(string filename)
+		public static PlayerDataClass Load<PlayerDataClass>(string filename) where PlayerDataClass : PlayerData
 		{
+			PlayerDataClass data = null;
+
 			if (!DoesSaveGameExist(filename))
 			{
-				return new PlayerData();
+				data = (PlayerDataClass)Activator.CreateInstance(typeof(PlayerDataClass));
 			}
-
-			BinaryFormatter formatter = new BinaryFormatter();
-
-			using (FileStream stream = new FileStream(GetSavePath(filename), FileMode.Open))
+			else
 			{
-				try
+				BinaryFormatter formatter = new BinaryFormatter();
+
+				using (FileStream stream = new FileStream(GetSavePath(filename), FileMode.Open))
 				{
-					return formatter.Deserialize(stream) as PlayerData;
-				}
-				catch (Exception)
-				{
-					return null;
+					try
+					{
+						data = formatter.Deserialize(stream) as PlayerDataClass;
+					}
+					catch (Exception)
+					{
+						data = null;
+					}
 				}
 			}
+
+			if (data != null)
+				data.CustomizeModels();
+
+			return data;
 		}
-		public static bool Save(PlayerData data, string filename)
+
+		public static bool Save<PlayerDataClass>(PlayerDataClass data, string filename) where PlayerDataClass : PlayerData
 		{
 			BinaryFormatter formatter = new BinaryFormatter();
 
@@ -114,7 +133,6 @@ namespace Zedarus.ToolKit.Data.Player
 			{
 				try
 				{
-					data.UpdateTimestamp();
 					formatter.Serialize(stream, data);
 				}
 				catch (Exception)
@@ -200,28 +218,6 @@ namespace Zedarus.ToolKit.Data.Player
 		{
 			Debug.Log("Merge with: " + mergeData);
 			// TODO: get list of models in current data and new data
-		}
-		#endregion
-
-		#region Migration
-		public void MigrateVersion(string version, int buildNumber)
-		{
-			if (_buildNumber != buildNumber)
-			{
-				ZedLogger.Log("Migrating from build " + _buildNumber.ToString() + " to " + buildNumber.ToString());
-			}
-			else
-				ZedLogger.Log("Build number is the same as in the save game file, no action required");
-
-			/*foreach (KeyValuePair<string, IPlayerDataModel> model in _models)
-			{
-				if (model.Value != null)
-					model.Value.Update(buildNumber);
-			}*/
-
-			_buildNumber = buildNumber;
-			_gameVersion = version;
-			Debug.Log(_gameVersion + ", " + _buildNumber);
 		}
 		#endregion
 
