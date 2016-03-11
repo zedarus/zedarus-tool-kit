@@ -61,6 +61,7 @@ namespace Zedarus.ToolKit
 
 		protected virtual void InitPlayerData(string filename, APIState customAPIState = null)
 		{
+			_data.Load(filename);
 			/*DataManager.Instance.Load(filename);
 			if (customAPIState == null)
 			{

@@ -29,12 +29,13 @@ namespace Zedarus.ToolKit.Data
 		{
 			_playerDataFilename = playerDataFilename;
 			_gameData = Resources.Load<GD>(GameData.DATABASE_LOCAL_PATH);
-			//_playerData = PD.Load(_playerDataFilename);
+			_playerData = (PD) typeof(PD).GetMethod("Load").Invoke(null, new object[] { _playerDataFilename });
+			Debug.Log("Loaded data: " + _playerData);
 		}
 
 		public void Save()
 		{
-			//PD.Save(_playerData, _playerDataFilename);	
+			typeof(PD).GetMethod("Save").Invoke(null, new object[] { _playerData, _playerDataFilename });
 		}
 		#endregion
 

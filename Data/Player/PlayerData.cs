@@ -2,6 +2,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 using Zedarus.ToolKit;
 using Zedarus.ToolKit.Helpers;
 using Zedarus.ToolKit.Data;
@@ -10,35 +12,23 @@ using Zedarus.ToolKit.API;
 
 namespace Zedarus.ToolKit.Data.Player
 {
+	[Serializable]
 	public class PlayerData
 	{
 		#region Build Info
-		#if ZTK_DATA_SERIALIZATION
-		[SerializeThis] private string _gameVersion;
-		[SerializeThis] private int _buildNumber = 0;
-		[SerializeThis] private DateTime _timestamp;
-		#else
-		private string _gameVersion;
-		private int _buildNumber = 0;
-		private DateTime _timestamp;
-		#endif
+		[SerializeField] private string _gameVersion;
+		[SerializeField] private int _buildNumber = 0;
+		[SerializeField] private DateTime _timestamp;
 		#endregion
 
 		#region Parameters
-		//private Dictionary<Type, int> _idsTable;
 		//[SerializeThis] private string _uuid;
 		#endregion
 
 		#region Models
-		#if ZTK_DATA_SERIALIZATION
-		[SerializeThis] private bool _useDataSync;   // do not sync this
-		[SerializeThis] private bool _askedToUseSync;   // do not sync this
-		[SerializeThis] private Dictionary<string, PlayerDataModel> _models;
-		#else
-		private bool _useDataSync;   // do not sync this
-		private bool _askedToUseSync;   // do not sync this
-		private Dictionary<string, PlayerDataModel> _models;
-		#endif
+		[SerializeField] private bool _useDataSync;   // do not sync this
+		[SerializeField] private bool _askedToUseSync;   // do not sync this
+		[SerializeField] private Dictionary<string, PlayerDataModel> _models;
 		#endregion
 
 		#region Init
@@ -59,14 +49,19 @@ namespace Zedarus.ToolKit.Data.Player
 
 			if (_models.ContainsKey(t))
 			{
-				//_idsTable.Add(typeof(T), modelID);
 				Debug.Log("Model with this id (" + t + ") already added to player data");
 			}
 			else
 			{
-				//_idsTable.Add(typeof(T), modelID);
 				_models.Add(t, (T)Activator.CreateInstance(typeof(T)));
 			}
+		}
+
+		public void UpdateVersion(string version, int build)
+		{
+			_gameVersion = version;
+			_buildNumber = build;
+			_timestamp = DateTime.UtcNow;
 		}
 		#endregion
 		
@@ -79,40 +74,78 @@ namespace Zedarus.ToolKit.Data.Player
 			else
 				return null;
 		}
-		#endregion
 
-		#region Loading Data
-		public static PlayerData Load(string filename)
+		public int Build
 		{
-			/*PlayerData playerData = Reader.Load(filename);
-			if (playerData == null) playerData = new PlayerData();
-			return playerData;*/
-			return null;
+			get { return _buildNumber; }
+		}
+
+		public DateTime Timestamp
+		{
+			get { return _timestamp; }
 		}
 		#endregion
 
-		#region Saving Data
-		public static void Save(PlayerData data, string filename)
+		#region Loading & Saving Data
+		public static PlayerData Load(string filename)
 		{
-			// TODO: save
-			//Reader.Save(data, filename);
+			if (!DoesSaveGameExist(filename))
+			{
+				return new PlayerData();
+			}
+
+			BinaryFormatter formatter = new BinaryFormatter();
+
+			using (FileStream stream = new FileStream(GetSavePath(filename), FileMode.Open))
+			{
+				try
+				{
+					return formatter.Deserialize(stream) as PlayerData;
+				}
+				catch (Exception)
+				{
+					return null;
+				}
+			}
+		}
+		public static bool Save(PlayerData data, string filename)
+		{
+			BinaryFormatter formatter = new BinaryFormatter();
+
+			using (FileStream stream = new FileStream(GetSavePath(filename), FileMode.Create))
+			{
+				try
+				{
+					formatter.Serialize(stream, data);
+				}
+				catch (Exception)
+				{
+					return false;
+				}
+			}
+
+			return true;
+		}
+
+		private static bool DoesSaveGameExist(string name)
+		{
+			return File.Exists(GetSavePath(name));
+		}
+
+		private static string GetSavePath(string name)
+		{
+			return Path.Combine(Application.persistentDataPath, name);
 		}
 		#endregion
 
 		#region Event Listeners
 		private void CreateEventListeners() 
 		{
-			//AudioManager.Instance.soundStateUpdate += OnSoundStateUpdate;
-			//AudioManager.Instance.musicStateUpdate += OnMusicStateUpdate;
-			
 			APIManager.Instance.Sync.SyncFinished += OnSyncFinished;
 		}
 		
 		private void RemoveEventListeners() 
 		{
-			//AudioManager.Instance.soundStateUpdate -= OnSoundStateUpdate;
-			//AudioManager.Instance.musicStateUpdate -= OnMusicStateUpdate;
-			
 			APIManager.Instance.Sync.SyncFinished -= OnSyncFinished;
 		}
 		#endregion
@@ -169,19 +202,6 @@ namespace Zedarus.ToolKit.Data.Player
 			Debug.Log("Merge with: " + mergeData);
 			// TODO: get list of models in current data and new data
 		}
-
-		/*
-		private void OniCloudConfirmPopupConfirm()
-		{
-			SetUseDataSync(true);
-			DownloadData();
-		}
-		
-		private void OniCloudConfirmPopupCancel()
-		{
-			SetUseDataSync(false);
-		}
-		*/
 		#endregion
 
 		#region Migration
