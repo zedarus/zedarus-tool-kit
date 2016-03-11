@@ -104,10 +104,9 @@ namespace Zedarus.ToolKit.UI
 
 		public void SetCustomData(IUIScreenData data)
 		{
-			ProcessCustomData(data);
-
 			if (data != null)
 			{
+				ProcessCustomData(data);
 				data.Clear();
 				data = null;
 			}
