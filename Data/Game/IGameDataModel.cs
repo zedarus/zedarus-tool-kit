@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Zedarus.Toolkit.Data.Game
+namespace Zedarus.ToolKit.Data.Game
 {
 	public interface IGameDataModel
 	{

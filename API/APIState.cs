@@ -8,7 +8,7 @@ using Serialization;
 
 namespace Zedarus.ToolKit.API
 {
-	public class APIState : PlayerDataModel
+	public class APIState : IPlayerDataModel
 	{
 		#region Properties
 		#if ZTK_DATA_SERIALIZATION
@@ -29,7 +29,7 @@ namespace Zedarus.ToolKit.API
 		#endregion
 
 		#region Controls
-		public override void Reset()
+		public void Reset()
 		{
 			// TODO: decide if we need to reset this data
 			// Reset only properties here!
@@ -37,7 +37,12 @@ namespace Zedarus.ToolKit.API
 			//_adsRemoved = false;
 		}
 
-		public override bool Merge(PlayerDataModel data)
+		public void SetDefaults(int currentBuild)
+		{
+			
+		}
+
+		public bool Merge(IPlayerDataModel data)
 		{
 			// TODO: decide is this data should be merged on sycn
 			if (data is APIState)

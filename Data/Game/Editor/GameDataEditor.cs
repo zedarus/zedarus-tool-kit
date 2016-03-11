@@ -2,7 +2,7 @@
 using UnityEditor;
 using System.Collections;
 
-namespace Zedarus.Toolkit.Data.Game
+namespace Zedarus.ToolKit.Data.Game
 {
 	public class GameDataEditor : EditorWindow
 	{

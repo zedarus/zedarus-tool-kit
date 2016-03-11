@@ -14,17 +14,22 @@ namespace Zedarus.ToolKit
 			get
 			{
 				if (_instance == null)
-					CreateInstance();
+					Init();
 			
 				return _instance;
 			}
 		}
+
+		public static void Init()
+		{
+			CreateInstance<T>();
+		}
 		
-		protected static void CreateInstance()
+		protected static void CreateInstance<InstanceType>() where InstanceType : T
 		{
 			if (_instance == null)
 			{
-				Type t = typeof(T);
+				Type t = typeof(InstanceType);
 		
 				/*
 				// Ensure there are no public constructors...
@@ -36,7 +41,7 @@ namespace Zedarus.ToolKit
 				*/
 		
 				// Create an instance via the private constructor
-				_instance = (T)Activator.CreateInstance(t, true);
+				_instance = (InstanceType)Activator.CreateInstance(t, true);
 			}
 		}
 	}

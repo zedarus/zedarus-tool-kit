@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Zedarus.Toolkit.Data.Game
+namespace Zedarus.ToolKit.Data.Game
 {
 	public class GameData : ScriptableObject
 	{

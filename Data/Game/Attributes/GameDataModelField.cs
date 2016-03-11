@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-namespace Zedarus.Toolkit.Data.Game
+namespace Zedarus.ToolKit.Data.Game
 {
 	[System.AttributeUsage(System.AttributeTargets.Field)]
 	public class DataTable : System.Attribute

@@ -5,7 +5,7 @@ using System.Reflection;
 #endif
 using System.Collections.Generic;
 
-namespace Zedarus.Toolkit.Data.Game
+namespace Zedarus.ToolKit.Data.Game
 {
 	[System.Serializable]
 	public class GameDataModel : IGameDataModel

@@ -6,7 +6,7 @@ using Zedarus.ToolKit;
 using Zedarus.ToolKit.Helpers;
 using Zedarus.ToolKit.Data;
 using Zedarus.ToolKit.Data.Player;
-using Zedarus.Toolkit.Data.Game;
+using Zedarus.ToolKit.Data.Game;
 
 namespace Zedarus.ToolKit.Data
 {
@@ -30,11 +30,11 @@ namespace Zedarus.ToolKit.Data
 			_playerDataFilename = playerDataFilename;
 			_gameData = Resources.Load<GD>(GameData.DATABASE_LOCAL_PATH);
 			_playerData = (PD) typeof(PD).GetMethod("Load").Invoke(null, new object[] { _playerDataFilename });
-			Debug.Log("Loaded data: " + _playerData);
 		}
 
 		public void Save()
 		{
+			_playerData.MigrateVersion("0.0.0", 20);	// TODO: use actial values here
 			typeof(PD).GetMethod("Save").Invoke(null, new object[] { _playerData, _playerDataFilename });
 		}
 		#endregion

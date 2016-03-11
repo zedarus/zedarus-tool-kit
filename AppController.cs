@@ -3,7 +3,7 @@ using System.Collections;
 using Zedarus.ToolKit.API;
 using Zedarus.ToolKit.Data;
 using Zedarus.ToolKit.Data.Player;
-using Zedarus.Toolkit.Data.Game;
+using Zedarus.ToolKit.Data.Game;
 
 namespace Zedarus.ToolKit
 {
@@ -16,11 +16,6 @@ namespace Zedarus.ToolKit
 		#endregion
 
 		#region Unity Methods
-		public static void Start()
-		{
-			CreateInstance();
-		}
-
 		public AppController()
 		{
 			if (!initialized)
@@ -59,7 +54,7 @@ namespace Zedarus.ToolKit
 			_data = new DataManager<GameDataClass, PlayerDataClass>();
 		}
 
-		protected virtual void InitPlayerData(string filename, APIState customAPIState = null)
+		protected virtual void InitPlayerData(string filename)
 		{
 			_data.Load(filename);
 			/*DataManager.Instance.Load(filename);

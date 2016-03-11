@@ -28,7 +28,7 @@ namespace Zedarus.ToolKit.Data.Player
 		#region Models
 		[SerializeField] private bool _useDataSync;   // do not sync this
 		[SerializeField] private bool _askedToUseSync;   // do not sync this
-		[SerializeField] private Dictionary<string, PlayerDataModel> _models;
+		[SerializeField] private Dictionary<string, IPlayerDataModel> _models;
 		#endregion
 
 		#region Init
@@ -36,14 +36,14 @@ namespace Zedarus.ToolKit.Data.Player
 		{
 			//_uuid = System.Guid.NewGuid().ToString();
 			//_idsTable = new Dictionary<Type, int>();
-			_models = new Dictionary<string, PlayerDataModel>();
+			_models = new Dictionary<string, IPlayerDataModel>();
 			_useDataSync = false;
 			_askedToUseSync = false;
 		}
 		#endregion
 
 		#region Controls
-		public void AddModel<T>() where T : PlayerDataModel
+		public void AddModel<T>() where T : IPlayerDataModel
 		{
 			string t = typeof(T).FullName;
 
@@ -57,22 +57,20 @@ namespace Zedarus.ToolKit.Data.Player
 			}
 		}
 
-		public void UpdateVersion(string version, int build)
+		public void UpdateTimestamp()
 		{
-			_gameVersion = version;
-			_buildNumber = build;
 			_timestamp = DateTime.UtcNow;
 		}
 		#endregion
 		
 		#region Getters
-		public T GetModel<T>() where T : PlayerDataModel
+		public T GetModel<T>() where T : IPlayerDataModel
 		{	
 			string key = typeof(T).FullName;
 			if (_models.ContainsKey(key))
-				return _models[key] as T;
+				return (T) _models[key];
 			else
-				return null;
+				return default(T);
 		}
 
 		public int Build
@@ -116,6 +114,7 @@ namespace Zedarus.ToolKit.Data.Player
 			{
 				try
 				{
+					data.UpdateTimestamp();
 					formatter.Serialize(stream, data);
 				}
 				catch (Exception)
@@ -205,18 +204,24 @@ namespace Zedarus.ToolKit.Data.Player
 		#endregion
 
 		#region Migration
-		public void MigrateVersion(int buildNumber, string version)
+		public void MigrateVersion(string version, int buildNumber)
 		{
 			if (_buildNumber != buildNumber)
 			{
-				ZedLogger.Log("Migrating from build " + _buildNumber.ToString() + " to " + buildNumber.ToString() + ": no action required");
+				ZedLogger.Log("Migrating from build " + _buildNumber.ToString() + " to " + buildNumber.ToString());
 			}
 			else
 				ZedLogger.Log("Build number is the same as in the save game file, no action required");
-			
+
+			/*foreach (KeyValuePair<string, IPlayerDataModel> model in _models)
+			{
+				if (model.Value != null)
+					model.Value.Update(buildNumber);
+			}*/
+
 			_buildNumber = buildNumber;
 			_gameVersion = version;
-			Debug.Log(_gameVersion);
+			Debug.Log(_gameVersion + ", " + _buildNumber);
 		}
 		#endregion
 
