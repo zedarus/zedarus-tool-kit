@@ -64,6 +64,9 @@ namespace Zedarus.ToolKit.UI
 				_label.text = data.Label;
 				_callback = data.Callback;
 				_closePopupOnPress = data.ClosePopupOnPress;
+
+				if (data.Color.HasValue)
+					_colorElement.color = data.Color.Value;
 			}
 		}
 		#endregion

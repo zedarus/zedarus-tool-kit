@@ -113,7 +113,7 @@ namespace Zedarus.ToolKit.UI
 				while (_buttons.Count < buttons.Length)
 				{
 					UIGenericPopupButton newButton = Instantiate<UIGenericPopupButton>(_button);
-					newButton.transform.parent = _button.transform.parent;
+					newButton.transform.SetParent(_button.transform.parent, false);
 					newButton.transform.localScale = Vector3.one;
 					newButton.Init();
 					newButton.Reset();
@@ -133,7 +133,11 @@ namespace Zedarus.ToolKit.UI
 			for (int i = _buttons.Count - 1; i > 0; i--)
 			{
 				_buttons[i].ClosePopup -= OnClosePopupRequest;
-				Destroy(_buttons[i].gameObject);
+
+				if (_buttons[i] != null && _buttons[i].gameObject != null)
+					Destroy(_buttons[i].gameObject);
+
+				_buttons.RemoveAt(i);
 			}
 		}
 		#endregion
