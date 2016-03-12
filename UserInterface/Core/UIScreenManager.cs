@@ -259,7 +259,7 @@ namespace Zedarus.ToolKit.UI
 			get { return _screens[CurrentState]; }
 		}
 
-		private bool EmptyScreen
+		public bool EmptyScreen
 		{
 			get { return CurrentState == NoScreen; }
 		}

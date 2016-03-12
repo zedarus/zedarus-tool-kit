@@ -62,7 +62,9 @@ namespace Zedarus.ToolKit.UI
 			_id = ID_COUNTER++;
 
 			if (_animator == null)
+			{
 				_animator = GetComponent<Animator>();
+			}
 
 			if (_canvasGroup == null)
 			{

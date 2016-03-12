@@ -27,6 +27,7 @@ namespace Zedarus.ToolKit.UI
 		[SerializeField] private bool _firstScreenInstantAnimation = false;
 		[SerializeField] private Image _popupsClickBlocker;
 		[SerializeField] private Animator _popupsBackgroundAnimator;
+		[SerializeField] private bool _useRealtimeInAnimations = false;
 		#endregion
 
 		#region Properties
@@ -89,6 +90,15 @@ namespace Zedarus.ToolKit.UI
 			_popupsList = null;
 			#endif
 
+			if (_useRealtimeInAnimations)
+			{
+				Animator[] animators = GetComponentsInChildren<Animator>(true);
+				foreach (Animator animator in animators)
+				{
+					animator.updateMode = AnimatorUpdateMode.UnscaledTime;
+				}
+			}
+
 			_initialized = true;
 		}
 
@@ -141,6 +151,11 @@ namespace Zedarus.ToolKit.UI
 		private bool Initialized
 		{
 			get { return _initialized; }
+		}
+
+		public bool HasOpenPopups
+		{
+			get { return !_popups.EmptyScreen; }
 		}
 		#endregion
 
@@ -212,6 +227,12 @@ namespace Zedarus.ToolKit.UI
 		{
 			get { return _popupsBackgroundAnimator; }
 			set { _popupsBackgroundAnimator = value; }
+		}
+
+		public bool UseRealtimeInAnimations
+		{
+			get { return _useRealtimeInAnimations; }
+			set { _useRealtimeInAnimations = value; }
 		}
 		#endregion
 		#endif

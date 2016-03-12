@@ -42,6 +42,10 @@ namespace Zedarus.ToolKit.UI
 			RenderScreensList<UIPopup>("Popups", myTarget.Popups, myTarget.RemovePopup, myTarget.AddPopup, 0, "Add popup", false);
 			myTarget.PopupsClickBlocker = EditorGUILayout.ObjectField("Popups Clicks Blocker", myTarget.PopupsClickBlocker, typeof(Image), true) as Image;
 			myTarget.PopupsBackgroundAnimator = EditorGUILayout.ObjectField("Popups Background Animator", myTarget.PopupsBackgroundAnimator, typeof(Animator), true) as Animator;
+		
+			GUILayout.Space(16);
+
+			myTarget.UseRealtimeInAnimations = EditorGUILayout.ToggleLeft("Use realtime for animations", myTarget.UseRealtimeInAnimations);
 		}
 
 		private int RenderScreensList<T>(string title, List<T> screens, Action<int> RemoveHandler, Action AddHandler, int firstIndex, string addButtonLabel, bool pickFirst, string firstLabel = null) where T : UIScreen
