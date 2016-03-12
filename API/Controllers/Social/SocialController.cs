@@ -48,7 +48,7 @@ namespace Zedarus.ToolKit.API
 			base.InitWrappers();
 		}
 		
-		protected override IAPIWrapperInterface GetWrapperForAPI(APIs wrapperAPI)
+		protected override IAPIWrapperInterface GetWrapperForAPI(int wrapperAPI)
 		{
 			switch (wrapperAPI)
 			{
@@ -56,7 +56,7 @@ namespace Zedarus.ToolKit.API
 					return FacebookWrapper.Instance;
 				case APIs.Twitter:
 					return TwitterWrapper.Instance;*/
-				case APIs.Email:
+				case APIs.Sharing.Email:
 					return EmailWrapper.Instance;
 				default:
 					return null;
@@ -156,22 +156,22 @@ namespace Zedarus.ToolKit.API
 		#region Getters
 		protected ISocialWrapperInterface WrapperForMedia(SocialMedia media)
 		{
-			APIs api = ConvertMediaToAPI(media);
+			int api = ConvertMediaToAPI(media);
 			return (ISocialWrapperInterface) WrapperWithAPI(api);
 		}
 		#endregion
 		
 		#region Helpers
-		private APIs ConvertMediaToAPI(SocialMedia media)
+		private int ConvertMediaToAPI(SocialMedia media)
 		{
 			switch (media)
 			{
 				case SocialMedia.Facebook:
-					return APIs.Facebook;
+					return APIs.Sharing.Facebook;
 				case SocialMedia.Twitter:
-					return APIs.Twitter;
+					return APIs.Sharing.Twitter;
 				case SocialMedia.Email:
-					return APIs.Email;
+					return APIs.Sharing.Email;
 				default:
 					return APIs.None;
 			}

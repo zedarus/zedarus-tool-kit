@@ -16,13 +16,13 @@ namespace Zedarus.ToolKit.API
 		#endregion
 		
 		#region Wrappers Initialization
-		protected override IAPIWrapperInterface GetWrapperForAPI(APIs wrapperAPI)
+		protected override IAPIWrapperInterface GetWrapperForAPI(int wrapperAPI)
 		{
 			switch (wrapperAPI)
 			{
-				case APIs.AppleICloud:
+				case APIs.Sync.iCloud:
 					return ICloudWrapper.Instance;
-				case APIs.GoogleGameServices:
+				case APIs.Sync.GooglePlayGameServices:
 					return GooglePlayGameSavesWrapper.Instance;
 				default:
 					return null;

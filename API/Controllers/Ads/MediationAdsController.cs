@@ -31,11 +31,11 @@ namespace Zedarus.ToolKit.API
 		#endregion
 
 		#region Wrappers Initialization
-		protected override IAPIWrapperInterface GetWrapperForAPI(APIs wrapperAPI)
+		protected override IAPIWrapperInterface GetWrapperForAPI(int wrapperAPI)
 		{
 			switch (wrapperAPI)
 			{
-				case APIs.HeyZap:
+				case APIs.Ads.HeyZap:
 					return HeyZapWrapper.Instance;
 				default:
 					return null;

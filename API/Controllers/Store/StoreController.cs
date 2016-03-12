@@ -50,11 +50,11 @@ namespace Zedarus.ToolKit.API
 			}
 		}
 		
-		protected override IAPIWrapperInterface GetWrapperForAPI(APIs wrapperAPI)
+		protected override IAPIWrapperInterface GetWrapperForAPI(int wrapperAPI)
 		{
 			switch (wrapperAPI)
 			{
-				case APIs.UnityIAPs:
+				case APIs.IAPs.Unity:
 					return UnityStoreWrapper.Instance;
 				default:
 					return null;
@@ -109,7 +109,7 @@ namespace Zedarus.ToolKit.API
 		public void SimulateRemoveAdsPurchase()
 		{
 			// TODO: PlayerDataManager.Instance.DisableAds();
-			APIManager.Instance.AdsMediation.DisableAds();
+			APIManager.Instance.Ads.DisableAds();
 			//APIManager.Instance.BannerAds.DisableAds();
 			if (OnDisableAds != null)
 				OnDisableAds();

@@ -117,11 +117,11 @@ namespace Zedarus.ToolKit.API
 			base.InitWrappers();
 		}
 		
-		protected override IAPIWrapperInterface GetWrapperForAPI(APIs wrapperAPI)
+		protected override IAPIWrapperInterface GetWrapperForAPI(int wrapperAPI)
 		{
 			switch (wrapperAPI)
 			{
-				case APIs.UnityAnalytics:
+				case APIs.Analytics.Unity:
 					return UnityAnalyticsWrapper.Instance;
 				default:
 					return null;

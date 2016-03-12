@@ -3,6 +3,7 @@ using System.Collections;
 using Zedarus.ToolKit.Data;
 using Zedarus.ToolKit.Data.Player;
 using Zedarus.ToolKit.Data.Game;
+using Zedarus.ToolKit.API;
 
 namespace Zedarus.ToolKit
 {
@@ -30,7 +31,7 @@ namespace Zedarus.ToolKit
 		{
 			InitEvents();
 			InitAPI();
-			//APIManager.Instance.Init();
+			APIManager.Instance.Init();
 
 			InitGameData();
 			InitPlayerData("default.dat");

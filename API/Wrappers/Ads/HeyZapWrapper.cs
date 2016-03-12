@@ -18,7 +18,7 @@ namespace Zedarus.ToolKit.API
 		#endregion
 
 		#region Setup
-		protected override void Setup()
+		protected override void Setup(object[] parameters)
 		{
 			#if API_ADS_HEYZAP
 			HeyzapAds.start("88184f6964eeed3450fc12e251615bba", HeyzapAds.FLAG_NO_OPTIONS)

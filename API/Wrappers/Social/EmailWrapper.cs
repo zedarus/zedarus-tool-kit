@@ -14,7 +14,7 @@ namespace Zedarus.ToolKit.API
 		#endregion
 		
 		#region Setup
-		protected override void Setup() 
+		protected override void Setup(object[] parameters) 
 		{
 			#if UNITY_IPHONE && API_EMAIL_PRIME31
 			if (EtceteraBinding.isEmailAvailable())

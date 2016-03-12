@@ -4,25 +4,15 @@ using System.Collections;
 using System.Collections.Generic;
 
 namespace Zedarus.ToolKit.API
-{
-	public enum MultipleAPIUseMode
-	{
-		OnlyFirst,
-		Cycle,
-		All,
-		Select,
-		None
-	}
-	
+{	
 	public abstract class APIController
 	{
 		#region Parameters
 		private bool _initialized = false;
 		private bool _initializationStarted = false;
-		private List<APIs> _apis = new List<APIs>();
-		private MultipleAPIUseMode _apiUseMode;
+		private List<int> _apis = new List<int>();
 		protected List<IAPIWrapperInterface> _wrappers;
-		private int _currentWrapperIndex = 0;
+		private object[] _wrapperParameters = null;
 		private int _numberOfWrappersInitialized = 0;
 		#endregion
 		
@@ -31,13 +21,10 @@ namespace Zedarus.ToolKit.API
 		#endregion
 		
 		#region Initialization
-		public void UseAPI(MultipleAPIUseMode useMode, params APIs[] values)
+		public void Use(int api, params object[] parameters)
 		{
-			_apiUseMode = useMode;
-			foreach (APIs api in values)
-			{
-				_apis.Add(api);
-			}
+			_apis.Add(api);
+			_wrapperParameters = parameters;
 		}
 		
 		public void Init()
@@ -74,7 +61,7 @@ namespace Zedarus.ToolKit.API
 		#region Wrappers Initialization
 		private void CreateWrappers()
 		{
-			foreach (APIs api in APIList)
+			foreach (int api in APIList)
 			{
 				AddWrapperForAPI(api);
 			}
@@ -83,10 +70,10 @@ namespace Zedarus.ToolKit.API
 		protected virtual void InitWrappers()
 		{
 			foreach (IAPIWrapperInterface wrapper in _wrappers)
-				wrapper.Init();
+				wrapper.Init(_wrapperParameters);
 		}
 		
-		private void AddWrapperForAPI(APIs wrapperAPI)
+		private void AddWrapperForAPI(int wrapperAPI)
 		{
 			IAPIWrapperInterface wrapper = GetWrapperForAPI(wrapperAPI);
 			if (wrapper != null)
@@ -96,7 +83,7 @@ namespace Zedarus.ToolKit.API
 			}
 		}
 		
-		protected abstract IAPIWrapperInterface GetWrapperForAPI(APIs wrapperAPI);
+		protected abstract IAPIWrapperInterface GetWrapperForAPI(int wrapperAPI);
 		#endregion
 		
 		#region Event Senders
@@ -136,14 +123,9 @@ namespace Zedarus.ToolKit.API
 			get { return _initialized; }
 		}
 		
-		protected List<APIs> APIList
+		protected List<int> APIList
 		{
 			get { return _apis; }
-		}
-		
-		private MultipleAPIUseMode APIUseMode
-		{
-			get { return _apiUseMode; }
 		}
 		
 		protected List<IAPIWrapperInterface> Wrappers
@@ -155,34 +137,14 @@ namespace Zedarus.ToolKit.API
 		{
 			get
 			{
-				switch (APIUseMode)
-				{
-					case MultipleAPIUseMode.OnlyFirst:
-					case MultipleAPIUseMode.Select:
-						if (_wrappers != null && _wrappers.Count > 0)
-							return _wrappers[0];
-						else
-							return null;
-					
-					case MultipleAPIUseMode.Cycle:
-						if (_currentWrapperIndex < _wrappers.Count)
-						{
-							IAPIWrapperInterface wrapper = _wrappers[_currentWrapperIndex];
-							_currentWrapperIndex++;
-							if (_currentWrapperIndex >= _wrappers.Count)
-								_currentWrapperIndex = 0;
-							return wrapper;
-						}
-						else
-							return null;
-					
-					default:
-						return null;
-				}
+				if (_wrappers != null && _wrappers.Count > 0)
+					return _wrappers[0];
+				else
+					return null;
 			}
 		}
 		
-		protected IAPIWrapperInterface WrapperWithAPI(APIs api)
+		protected IAPIWrapperInterface WrapperWithAPI(int api)
 		{
 			for (int i = 0; i < _wrappers.Count; i++)
 			{

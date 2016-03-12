@@ -8,9 +8,9 @@ namespace Zedarus.ToolKit.API
 	{
 		event Action Initialized;
 		
-		void Init();
+		void Init(object[] parameters);
 		void Destroy();
-		void SetAPI(APIs api);
-		APIs API { get; }
+		void SetAPI(int api);
+		int API { get; }
 	}
 }

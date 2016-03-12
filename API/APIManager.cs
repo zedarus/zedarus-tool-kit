@@ -4,22 +4,43 @@ using Zedarus.ToolKit;
 
 namespace Zedarus.ToolKit.API
 {
-	public enum APIs
+	public struct APIs
 	{
-		AppleStoreKit,
-		AppleGameCenter,
-		AppleICloud,
-		GoogleCheckout,
-		GoogleGameServices,
-		Facebook,
-		Twitter,
-		Email,
-		HeyZap,
-		UnityAnalytics,
-		ComboIAPs,
-		GoogleStoreKit,
-		UnityIAPs,
-		None,
+		public struct Ads
+		{
+			public const int HeyZap = 1;
+		}
+
+		public struct Score
+		{
+			public const int GameCenter = 1;
+			public const int GooglePlayPlayServices = 2;
+		}
+
+		public struct Sharing
+		{
+			public const int Facebook = 1;
+			public const int Twitter = 2;
+			public const int Email = 3;
+		}
+
+		public struct Analytics
+		{
+			public const int Unity = 1;
+		}
+
+		public struct IAPs
+		{
+			public const int Unity = 2;
+		}
+
+		public struct Sync
+		{
+			public const int iCloud = 1;
+			public const int GooglePlayGameServices = 2;
+		}
+
+		public const int None = 0;
 	}
 	
 	public class APIManager : SimpleSingleton<APIManager>
@@ -31,11 +52,6 @@ namespace Zedarus.ToolKit.API
 		private SyncController _syncController;
 		private AnalyticsController _analyticsController;
 		private MediationAdsController _mediationAdsController;
-		#endregion
-
-		#region Properties
-		private bool _firstTierInitialized = false;
-		private bool _secondTierInitialized = false;
 		#endregion
 		
 		#region Initalization
@@ -58,41 +74,14 @@ namespace Zedarus.ToolKit.API
 		#endregion
 		
 		#region Controls
-		public void InitFirstTier()
+		public void Init()
 		{
-			if (!_firstTierInitialized)
-			{
-				_firstTierInitialized = true;
-				// We split initialization because of poor performance on Android
-				#if UNITY_ANDROID
-				_socialController.Init();
-				_scoreController.Init();
-				#else
-				_storeController.Init();
-				_socialController.Init();
-				_scoreController.Init();
-				_syncController.Init();
-				_analyticsController.Init();
-				_mediationAdsController.Init();
-				#endif
-			}
-		}
-
-		public void InitSecondTier()
-		{
-			if (!_secondTierInitialized)
-			{
-				_secondTierInitialized = true;
-				#if UNITY_ANDROID
-				_storeController.Init();
-				_syncController.Init();
-				_analyticsController.Init();
-				_interstitialsAdsController.Init();
-				_bannersAdsController.Init();
-				_mediationAdsController.Init();
-				#else
-				#endif
-			}
+			_storeController.Init();
+			_socialController.Init();
+			_scoreController.Init();
+			_syncController.Init();
+			_analyticsController.Init();
+			_mediationAdsController.Init();
 		}
 		#endregion
 		
@@ -129,17 +118,7 @@ namespace Zedarus.ToolKit.API
 			get { return _analyticsController; }
 		}
 
-		/*public InterstitialsAdsController InterstitialsAds
-		{
-			get { return _interstitialsAdsController; }
-		}
-
-		public BannerAdsController BannerAds
-		{
-			get { return _bannersAdsController; }
-		}*/
-
-		public MediationAdsController AdsMediation
+		public MediationAdsController Ads
 		{
 			get { return _mediationAdsController; }
 		}

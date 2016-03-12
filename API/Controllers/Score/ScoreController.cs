@@ -21,13 +21,13 @@ namespace Zedarus.ToolKit.API
 			base.InitWrappers();
 		}
 		
-		protected override IAPIWrapperInterface GetWrapperForAPI(APIs wrapperAPI)
+		protected override IAPIWrapperInterface GetWrapperForAPI(int wrapperAPI)
 		{
 			switch (wrapperAPI)
 			{
-				case APIs.AppleGameCenter:
+				case APIs.Score.GameCenter:
 					return GameCenterWrapper.Instance;
-				case APIs.GoogleGameServices:
+				case APIs.Score.GooglePlayPlayServices:
 					return GooglePlayGameServicesWrapper.Instance;
 				default:
 					return null;

@@ -9,7 +9,7 @@ namespace Zedarus.ToolKit.API
 	{
 		#region Parameters
 		protected bool _initialized = false;
-		private APIs _api;
+		private int _api;
 		#endregion
 		
 		#region Events
@@ -17,12 +17,12 @@ namespace Zedarus.ToolKit.API
 		#endregion
 		
 		#region Initialization
-		public void Init()
+		public void Init(object[] parameters)
 		{
 			if (!_initialized)
 			{
 				CreateEventListeners();
-				Setup();
+				Setup(parameters);
 				_initialized = true;
 			}
 		}
@@ -33,14 +33,14 @@ namespace Zedarus.ToolKit.API
 			_initialized = false;
 		}
 		
-		public void SetAPI(APIs api)
+		public void SetAPI(int api)
 		{
 			_api = api;
 		}
 		#endregion
 		
 		#region Setup
-		protected abstract void Setup();
+		protected abstract void Setup(object[] parameters);
 		#endregion
 		
 		#region Event Senders
@@ -57,7 +57,7 @@ namespace Zedarus.ToolKit.API
 		#endregion
 		
 		#region Getters/Setters
-		public APIs API
+		public int API
 		{
 			get { return _api; }
 		}
