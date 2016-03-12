@@ -31,13 +31,6 @@ namespace Zedarus.ToolKit.API
 		#endregion
 		
 		#region Initialization
-		public APIController() {}
-
-		public APIController(MultipleAPIUseMode useMode, params APIs[] values) : this()
-		{
-			UseAPI(useMode, values);
-		}
-
 		public void UseAPI(MultipleAPIUseMode useMode, params APIs[] values)
 		{
 			_apiUseMode = useMode;
@@ -82,7 +75,9 @@ namespace Zedarus.ToolKit.API
 		private void CreateWrappers()
 		{
 			foreach (APIs api in APIList)
+			{
 				AddWrapperForAPI(api);
+			}
 		}
 		
 		protected virtual void InitWrappers()
@@ -98,8 +93,7 @@ namespace Zedarus.ToolKit.API
 			{
 				wrapper.SetAPI(wrapperAPI);
 				_wrappers.Add(wrapper);
-			} else
-				Debug.LogWarning("No wrapper for API " + wrapperAPI + " in controller: " + this);
+			}
 		}
 		
 		protected abstract IAPIWrapperInterface GetWrapperForAPI(APIs wrapperAPI);
@@ -131,13 +125,13 @@ namespace Zedarus.ToolKit.API
 		private void OnWrapperInitialized()
 		{
 			_numberOfWrappersInitialized++;
-			if (_numberOfWrappersInitialized == _wrappers.Count)
+			if (_numberOfWrappersInitialized >= _wrappers.Count)
 				CompleteInitialization();
 		}
 		#endregion
 		
 		#region Getters
-		protected bool IsInitialized
+		public bool IsInitialized
 		{
 			get { return _initialized; }
 		}
@@ -164,7 +158,8 @@ namespace Zedarus.ToolKit.API
 				switch (APIUseMode)
 				{
 					case MultipleAPIUseMode.OnlyFirst:
-						if (_wrappers.Count > 0)
+					case MultipleAPIUseMode.Select:
+						if (_wrappers != null && _wrappers.Count > 0)
 							return _wrappers[0];
 						else
 							return null;

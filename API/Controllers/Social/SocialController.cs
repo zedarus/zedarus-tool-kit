@@ -2,7 +2,6 @@ using UnityEngine;
 using System;
 using System.Collections;
 using Zedarus.ToolKit;
-using Zedarus.ToolKit.Events;
 
 namespace Zedarus.ToolKit.API
 {
@@ -40,7 +39,6 @@ namespace Zedarus.ToolKit.API
 		#endregion
 		
 		#region Initialization
-		public SocialController(MultipleAPIUseMode useMode, params APIs[] values) : base(useMode, values) {}
 		protected override void Setup() {}	
 		#endregion
 		
@@ -54,18 +52,12 @@ namespace Zedarus.ToolKit.API
 		{
 			switch (wrapperAPI)
 			{
-				#if API_FACEBOOK_P31
-				case APIs.Facebook:
+				/*case APIs.Facebook:
 					return FacebookWrapper.Instance;
-				#endif
-				#if API_TWITTER_P31
 				case APIs.Twitter:
-					return TwitterWrapper.Instance;
-				#endif
-				#if API_EMAIL_P31
+					return TwitterWrapper.Instance;*/
 				case APIs.Email:
 					return EmailWrapper.Instance;
-				#endif
 				default:
 					return null;
 			}
@@ -98,10 +90,9 @@ namespace Zedarus.ToolKit.API
 		private void SetRewardAction(SocialAction action)
 		{
 			_action = action;
-			Debug.Log(_action);
 		}
 		
-		/*private Reward ApplyReward(bool result)
+		private Reward ApplyReward(bool result)
 		{	
 			Reward award = new Reward(_action, result);
 			_action = SocialAction.None;
@@ -112,12 +103,12 @@ namespace Zedarus.ToolKit.API
 			switch (award.Currency)
 			{
 				case SocialSharingReward.Coins:
-					//PlayerDataManager.Instance.Wallet.AddCoins(award.Amount, true);
+					// TODO: PlayerDataManager.Instance.Wallet.AddCoins(award.Amount, true);
 					break;
 			}
 			
 			return award;
-		}*/
+		}
 		#endregion
 		
 		#region Event Listeners
@@ -147,17 +138,15 @@ namespace Zedarus.ToolKit.API
 		#region Event Handlers
 		private void OnSharingStarted()
 		{	
-			// TODO: send event to display processing popup
-			//PopupManager.Instance.ShowProcessingPopup();
+			// TODO: PopupManager.Instance.ShowProcessingPopup();
 			if (SharingStarted != null)
 				SharingStarted();
 		}
 		
 		private void OnSharingFinished(bool result)
 		{
-			//Reward reward = ApplyReward(result);
-			// TODO: use events to display popup
-			//PopupManager.Instance.ShowSocialSharingResultPopup(null, result, reward.Currency, reward.Amount);
+			Reward reward = ApplyReward(result);
+			// TODO: PopupManager.Instance.ShowSocialSharingResultPopup(null, result, reward.Currency, reward.Amount);
 			
 			if (SharingFinished != null)
 				SharingFinished(result);
@@ -189,9 +178,8 @@ namespace Zedarus.ToolKit.API
 		}
 		#endregion
 	}
-
-	// TODO: refactor this
-	/*internal class Reward
+	
+	internal class Reward
 	{
 		private SocialSharingReward _currency;
 		private int _amount;
@@ -209,10 +197,10 @@ namespace Zedarus.ToolKit.API
 			
 			switch (action)
 			{
-				case SocialAction.ShareGame:
+				/*case SocialAction.ShareGame:
 					return GlobalSettings.Instance.RewardForSharingTheGame.Amount;
 				case SocialAction.ShareLevelScreenshot:
-					return GlobalSettings.Instance.RewardForSharingTheLevel.Amount;
+					return GlobalSettings.Instance.RewardForSharingTheLevel.Amount;*/
 				default:
 					return 0;
 			}
@@ -225,10 +213,10 @@ namespace Zedarus.ToolKit.API
 			
 			switch (action)
 			{
-				case SocialAction.ShareGame:
+				/*case SocialAction.ShareGame:
 					return GlobalSettings.Instance.RewardForSharingTheGame.Currency;
 				case SocialAction.ShareLevelScreenshot:
-					return GlobalSettings.Instance.RewardForSharingTheLevel.Currency;
+					return GlobalSettings.Instance.RewardForSharingTheLevel.Currency;*/
 				default:
 					return SocialSharingReward.None;
 			}
@@ -243,5 +231,5 @@ namespace Zedarus.ToolKit.API
 		{
 			get { return _amount; }
 		}
-	}*/
+	}
 }

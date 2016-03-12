@@ -23,6 +23,7 @@ namespace Zedarus.ToolKit.API
 		
 		#region Queries
 		bool HasNotifications { get; }
+		bool LoggedIn { get; }
 		#endregion
 	}
 }

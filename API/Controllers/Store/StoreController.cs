@@ -3,8 +3,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Zedarus.ToolKit;
-using Zedarus.ToolKit.Data;
-using Zedarus.ToolKit.Events;
 
 namespace Zedarus.ToolKit.API
 {
@@ -12,7 +10,7 @@ namespace Zedarus.ToolKit.API
 	{
 		#region Parameters
 		private List<StoreItem> _items;
-		private Queue<int> _queuedPurchases;
+		private Queue<StoreItemType> _queuedPurchases;
 		#endregion
 		
 		#region Events
@@ -23,17 +21,16 @@ namespace Zedarus.ToolKit.API
 		#endregion
 		
 		#region Initialization
-		public StoreController(MultipleAPIUseMode useMode, params APIs[] values) : base(useMode, values) {}
-
 		protected override void Setup() 
 		{
 			_items = new List<StoreItem>();
-			_queuedPurchases = new Queue<int>();
-			
-			foreach (KeyValuePair<int, string> storeItem in APIManager.Instance.Settings.StoreItems)
-			{
-				_items.Add(new StoreItem(storeItem.Key, storeItem.Value));
-			}
+			_queuedPurchases = new Queue<StoreItemType>();
+
+			// TODO: move this to settings class
+			_items.Add(new StoreItem(StoreItemType.CoinsPackSmall, "CoinsPackSmall", "KubikoCoinsPackSmall", "com.zedarus.kubiko.coins_pack_small"));
+			_items.Add(new StoreItem(StoreItemType.CoinsPackMedium, "CoinsPackMedium", "KubikoCoinsPackMedium", "com.zedarus.kubiko.coins_pack_medium"));
+			_items.Add(new StoreItem(StoreItemType.CoinsPackBig, "CoinsPackBig", "KubikoCoinsPackBig", "com.zedarus.kubiko.coins_pack_big"));
+			_items.Add(new StoreItem(StoreItemType.RemoveAds, "RemoveAds", "KubikoRemoveAds", "com.zedarus.kubiko.remove_ads"));
 		}	
 		
 		protected override void CompleteInitialization()
@@ -47,29 +44,26 @@ namespace Zedarus.ToolKit.API
 		protected override void InitWrappers() 
 		{
 			base.InitWrappers();
-			
 			foreach (IStoreWrapperInterface wrapper in Wrappers)
+			{
 				wrapper.GetProductsListFromServer(_items);
+			}
 		}
 		
 		protected override IAPIWrapperInterface GetWrapperForAPI(APIs wrapperAPI)
 		{
 			switch (wrapperAPI)
 			{
-				case APIs.Generic:
-					return GenericStoreWrapper.Instance;
-				#if API_STOREKIT_P31
-				case APIs.AppleStoreKit:
-					return StoreKitWrapper.Instance;
-				#endif
+				case APIs.UnityIAPs:
+					return UnityStoreWrapper.Instance;
 				default:
 					return null;
 			}
 		}
 		#endregion
-		
+
 		#region Controls
-		public void PurchaseItem(int itemType)
+		public void PurchaseItem(StoreItemType itemType)
 		{
 			if (!IsInitialized)
 			{
@@ -91,35 +85,32 @@ namespace Zedarus.ToolKit.API
 			if (Wrapper != null) Wrapper.RestorePurchases();
 		}
 		
-		public string GetPriceForItem(int itemType)
+		public string GetPriceForItem(StoreItemType itemType)
 		{
 			StoreItem item = GetItemWithType(itemType);
 			if (item != null)
-				return item.Price;
+				return item.FormattedPrice;
 			else
 				return "--";
 		}
 		
-		public void ShowCoinsShop()
+		public void ShowCoinsShop(LogScreens location, LogButtons button)
 		{
-			// TODO: use events to show popup
-			//if (GlobalSettings.Instance.IAPEnabled)
-			//	PopupManager.Instance.ShowPopupCoinsShop(OnCoinsShopPopupBuyPack, null);
+			/*if (GlobalSettings.Instance.IAPEnabled)
+				PopupManager.Instance.ShowPopupCoinsShop(OnCoinsShopPopupBuyPack, null, location, button);*/
 		}
 
 		public void ShowNotEnoughCoinsPopup()
 		{
-			// TODO: use events to show popup
-			//if (GlobalSettings.Instance.IAPEnabled)
-			//	PopupManager.Instance.ShowNotEnoughCoinsPopup(null, null);
+			/*if (GlobalSettings.Instance.IAPEnabled)
+				PopupManager.Instance.ShowNotEnoughCoinsPopup(null, null);*/
 		}
 
 		public void SimulateRemoveAdsPurchase()
 		{
-			APIManager.Instance.State.RemoveAds();
-			APIManager.Instance.BannerAds.DisableAds();
-			// TODO: use event here instead
-			//DataManager.Instance.Save();
+			// TODO: PlayerDataManager.Instance.DisableAds();
+			APIManager.Instance.AdsMediation.DisableAds();
+			//APIManager.Instance.BannerAds.DisableAds();
 			if (OnDisableAds != null)
 				OnDisableAds();
 		}
@@ -152,32 +143,33 @@ namespace Zedarus.ToolKit.API
 		#endregion
 		
 		#region Event Handlers
-		private void OnPurchaseStarted(StoreItem item)
+		private void OnPurchaseStarted(string itemID)
 		{
 			//if (PurchaseProcessStarted != null)
 			//	PurchaseProcessStarted(item);
-
-			// TODO: use events to show popup
-			//PopupManager.Instance.ShowProcessingPopup();
+			
+			// TODO: PopupManager.Instance.ShowProcessingPopup();
 		}
 		
-		private void OnPurchaseFinished(StoreItem item, bool success)
+		private void OnPurchaseFinished(string itemID, bool success)
 		{
 			//if (PurchaseProcessFinished != null)
 			//	PurchaseProcessFinished(item, success);
 
-			// TOOD: use events to show popup
-			//PopupManager.Instance.ShowTransactionResultPopup(null, success);
+			StoreItem item = GetItemWithID(itemID);
+			// TODO: PopupManager.Instance.ShowTransactionResultPopup(null, success);
 
 			if (success)
 			{
 				if (item.Type == StoreItemType.RemoveAds)
+				{
 					SimulateRemoveAdsPurchase();
-				else
-					EventManager.SendEvent(APIEvents.CurrencyPurchaseSuccess, item.Type);
+				}
+				//else
+					// TODO: PlayerDataManager.Instance.Wallet.AddCoins(GameDataManager.Instance.GetCoinsForPurchase(item.Type), true);
 			}
 			
-			APIManager.Instance.Analytics.LogPurchase(success, item.ID);
+			//APIManager.Instance.Analytics.LogPurchase(success, item.ID, item.Price, item.Currency);
 			
 			CheckQueue();
 		}
@@ -188,20 +180,22 @@ namespace Zedarus.ToolKit.API
 			{
 				for (int i = 0; i < _items.Count; i++)
 				{
-					string price = Wrapper.GetLocalisedPriceForItemWithID(_items[i].ID);
-					_items[i].UpdatePrice(price);
+					decimal price = Wrapper.GetDecimalPriceForItemWithID(_items[i].ID);
+					string formattedPrice = Wrapper.GetLocalisedPriceForItemWithID(_items[i].ID);
+					string currency = Wrapper.GetCurrencyIDForItemWithID(_items[i].ID);
+					_items[i].UpdatePrice(price, formattedPrice, currency);
 				}
 			}
 		}
 		
-		private void OnCoinsShopPopupBuyPack(int itemType)
+		private void OnCoinsShopPopupBuyPack(StoreItemType itemType)
 		{
 			PurchaseItem(itemType);
 		}
 		#endregion
 		
 		#region Helpers
-		private StoreItem GetItemWithType(int itemType)
+		private StoreItem GetItemWithType(StoreItemType itemType)
 		{
 			for (int i = 0; i < _items.Count; i++)
 			{
@@ -209,6 +203,17 @@ namespace Zedarus.ToolKit.API
 					return _items[i];
 			}
 			
+			return null;
+		}
+
+		private StoreItem GetItemWithID(string id)
+		{
+			for (int i = 0; i < _items.Count; i++)
+			{
+				if (_items[i].ID.Equals(id))
+					return _items[i];
+			}
+
 			return null;
 		}
 		#endregion
@@ -225,7 +230,7 @@ namespace Zedarus.ToolKit.API
 		{
 			if (_queuedPurchases.Count > 0)
 			{
-				int itemType = _queuedPurchases.Dequeue();
+				StoreItemType itemType = _queuedPurchases.Dequeue();
 				PurchaseItem(itemType);
 			}
 		}

@@ -16,7 +16,8 @@ namespace Zedarus.ToolKit.API
 		Game,
 		GamePause,
 		GameCompletionScreen,
-		LanguageSelection
+		LanguageSelection,
+		Tutorial
 	}
 	
 	public enum LogButtons
@@ -55,6 +56,7 @@ namespace Zedarus.ToolKit.API
 		Exit,
 		RateGame,
 		SmallPack,
+		FreePack,
 		MediumPack,
 		BigPack,
 		Cancel,
@@ -71,7 +73,10 @@ namespace Zedarus.ToolKit.API
 		Email,
 		Learn,
 		RestorePurchases,
-		RemoveAds
+		RemoveAds,
+		CoinsShop,
+		Undo,
+		NotEnoughCoins,
 	}
 	
 	public enum LogPopups
@@ -88,6 +93,7 @@ namespace Zedarus.ToolKit.API
 		SharingResult,
 		Solve,
 		TransactionResult,
+		Message,
 		GameCenter,
 		iCloud,
 		iCloudExistingData,
@@ -98,8 +104,11 @@ namespace Zedarus.ToolKit.API
 	public class AnalyticsController : APIController 
 	{
 		#region Initialization
-		public AnalyticsController(MultipleAPIUseMode useMode, params APIs[] values) : base(useMode, values) {}
 		protected override void Setup() {}	
+		#endregion
+
+		#region Properties
+		private LogScreens _previousScreen = LogScreens.Options;
 		#endregion
 		
 		#region Wrappers Initialization
@@ -112,10 +121,8 @@ namespace Zedarus.ToolKit.API
 		{
 			switch (wrapperAPI)
 			{
-				#if API_FLURRY_P31
-				case APIs.Flurry:
-					return FlurryWrapper.Instance;
-				#endif
+				case APIs.UnityAnalytics:
+					return UnityAnalyticsWrapper.Instance;
 				default:
 					return null;
 			}
@@ -136,36 +143,77 @@ namespace Zedarus.ToolKit.API
 		{
 			return Regex.Replace(popup.ToString(), "(\\B[A-Z])", " $1");
 		}
+
+		public void LogLevelPackUnlockRequest(int levelPackID)
+		{
+			if (Wrappers == null || Wrappers.Count < 1)
+				return;
+
+			Dictionary<string, object> parameters = new Dictionary<string, object>();
+			parameters.Add("levelpackID", levelPackID.ToString());
+
+			foreach (IAnalyticsWrapperInterface wrapper in Wrappers)
+			{
+				string eventName = "Monetization - LevelPackUnlock - Request";
+				wrapper.LogEvent(eventName, parameters);
+			}
+		}
+
+		public void LogLevelPackUnlock(int levelPackID, int price, bool success)
+		{
+			if (Wrappers == null || Wrappers.Count < 1)
+				return;
+
+			Dictionary<string, object> parameters = new Dictionary<string, object>();
+			parameters.Add("levelpackID", levelPackID.ToString());
+			parameters.Add("price", price.ToString());
+			parameters.Add("success", success.ToString());
+
+			foreach (IAnalyticsWrapperInterface wrapper in Wrappers)
+			{
+				string eventName = "Monetization - LevelPackUnlock - Unlock";
+				wrapper.LogEvent(eventName, parameters);
+			}
+		}
 		
 		#region User Interface
 		public void LogScreen(LogScreens screen) 
 		{
-			if (Wrapper == null)
+			if (_previousScreen == screen)
 				return;
-			
-			string eventName = "UI - " + GetScreenName(screen) + " - Display";
-			Wrapper.LogEvent(eventName);
+
+			if (Wrappers == null || Wrappers.Count < 1)
+				return;
+
+			foreach (IAnalyticsWrapperInterface wrapper in Wrappers)
+			{
+				string eventName = "UI - " + GetScreenName(screen) + " - Display";
+				wrapper.LogEvent(eventName);
+			}
+
+			_previousScreen = screen;
 		}
 
 		public void LogPromo(string promoName)
 		{
-			if (Wrapper == null)
+			if (Wrappers == null || Wrappers.Count < 1)
 				return;
 
-			Wrapper.LogEvent("Promo - " + promoName);
+			foreach (IAnalyticsWrapperInterface wrapper in Wrappers)
+				wrapper.LogEvent("Promo - " + promoName);
 		}
 		
-		public void LogButton(LogScreens screen, LogButtons button) 
+		private void LogButton(LogScreens screen, LogButtons button) 
 		{
-			Dictionary<string,string> noParams = null;
+			Dictionary<string,object> noParams = null;
 			LogButton(screen, button, noParams);	
 		}
 		
-		public void LogButton(LogScreens screen, LogButtons button, params string[] parameters) 
+		private void LogButton(LogScreens screen, LogButtons button, params string[] parameters) 
 		{	
 			if (parameters.Length % 2 == 0 && parameters.Length > 0)
 			{
-				Dictionary<string,string> filteredParameters = new Dictionary<string, string>();
+				Dictionary<string,object> filteredParameters = new Dictionary<string, object>();
 				for (int i = 0; i < parameters.Length / 2; i += 2)
 				{
 					filteredParameters.Add(parameters[i], parameters[i+1]);
@@ -176,193 +224,247 @@ namespace Zedarus.ToolKit.API
 				Debug.LogWarning("Incorrect number of parameters for event");
 		}
 		
-		public void LogButton(LogScreens screen, LogButtons button, Dictionary<string,string> parameters) 
+		private void LogButton(LogScreens screen, LogButtons button, Dictionary<string,object> parameters) 
 		{
-			if (Wrapper == null)
+			if (Wrappers == null || Wrappers.Count < 1)
 				return;
 			
 			string eventName = "UI - " + GetScreenName(screen) + " - Button - " + GetButtonName(button);
-			
-			if (parameters != null)
-				Wrapper.LogEvent(eventName, parameters);
-			else
-				Wrapper.LogEvent(eventName);
+
+			foreach (IAnalyticsWrapperInterface wrapper in Wrappers)
+			{
+				if (parameters != null)
+					wrapper.LogEvent(eventName, parameters);
+				else
+					wrapper.LogEvent(eventName);
+			}
 		}
 		#endregion
 		
 		#region User Interface
-		public void LogPopup(LogPopups popup) 
+		public void LogShopPopup(LogPopups popup, LogScreens location, LogButtons button)
 		{
-			if (Wrapper == null)
+			if (Wrappers == null || Wrappers.Count < 1)
 				return;
-			
-			string eventName = "UI - Popup - " + GetPopupName(popup) + " - Display";
-			Wrapper.LogEvent(eventName);
+
+			Dictionary<string, object> parameters = new Dictionary<string, object>();
+			parameters.Add("location", GetScreenName(location));
+			parameters.Add("button", GetButtonName(button));
+
+			foreach (IAnalyticsWrapperInterface wrapper in Wrappers)
+			{
+				string eventName = "UI - Popup - " + GetPopupName(popup) + " - Display";
+				wrapper.LogEvent(eventName, parameters);
+			}
+		}
+
+		public void LogShopPopupButton(LogButtons button)
+		{
+			LogPopupButton(LogPopups.Shop, button);
+		}
+
+		public void LogRateMePopup(LogScreens location)
+		{
+			if (Wrappers == null || Wrappers.Count < 1)
+				return;
+
+			Dictionary<string, object> parameters = new Dictionary<string, object>();
+			parameters.Add("location", GetScreenName(location));
+
+			foreach (IAnalyticsWrapperInterface wrapper in Wrappers)
+			{
+				string eventName = "UI - Popup - " + GetPopupName(LogPopups.Rate) + " - Display";
+				wrapper.LogEvent(eventName, parameters);
+			}
+		}
+
+		public void LogRateMePopupButton(LogButtons button)
+		{
+			LogPopupButton(LogPopups.Rate, button);
+		}
+
+		private void LogPopup(LogPopups popup, string message = null) 
+		{
+			if (Wrappers == null || Wrappers.Count < 1)
+				return;
+
+			Dictionary<string, object> parameters = null;
+
+			if (message != null)
+			{
+				parameters = new Dictionary<string, object>();
+				parameters.Add("message", message);
+			}
+
+			foreach (IAnalyticsWrapperInterface wrapper in Wrappers)
+			{
+				string eventName = "UI - Popup - " + GetPopupName(popup) + " - Display";
+				if (parameters != null)
+					wrapper.LogEvent(eventName, parameters);
+				else
+					wrapper.LogEvent(eventName);
+			}
 		}
 		
-		public void LogPopupButton(LogPopups popup, LogButtons button) 
+		private void LogPopupButton(LogPopups popup, LogButtons button) 
 		{
-			if (Wrapper == null)
+			if (Wrappers == null || Wrappers.Count < 1)
 				return;
-			
-			string eventName = "UI - Popup - " + GetPopupName(popup) + " - Button - " + GetButtonName(button);
-			Wrapper.LogEvent(eventName);
+
+			foreach (IAnalyticsWrapperInterface wrapper in Wrappers)
+			{
+				string eventName = "UI - Popup - " + GetPopupName(popup) + " - Button - " + GetButtonName(button);
+				wrapper.LogEvent(eventName);
+			}
 		}
 		#endregion
 		
 		#region Sync
 		public void LogDataSyncStatusChange(bool status) 
 		{
-			if (Wrapper == null)
+			if (Wrappers == null || Wrappers.Count < 1)
 				return;
-			
-			string eventName = "Sync - iCloud - " + (status ? "On" : "Off");
-			Wrapper.LogEvent(eventName);
-		}
-		
-		public void LogDataSyncEvent() 
-		{
-			if (Wrapper == null)
-				return;
-			
-			string eventName = "Sync - iCloud - Data Update";
-			Wrapper.LogEvent(eventName);
+
+			foreach (IAnalyticsWrapperInterface wrapper in Wrappers)
+			{
+				string eventName = "Sync - iCloud - " + (status ? "On" : "Off");
+				wrapper.LogEvent(eventName);
+			}
 		}
 		#endregion
 		
 		#region External Links
 		public void LogExternalLink(string link, bool inBrowser) 
 		{
-			if (Wrapper == null) return;
+			if (Wrappers == null || Wrappers.Count < 1)
+				return;
 			
-			Dictionary<string, string> parameters = new Dictionary<string, string>();
+			Dictionary<string, object> parameters = new Dictionary<string, object>();
 			parameters.Add("url", link);
 			parameters.Add("in_browser", (inBrowser ? "Yes":"No"));
-			if (Wrapper != null) Wrapper.LogEvent("Open External Link", parameters);
+
+			foreach (IAnalyticsWrapperInterface wrapper in Wrappers)
+				wrapper.LogEvent("Open External Link", parameters);
 		}
 		#endregion
 		
 		#region Audio
-		public void DisableMusic() { if (Wrapper != null) Wrapper.LogEvent("Disable Music"); }
-		public void EnableMusic() { if (Wrapper != null) Wrapper.LogEvent("Enable Music"); }
-		public void DisableSounds() { if (Wrapper != null) Wrapper.LogEvent("Disable Sounds"); }
-		public void EnableSounds() { if (Wrapper != null) Wrapper.LogEvent("Enable Sounds"); }
+		public void DisableMusic() 
+		{ 
+			foreach (IAnalyticsWrapperInterface wrapper in Wrappers)
+				wrapper.LogEvent("Disable Music"); 
+		}
+
+		public void EnableMusic() 
+		{ 
+			foreach (IAnalyticsWrapperInterface wrapper in Wrappers)
+				wrapper.LogEvent("Enable Music"); 
+		}
+
+		public void DisableSounds() 
+		{ 
+			foreach (IAnalyticsWrapperInterface wrapper in Wrappers)
+				wrapper.LogEvent("Disable Sounds"); 
+		}
+
+		public void EnableSounds() 
+		{ 
+			foreach (IAnalyticsWrapperInterface wrapper in Wrappers)
+				wrapper.LogEvent("Enable Sounds"); 
+		}
+
 		public void LogIPodMusicStatus(bool playing, bool onAppStart) 
 		{
-			if (Wrapper == null) return;
+			if (Wrappers == null || Wrappers.Count < 1)
+				return;
 			
-			Dictionary<string, string> parameters = new Dictionary<string, string>();
+			Dictionary<string, object> parameters = new Dictionary<string, object>();
 			parameters.Add("music_playing", (playing ? "Yes":"No"));
 			parameters.Add("on_app_start", (onAppStart ? "Yes":"No"));
-			if (Wrapper != null) Wrapper.LogEvent("iPod Music Status", parameters);
+
+			foreach (IAnalyticsWrapperInterface wrapper in Wrappers)
+				wrapper.LogEvent("iPod Music Status", parameters);
 		}
 		#endregion
 		
 		#region Localisation
 		public void LogSystemLanguage(string languageCode) 
 		{
-			if (Wrapper == null) return;
+			if (Wrappers == null || Wrappers.Count < 1)
+				return;
 			
-			Dictionary<string, string> parameters = new Dictionary<string, string>();
+			Dictionary<string, object> parameters = new Dictionary<string, object>();
 			parameters.Add("code", languageCode.ToLower());
-			if (Wrapper != null) Wrapper.LogEvent("Localisation - System Language", parameters);
+
+			foreach (IAnalyticsWrapperInterface wrapper in Wrappers)
+				wrapper.LogEvent("Localisation - System Language", parameters);
 		}
 		
 		public void LogLanguageChange(string languageCode) 
 		{
-			if (Wrapper == null) return;
+			if (Wrappers == null || Wrappers.Count < 1)
+				return;
 			
-			Dictionary<string, string> parameters = new Dictionary<string, string>();
+			Dictionary<string, object> parameters = new Dictionary<string, object>();
 			parameters.Add("code", languageCode.ToLower());
-			if (Wrapper != null) Wrapper.LogEvent("Localisation - Change Language", parameters);
-		}
-		#endregion
-		
-		#region Performance
-		public void LogBackgroundGenerationTime(float seconds, string device, bool initial) 
-		{
-			if (Wrapper == null) return;
-			
-			Dictionary<string, string> parameters = new Dictionary<string, string>();
-			parameters.Add("time_seconds", seconds.ToString());
-			parameters.Add("device", device);
-			parameters.Add("inital", (initial ? "Yes":"No"));
-			if (Wrapper != null) Wrapper.LogEvent("Performance - Background Generation", parameters);
-		}
-		
-		public void LogLevelGenerationTime(float seconds, string device) 
-		{
-			if (Wrapper == null) return;
-			
-			Dictionary<string, string> parameters = new Dictionary<string, string>();
-			parameters.Add("time_seconds", seconds.ToString());
-			parameters.Add("device", device);
-			if (Wrapper != null) Wrapper.LogEvent("Performance - Level Generation", parameters);
+
+			foreach (IAnalyticsWrapperInterface wrapper in Wrappers)
+				wrapper.LogEvent("Localisation - Change Language", parameters);
 		}
 		#endregion
 		
 		#region IAPs
-		public void LogPurchase(bool result, string item) 
+		public void LogPurchase(bool result, string item, decimal price, string currency) 
 		{
-			if (Wrapper == null) return;
-			
-			Dictionary<string, string> parameters = new Dictionary<string, string>();
+			if (Wrappers == null || Wrappers.Count < 1)
+				return;
+
+			Dictionary<string, object> parameters = new Dictionary<string, object>();
 			parameters.Add("item", item);
-			if (result)
-				Wrapper.LogEvent("IAPs - Purchase Successfull", parameters);
-			else
-				Wrapper.LogEvent("IAPs - Purchase Failed", parameters);
+
+			foreach (IAnalyticsWrapperInterface wrapper in Wrappers)
+			{
+				if (result)
+					wrapper.LogPurchase(item, price, currency);
+				else
+					wrapper.LogEvent("IAPs - Purchase Failed", parameters);
+			}
 		}
 		#endregion
 		
 		#region Social
 		public void LogLevelShare(string media) 
 		{
-			if (Wrapper == null) return;
+			if (Wrappers == null || Wrappers.Count < 1)
+				return;
 			
-			Dictionary<string, string> parameters = new Dictionary<string, string>();
+			Dictionary<string, object> parameters = new Dictionary<string, object>();
 			parameters.Add("media", media);
-			Wrapper.LogEvent("Social - Share Level Started", parameters);
-		}
-		
-		public void LogGameShare(string media) 
-		{
-			if (Wrapper == null) return;
-			
-			Dictionary<string, string> parameters = new Dictionary<string, string>();
-			parameters.Add("media", media);
-			Wrapper.LogEvent("Social - Share Game Started", parameters);
-		}
-		
-		public void LogGiftApp() 
-		{
-			if (Wrapper != null) Wrapper.LogEvent("Social - Start Gift Process");
+
+			foreach (IAnalyticsWrapperInterface wrapper in Wrappers)
+				wrapper.LogEvent("Social - Share Level Screenshot", parameters);
 		}
 		#endregion
 		
 		#region Gameplay
 		public void LogUnlockAchievement(int achievementID) 
 		{
-			//AchievementData achievement = GameDataManager.Instance.GetAchievementWithID(achievementID);
-			//int gameMode = PlayerDataManager.Instance.GetCurrentGameModeID();
-			//float playtime = PlayerDataManager.Instance.GetTotalPlaytime(gameMode);
-			//int levelsCompleted = PlayerDataManager.Instance.GetNumberOfLevelsCompletedInGameModeWithID(gameMode);
-			
-			Dictionary<string, string> parameters = new Dictionary<string, string>();
-			parameters.Add("achievement_id", achievementID.ToString());
-			//parameters.Add("achievement_name", achievement.GameCenterIosID);
-			//parameters.Add("game_mode_id", gameMode.ToString());
-			//parameters.Add("playtime_seconds", Mathf.CeilToInt(playtime).ToString());
-			//parameters.Add("levels_completed", levelsCompleted.ToString());
-			
-			if (Wrapper != null) Wrapper.LogEvent("Game - Unlock Achievement", parameters);
-		}
-		#endregion
-		
-		#region Getters
-		protected IAnalyticsWrapperInterface Wrapper
-		{
-			get { return (IAnalyticsWrapperInterface)CurrentWrapperBase; }
+			if (Wrappers == null || Wrappers.Count < 1)
+				return;
+
+			/*AchievementData achievement = GameDataManager.Instance.GetAchievementWithID(achievementID);
+			int gameMode = PlayerDataManager.Instance.GetCurrentGameModeID();
+			float playtime = PlayerDataManager.Instance.GetTotalPlaytime(gameMode);
+			int levelsCompleted = PlayerDataManager.Instance.GetNumberOfLevelsCompletedInGameModeWithID(gameMode);
+
+			Dictionary<string, object> parameters = new Dictionary<string, object>();
+			parameters.Add("achievement_id", achievement.id.ToString());
+			parameters.Add("achievement_name", achievement.GameCenterIosID);
+			parameters.Add("playtime_seconds", Mathf.CeilToInt(playtime));
+			parameters.Add("levels_completed", levelsCompleted);
+
+			foreach (IAnalyticsWrapperInterface wrapper in Wrappers)
+				wrapper.LogEvent("Game - Unlock Achievement", parameters);*/
 		}
 		#endregion
 	}

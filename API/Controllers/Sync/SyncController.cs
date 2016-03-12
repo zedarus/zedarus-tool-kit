@@ -12,7 +12,6 @@ namespace Zedarus.ToolKit.API
 		#endregion
 		
 		#region Initialization
-		public SyncController(MultipleAPIUseMode useMode, params APIs[] values) : base(useMode, values) {}
 		protected override void Setup() {}	
 		#endregion
 		
@@ -21,10 +20,10 @@ namespace Zedarus.ToolKit.API
 		{
 			switch (wrapperAPI)
 			{
-				#if API_ICLOUD_P31
 				case APIs.AppleICloud:
 					return ICloudWrapper.Instance;
-				#endif
+				case APIs.GoogleGameServices:
+					return GooglePlayGameSavesWrapper.Instance;
 				default:
 					return null;
 			}
@@ -38,20 +37,26 @@ namespace Zedarus.ToolKit.API
 				Wrapper.Sync();
 		}
 		
-		public bool SetData<T>(T data) where T : class 
+		public bool SaveData(byte[] data) 
 		{
 			if (Wrapper != null)
-				return Wrapper.SetData(data);
+				return Wrapper.SaveData(data);
 			else
 				return false;
 		}
 		
-		public T GetData<T>() where T : class 
+		public byte[] GetPlayerData() 
 		{
 			if (Wrapper != null)
-				return Wrapper.GetData<T>();
+				return Wrapper.GetData();
 			else
 				return null;
+		}
+
+		public void DisplayUI()
+		{
+			if (Wrapper != null)
+				Wrapper.DisplayUI();
 		}
 		#endregion
 		
@@ -89,7 +94,6 @@ namespace Zedarus.ToolKit.API
 		{
 			if (SyncFinished != null)
 				SyncFinished();
-			APIManager.Instance.Analytics.LogDataSyncEvent();
 		}
 		#endregion
 	}

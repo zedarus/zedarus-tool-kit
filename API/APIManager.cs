@@ -1,13 +1,11 @@
 using UnityEngine;
 using System.Collections;
-using System.Collections.Generic;
 using Zedarus.ToolKit;
 
 namespace Zedarus.ToolKit.API
 {
 	public enum APIs
 	{
-		Generic,
 		AppleStoreKit,
 		AppleGameCenter,
 		AppleICloud,
@@ -16,163 +14,134 @@ namespace Zedarus.ToolKit.API
 		Facebook,
 		Twitter,
 		Email,
-		Flurry,
-		Chartboost,
-		AdMob,
-		AppleiAds,
-		PlayHaven,
-		None
+		HeyZap,
+		UnityAnalytics,
+		ComboIAPs,
+		GoogleStoreKit,
+		UnityIAPs,
+		None,
 	}
 	
 	public class APIManager : SimpleSingleton<APIManager>
 	{
-		#region Enums
-		public enum Controllers
-		{
-			Store,
-			Social,
-			Score,
-			Sync,
-			Analytics,
-			AdsInterstitials,
-			AdsBanners
-		}
+		#region Parameter
+		private StoreController _storeController;
+		private SocialController _socialController;
+		private ScoreController _scoreController;
+		private SyncController _syncController;
+		private AnalyticsController _analyticsController;
+		private MediationAdsController _mediationAdsController;
 		#endregion
 
 		#region Properties
-		private bool _initStarted;
-		private bool _initialized;
-		private int _initControllersCount;
-		private APISettings _settings;
-		private APIState _state;
-		private Dictionary<Controllers, APIController> _controllers;
+		private bool _firstTierInitialized = false;
+		private bool _secondTierInitialized = false;
 		#endregion
 		
 		#region Initalization
 		private APIManager()
 		{
-			APIEvents.Register();
-			_initStarted = false;
-			_initialized = false;
-			_initControllersCount = 0;
-			_settings = new APISettings();
-			_state = new APIState();
-			_controllers = new Dictionary<Controllers, APIController>();
+			_storeController = new StoreController();
+			_socialController = new SocialController();
+			_scoreController = new ScoreController();
+			_syncController = new SyncController();
+			_analyticsController = new AnalyticsController();
+			_mediationAdsController = new MediationAdsController();
+			
+			_storeController.Initialized += OnControllerInitialized;
+			_socialController.Initialized += OnControllerInitialized;
+			_scoreController.Initialized += OnControllerInitialized;
+			_syncController.Initialized += OnControllerInitialized;
+			_analyticsController.Initialized += OnControllerInitialized;
+			_mediationAdsController.Initialized += OnControllerInitialized;
 		}
 		#endregion
 		
 		#region Controls
-		public void Init()
+		public void InitFirstTier()
 		{
-			if (!_initialized)
+			if (!_firstTierInitialized)
 			{
-				if (!_initStarted)
-				{
-					_initControllersCount = 0;
-					_initStarted = true;
-					foreach (KeyValuePair<Controllers, APIController> controller in _controllers)
-					{
-						controller.Value.Initialized += OnControllerInitialized;
-						controller.Value.Init();
-					}
-				} else
-					Debug.Log("API manager initalization is already in progress");
-			} else
-				Debug.Log("API manager already initialized");
+				_firstTierInitialized = true;
+				// We split initialization because of poor performance on Android
+				#if UNITY_ANDROID
+				_socialController.Init();
+				_scoreController.Init();
+				#else
+				_storeController.Init();
+				_socialController.Init();
+				_scoreController.Init();
+				_syncController.Init();
+				_analyticsController.Init();
+				_mediationAdsController.Init();
+				#endif
+			}
 		}
 
-		public void AddController(Controllers type, APIController controller)
+		public void InitSecondTier()
 		{
-			if (_initialized || _initStarted)
+			if (!_secondTierInitialized)
 			{
-				Debug.Log("Can't add new API controllers after initialization was started or was finished");
-				return;
+				_secondTierInitialized = true;
+				#if UNITY_ANDROID
+				_storeController.Init();
+				_syncController.Init();
+				_analyticsController.Init();
+				_interstitialsAdsController.Init();
+				_bannersAdsController.Init();
+				_mediationAdsController.Init();
+				#else
+				#endif
 			}
-
-			if (_controllers.ContainsKey(type))
-				Debug.Log("Already has controller for this type: " + type);
-			else
-				_controllers.Add(type, controller);
-		}
-
-		public void UseState(APIState state)
-		{
-			if (state == null)
-			{
-				Debug.Log("Can't use new APIState because it's null");
-				return;
-			}
-
-			_state = state;
 		}
 		#endregion
 		
 		#region Event Handlers
 		private void OnControllerInitialized()
 		{
-			_initControllersCount++;
-			if (_initControllersCount >= _controllers.Count)
-				_initialized = true;
+			//ZedLogger.Log("Controller initialized");
 		}
 		#endregion
 		
 		#region Getters
-		public APISettings Settings
-		{
-			get { return _settings; }
-		}
-
-		public APIState State
-		{
-			get { return _state; }
-		}
-
 		public StoreController Store
 		{
-			get { return GetControllerForType<StoreController>(Controllers.Store); }
+			get { return _storeController; }
 		}
 		
 		public SocialController Social
 		{
-			get { return GetControllerForType<SocialController>(Controllers.Social); }
+			get { return _socialController; }
 		}
 		
 		public ScoreController Score
 		{
-			get { return GetControllerForType<ScoreController>(Controllers.Score); }	
+			get { return _scoreController; }	
 		}
 		
 		public SyncController Sync
 		{
-			get { return GetControllerForType<SyncController>(Controllers.Sync); }
+			get { return _syncController; }
 		}
 		
 		public AnalyticsController Analytics
 		{
-			get { return GetControllerForType<AnalyticsController>(Controllers.Analytics); }
+			get { return _analyticsController; }
 		}
 
-		public InterstitialsAdsController InterstitialsAds
+		/*public InterstitialsAdsController InterstitialsAds
 		{
-			get { return GetControllerForType<InterstitialsAdsController>(Controllers.AdsInterstitials); }
+			get { return _interstitialsAdsController; }
 		}
 
 		public BannerAdsController BannerAds
 		{
-			get { return GetControllerForType<BannerAdsController>(Controllers.AdsBanners); }
-		}
+			get { return _bannersAdsController; }
+		}*/
 
-		public T Controller<T>(Controllers type) where T : APIController
+		public MediationAdsController AdsMediation
 		{
-			return GetControllerForType<T>(type);
-		}
-
-		private T GetControllerForType<T>(Controllers type) where T : APIController
-		{
-			if (_controllers.ContainsKey(type))
-				return _controllers[type] as T;
-			else
-				return null;
+			get { return _mediationAdsController; }
 		}
 		#endregion
 	}

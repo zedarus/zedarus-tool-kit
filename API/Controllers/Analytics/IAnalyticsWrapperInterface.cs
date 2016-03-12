@@ -12,7 +12,8 @@ namespace Zedarus.ToolKit.API
 		
 		#region Controls
 		void LogEvent(string eventName);
-		void LogEvent(string eventName, Dictionary<string,string> parameters);
+		void LogEvent(string eventName, Dictionary<string,object> parameters);
+		void LogPurchase(string product, decimal price, string currency);
 		#endregion
 		
 		#region Queries

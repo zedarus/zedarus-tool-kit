@@ -3,14 +3,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Zedarus.ToolKit;
-#if API_TWITTER_P31
-using Prime31;
-#endif
 
 namespace Zedarus.ToolKit.API
 {
-	#if API_TWITTER_P31
-	public class TwitterWrapper : APIWrapper<TwitterWrapper>, ISocialWrapperInterface 
+	/*public class TwitterWrapper : APIWrapper<TwitterWrapper>, ISocialWrapperInterface 
 	{
 		#region Events
 		public event Action SharingStarted;
@@ -20,7 +16,7 @@ namespace Zedarus.ToolKit.API
 		#region Setup
 		protected override void Setup() 
 		{
-			TwitterCombo.init(APIManager.Instance.Settings.TwitterKey, APIManager.Instance.Settings.TwitterSecret);
+			TwitterCombo.init(GlobalSettings.Instance.API.TwitterKey, GlobalSettings.Instance.API.TwitterSecret);
 		}
 		#endregion
 		
@@ -30,7 +26,7 @@ namespace Zedarus.ToolKit.API
 			SendSharingStartedEvent();
 
 			if (CanTweet)
-				TwitterCombo.postStatusUpdate(text + ((url == null) ? "" : (" (" + url + ")")) + " #Numerity", imagePath);
+				TwitterCombo.postStatusUpdate(text + ((url == null) ? "" : (" (" + url + ")")) + " #Kubiko", imagePath);
 			else
 			{
 				TwitterCombo.showLoginDialog();
@@ -45,9 +41,9 @@ namespace Zedarus.ToolKit.API
 			if (CanTweet)
 			{
 				#if UNITY_IPHONE
-				TwitterBinding.showTweetComposer(description + " #Numerity", pictureURL, link);
+				TwitterBinding.showTweetComposer(description + " #Kubiko", pictureURL, link);
 				#elif UNITY_ANDROID
-				TwitterAndroid.postStatusUpdate(description + ((link == null) ? "" : (" (" + link + ")")) + " #Numerity");
+				TwitterAndroid.postStatusUpdate(description + ((link == null) ? "" : (" (" + link + ")")) + " #Kubiko");
 				#endif
 			}
 			else
@@ -148,6 +144,5 @@ namespace Zedarus.ToolKit.API
 			}
 		}
 		#endregion
-	}
-	#endif
+	}*/
 }

@@ -3,13 +3,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Zedarus.ToolKit;
-#if API_EMAIL_P31
-using Prime31;
-#endif
 
 namespace Zedarus.ToolKit.API
 {
-#if API_EMAIL_P31
 	public class EmailWrapper : APIWrapper<EmailWrapper>, ISocialWrapperInterface 
 	{
 		#region Events
@@ -20,7 +16,7 @@ namespace Zedarus.ToolKit.API
 		#region Setup
 		protected override void Setup() 
 		{
-			#if UNITY_IPHONE
+			#if UNITY_IPHONE && API_EMAIL_PRIME31
 			if (EtceteraBinding.isEmailAvailable())
 				SendInitializedEvent();
 			#elif UNITY_ANDROID
@@ -32,7 +28,7 @@ namespace Zedarus.ToolKit.API
 		#region Controls
 		public void PostTextAndImage(string subject, string text, string imagePath, byte[] image, string url)
 		{
-			#if UNITY_IPHONE
+			#if UNITY_IPHONE && API_EMAIL_PRIME31
 			SendSharingStartedEvent();
 			if (EtceteraBinding.isEmailAvailable())
 			{
@@ -50,7 +46,7 @@ namespace Zedarus.ToolKit.API
 		
 		public void Share(string link, string name, string caption, string description, string pictureURL) 
 		{
-			#if UNITY_IPHONE
+			#if UNITY_IPHONE && API_EMAIL_PRIME31
 			SendSharingStartedEvent();
 
 			if (EtceteraBinding.isEmailAvailable())
@@ -76,7 +72,7 @@ namespace Zedarus.ToolKit.API
 		#region Event Handlers
 		private void OnMailComposerFinishedEvent(string message) 
 		{
-			#if UNITY_IPHONE
+			#if UNITY_IPHONE && API_EMAIL_PRIME31
 			EtceteraManager.mailComposerFinishedEvent -= OnMailComposerFinishedEvent;
 			#endif
 			ZedLogger.Log("Email composer finished with message: " + message);
@@ -109,5 +105,4 @@ namespace Zedarus.ToolKit.API
 		#endregion
 		
 	}
-#endif
 }

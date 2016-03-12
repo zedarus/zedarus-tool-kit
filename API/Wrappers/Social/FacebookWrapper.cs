@@ -3,14 +3,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Zedarus.ToolKit;
-#if API_FACEBOOK_P31
-using Prime31;
-#endif
 
 namespace Zedarus.ToolKit.API
 {
-	#if API_FACEBOOK_P31
-	public class FacebookWrapper : APIWrapper<FacebookWrapper>, ISocialWrapperInterface 
+	/*public class FacebookWrapper : APIWrapper<FacebookWrapper>, ISocialWrapperInterface 
 	{
 		#region Events
 		public event Action SharingStarted;
@@ -219,6 +215,5 @@ namespace Zedarus.ToolKit.API
 			get { return FacebookCombo.isSessionValid(); }
 		}
 		#endregion
-	}
-	#endif
+	}*/
 }

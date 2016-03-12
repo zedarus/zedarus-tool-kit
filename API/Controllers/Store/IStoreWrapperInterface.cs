@@ -8,8 +8,8 @@ namespace Zedarus.ToolKit.API
 	public interface IStoreWrapperInterface
 	{
 		#region Events
-		event Action<StoreItem> PurchaseProcessStarted;
-		event Action<StoreItem, bool> PurchaseProcessFinished;
+		event Action<string> PurchaseProcessStarted;
+		event Action<string, bool> PurchaseProcessFinished;
 		event Action ProductsListReceivedFromServer;
 		#endregion
 		
@@ -18,6 +18,8 @@ namespace Zedarus.ToolKit.API
 		void RestorePurchases();
 		void GetProductsListFromServer(List<StoreItem> products);
 		string GetLocalisedPriceForItemWithID(string id);
+		string GetCurrencyIDForItemWithID(string id);
+		decimal GetDecimalPriceForItemWithID(string id);
 		#endregion
 	}
 }

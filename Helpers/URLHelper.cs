@@ -1,6 +1,5 @@
 using UnityEngine;
 using System.Collections;
-using Zedarus.ToolKit.API;
 
 namespace Zedarus.ToolKit.Helpers
 {
@@ -14,12 +13,12 @@ namespace Zedarus.ToolKit.Helpers
 			{
 				#if PRIME31
 				#if UNITY_IPHONE
-			EtceteraBinding.showWebPage(url, true);
+			//EtceteraBinding.showWebPage(url, true);
 				#endif
 				#endif
 			}
 		
-			APIManager.Instance.Analytics.LogExternalLink(url, inBrowser);
+			//APIManager.Instance.Analytics.LogExternalLink(url, inBrowser);
 		}
 	}
 }

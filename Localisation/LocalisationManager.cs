@@ -1,7 +1,6 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using Zedarus.ToolKit.API;
 
 namespace Zedarus.ToolKit.Localisation
 {

@@ -10,7 +10,6 @@ using Zedarus.ToolKit;
 using Zedarus.ToolKit.Helpers;
 using Zedarus.ToolKit.Data;
 using Zedarus.ToolKit.Data.Player;
-using Zedarus.ToolKit.API;
 
 namespace Zedarus.ToolKit.Data.Player
 {

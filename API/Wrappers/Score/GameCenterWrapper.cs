@@ -2,24 +2,24 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Zedarus.ToolKit.Localisation;
 using Zedarus.ToolKit;
 
 namespace Zedarus.ToolKit.API
 {
-#if API_GAME_CENTER_P31
 	public class GameCenterWrapper : APIWrapper<GameCenterWrapper>, IScoreWrapperInterface 
 	{
 		#region Setup
 		protected override void Setup() 
 		{
-			//Login();
+//			Login();
 		}
 		#endregion
 		
 		#region Controls
 		public void RequestAuthorisation()
 		{
-			#if UNITY_IPHONE
+			#if UNITY_IPHONE && API_SCORE_GAMECENTER
 			if (!PlayerDataManager.Instance.GameCenterLoginRequested)
 			{
 				PopupManager.Instance.ShowUseGameCenterPopup(OnGameCenterUseConfirm, null);
@@ -30,7 +30,7 @@ namespace Zedarus.ToolKit.API
 		
 		public void Login()
 		{
-			#if UNITY_IPHONE
+			#if UNITY_IPHONE && API_SCORE_GAMECENTER
 			if (!GameCenterBinding.isPlayerAuthenticated())
 			{
 				ZedLogger.Log("trying to authenticate local player");
@@ -41,7 +41,7 @@ namespace Zedarus.ToolKit.API
 		
 		public void UnlockAchievement(int achievementID) 
 		{
-			#if UNITY_IPHONE
+			#if UNITY_IPHONE && API_SCORE_GAMECENTER
 			if (!Enabled)
 				return;
 			
@@ -56,7 +56,7 @@ namespace Zedarus.ToolKit.API
 		
 		public void RestoreAchievement(int achievementID)
 		{
-			#if UNITY_IPHONE
+			#if UNITY_IPHONE && API_SCORE_GAMECENTER
 			if (!Enabled)
 				return;
 			
@@ -68,7 +68,7 @@ namespace Zedarus.ToolKit.API
 		
 		public void SubmitScore(int score, int leaderboardID) 
 		{
-			#if UNITY_IPHONE
+			#if UNITY_IPHONE && API_SCORE_GAMECENTER
 			if (!Enabled)
 				return;
 			
@@ -80,7 +80,7 @@ namespace Zedarus.ToolKit.API
 		
 		public void DisplayAchievementsList() 
 		{
-			#if UNITY_IPHONE
+			#if UNITY_IPHONE && API_SCORE_GAMECENTER
 			if (Enabled)
 				GameCenterBinding.showAchievements();
 			else
@@ -90,7 +90,7 @@ namespace Zedarus.ToolKit.API
 		
 		public void DisplayLeaderboardsList() 
 		{
-			#if UNITY_IPHONE
+			#if UNITY_IPHONE && API_SCORE_GAMECENTER
 			if (Enabled)
 				GameCenterBinding.showLeaderboardWithTimeScope(GameCenterLeaderboardTimeScope.Week);
 			else
@@ -100,7 +100,7 @@ namespace Zedarus.ToolKit.API
 		
 		public void DisplayDefaultView() 
 		{
-			#if UNITY_IPHONE
+			#if UNITY_IPHONE && API_SCORE_GAMECENTER
 			if (Enabled)
 				GameCenterBinding.showGameCenterViewController(GameCenterViewControllerState.Default);
 			else
@@ -114,6 +114,11 @@ namespace Zedarus.ToolKit.API
 		{ 
 			get { return true; }
 		}
+
+		public bool LoggedIn
+		{
+			get { return Enabled; }
+		}
 		#endregion
 		
 		#region Helpers
@@ -121,7 +126,7 @@ namespace Zedarus.ToolKit.API
 		{
 			get 
 			{
-				#if UNITY_IPHONE
+				#if UNITY_IPHONE && API_SCORE_GAMECENTER
 				return GameCenterBinding.isPlayerAuthenticated(); 
 				#else
 				return false;
@@ -131,17 +136,21 @@ namespace Zedarus.ToolKit.API
 		
 		private string GetAchivementID(int achievementID)
 		{
+			#if UNITY_IPHONE && API_SCORE_GAMECENTER
 			AchievementData achievement = GameDataManager.Instance.GetAchievementWithID(achievementID);
 			if (achievement != null)
 				return achievement.GameCenterIosID;
+			#endif
 			return null;
 		}
 		
 		private string GetLeaderboardID(int leaderboardID)
 		{
+			#if UNITY_IPHONE && API_SCORE_GAMECENTER
 			LeaderboardData leaderboard = GameDataManager.Instance.GetLeaderboardWithID(leaderboardID);	
 			if (leaderboard != null)
 				return leaderboard.GameCenterIosID;
+			#endif
 			return null;
 		}
 		#endregion
@@ -149,7 +158,7 @@ namespace Zedarus.ToolKit.API
 		#region Event Listeners
 		protected override void CreateEventListeners() 
 		{
-			#if UNITY_IPHONE
+			#if UNITY_IPHONE && API_SCORE_GAMECENTER
 			// Listens to all the GameCenter events.  All event listeners MUST be removed before this object is disposed!
 			// Player events
 			GameCenterManager.loadPlayerDataFailedEvent += loadPlayerDataFailed;
@@ -193,7 +202,7 @@ namespace Zedarus.ToolKit.API
 		
 		protected override void RemoveEventListeners() 
 		{
-			#if UNITY_IPHONE
+			#if UNITY_IPHONE && API_SCORE_GAMECENTER
 			// Remove all the event handlers
 			// Player events
 			GameCenterManager.loadPlayerDataFailedEvent -= loadPlayerDataFailed;
@@ -242,7 +251,7 @@ namespace Zedarus.ToolKit.API
 		}
 		#endregion
 
-		#if UNITY_IPHONE
+		#if UNITY_IPHONE && API_SCORE_GAMECENTER
 		#region Player Events
 		private void playerAuthenticated()
 		{
@@ -420,5 +429,4 @@ namespace Zedarus.ToolKit.API
 		#endregion
 		#endif
 	}
-#endif
 }

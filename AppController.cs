@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using System.Collections;
-using Zedarus.ToolKit.API;
 using Zedarus.ToolKit.Data;
 using Zedarus.ToolKit.Data.Player;
 using Zedarus.ToolKit.Data.Game;
@@ -31,7 +30,7 @@ namespace Zedarus.ToolKit
 		{
 			InitEvents();
 			InitAPI();
-			APIManager.Instance.Init();
+			//APIManager.Instance.Init();
 
 			InitGameData();
 			InitPlayerData("default.dat");

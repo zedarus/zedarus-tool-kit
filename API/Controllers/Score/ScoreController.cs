@@ -2,8 +2,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Zedarus.ToolKit;
-using Zedarus.ToolKit.Events;
 
 namespace Zedarus.ToolKit.API
 {
@@ -14,7 +12,6 @@ namespace Zedarus.ToolKit.API
 		#endregion
 		
 		#region Initialization
-		public ScoreController(MultipleAPIUseMode useMode, params APIs[] values) : base(useMode, values) {}
 		protected override void Setup() {}	
 		#endregion
 		
@@ -28,16 +25,10 @@ namespace Zedarus.ToolKit.API
 		{
 			switch (wrapperAPI)
 			{
-				#if API_GAME_CENTER_P31
 				case APIs.AppleGameCenter:
 					return GameCenterWrapper.Instance;
-				#endif
-				#if API_GAME_SERVICES_P31
 				case APIs.GoogleGameServices:
 					return GooglePlayGameServicesWrapper.Instance;
-				#endif
-				case APIs.Generic:
-					return GenericScoreWrapper.Instance;
 				default:
 					return null;
 			}
@@ -71,6 +62,11 @@ namespace Zedarus.ToolKit.API
 			if (Wrapper != null) Wrapper.RestoreAchievement(achievementID);
 		}
 		
+		public void SubmitTotalScore(int score)
+		{
+			throw new NotImplementedException();
+		}
+		
 		public void SubmitScore(int score, int leaderboardID) 
 		{
 			if (Wrapper != null) Wrapper.SubmitScore(score, leaderboardID);
@@ -97,14 +93,25 @@ namespace Zedarus.ToolKit.API
 		{
 			get { return (IScoreWrapperInterface)CurrentWrapperBase; }
 		}
+
+		public bool LoggedIn
+		{
+			get 
+			{ 
+				if (Wrapper != null)
+					return Wrapper.LoggedIn;
+				else
+					return false;
+			}
+		}
 		#endregion
 		
 		protected override void CompleteInitialization()
 		{
 			base.CompleteInitialization();
-
-			EventManager.SendEvent(APIEvents.UploadScore);
-			EventManager.SendEvent(APIEvents.UploadAchievements);
+			
+			// TODO: PlayerDataManager.Instance.UploadScore();
+			// TODO: PlayerDataManager.Instance.UploadAchievements();
 		}
 	}
 }

@@ -2,11 +2,11 @@ using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Zedarus.ToolKit.Localisation;
 using Zedarus.ToolKit;
 
 namespace Zedarus.ToolKit.API
 {
-	#if API_GAME_SERVICES_P31
 	public class GooglePlayGameServicesWrapper : APIWrapper<GooglePlayGameServicesWrapper>, IScoreWrapperInterface
 	{
 		#region Parameters
@@ -17,7 +17,7 @@ namespace Zedarus.ToolKit.API
 		protected override void Setup()
 		{
 			#if UNITY_ANDROID
-			if (!PlayGameServices.isSignedIn())
+			if (!PlayGameServices.isSignedIn() && !PlayerDataManager.Instance.GameCenterLoginRequested)
 			{
 				ZedLogger.Log("trying to authenticate local player (silently)");
 				PlayGameServices.attemptSilentAuthentication();
@@ -27,19 +27,7 @@ namespace Zedarus.ToolKit.API
 		#endregion
 		
 		#region Controls
-		public void RequestAuthorisation()
-		{
-			#if UNITY_ANDROID
-			if (!PlayerDataManager.Instance.GameCenterLoginRequested)
-			{
-				PopupUseGameCenter popup = PopupManager.Instance.ShowUseGameCenterPopup();
-				popup.confirm += OnGameCenterUseConfirm;
-				popup.closing += OnGameCenterPopupClosing;
-				
-				PlayerDataManager.Instance.RequestGameCenterLogin();
-			}
-			#endif
-		}
+		public void RequestAuthorisation() {}
 		
 		public void Login()
 		{
@@ -126,6 +114,11 @@ namespace Zedarus.ToolKit.API
 		{ 
 			get { return true; }
 		}
+
+		public bool LoggedIn
+		{
+			get { return Enabled; }
+		}
 		#endregion
 		
 		#region Helpers
@@ -143,17 +136,17 @@ namespace Zedarus.ToolKit.API
 		
 		private string GetAchivementID(int achievementID)
 		{
-			AchievementData achievement = GameDataManager.Instance.GetAchievementWithID(achievementID);
+			/*AchievementData achievement = GameDataManager.Instance.GetAchievementWithID(achievementID);
 			if (achievement != null)
-				return achievement.GooglePlayGameServiceID;
+				return achievement.GooglePlayGameServiceID;*/
 			return null;
 		}
 		
 		private string GetLeaderboardID(int leaderboardID)
 		{
-			LeaderboardData leaderboard = GameDataManager.Instance.GetLeaderboardWithID(leaderboardID);	
+			/*LeaderboardData leaderboard = GameDataManager.Instance.GetLeaderboardWithID(leaderboardID);	
 			if (leaderboard != null)
-				return leaderboard.GooglePlayGameServiceID;
+				return leaderboard.GooglePlayGameServiceID;*/
 			return null;
 		}
 		#endregion
@@ -171,14 +164,14 @@ namespace Zedarus.ToolKit.API
 			
 			GPGManager.reloadDataForKeyFailedEvent += reloadDataForKeyFailedEvent;
 			GPGManager.reloadDataForKeySucceededEvent += reloadDataForKeySucceededEvent;
-			GPGManager.loadCloudDataForKeyFailedEvent += loadCloudDataForKeyFailedEvent;
+			/*GPGManager.loadCloudDataForKeyFailedEvent += loadCloudDataForKeyFailedEvent;
 			GPGManager.loadCloudDataForKeySucceededEvent += loadCloudDataForKeySucceededEvent;
 			GPGManager.updateCloudDataForKeyFailedEvent += updateCloudDataForKeyFailedEvent;
 			GPGManager.updateCloudDataForKeySucceededEvent += updateCloudDataForKeySucceededEvent;
 			GPGManager.clearCloudDataForKeyFailedEvent += clearCloudDataForKeyFailedEvent;
 			GPGManager.clearCloudDataForKeySucceededEvent += clearCloudDataForKeySucceededEvent;
 			GPGManager.deleteCloudDataForKeyFailedEvent += deleteCloudDataForKeyFailedEvent;
-			GPGManager.deleteCloudDataForKeySucceededEvent += deleteCloudDataForKeySucceededEvent;
+			GPGManager.deleteCloudDataForKeySucceededEvent += deleteCloudDataForKeySucceededEvent;*/
 			
 			GPGManager.unlockAchievementFailedEvent += unlockAchievementFailedEvent;
 			GPGManager.unlockAchievementSucceededEvent += unlockAchievementSucceededEvent;
@@ -206,14 +199,14 @@ namespace Zedarus.ToolKit.API
 			
 			GPGManager.reloadDataForKeyFailedEvent -= reloadDataForKeyFailedEvent;
 			GPGManager.reloadDataForKeySucceededEvent -= reloadDataForKeySucceededEvent;
-			GPGManager.loadCloudDataForKeyFailedEvent -= loadCloudDataForKeyFailedEvent;
+			/*GPGManager.loadCloudDataForKeyFailedEvent -= loadCloudDataForKeyFailedEvent;
 			GPGManager.loadCloudDataForKeySucceededEvent -= loadCloudDataForKeySucceededEvent;
 			GPGManager.updateCloudDataForKeyFailedEvent -= updateCloudDataForKeyFailedEvent;
 			GPGManager.updateCloudDataForKeySucceededEvent -= updateCloudDataForKeySucceededEvent;
 			GPGManager.clearCloudDataForKeyFailedEvent -= clearCloudDataForKeyFailedEvent;
 			GPGManager.clearCloudDataForKeySucceededEvent -= clearCloudDataForKeySucceededEvent;
 			GPGManager.deleteCloudDataForKeyFailedEvent -= deleteCloudDataForKeyFailedEvent;
-			GPGManager.deleteCloudDataForKeySucceededEvent -= deleteCloudDataForKeySucceededEvent;
+			GPGManager.deleteCloudDataForKeySucceededEvent -= deleteCloudDataForKeySucceededEvent;*/
 			
 			GPGManager.unlockAchievementFailedEvent -= unlockAchievementFailedEvent;
 			GPGManager.unlockAchievementSucceededEvent -= unlockAchievementSucceededEvent;
@@ -234,151 +227,144 @@ namespace Zedarus.ToolKit.API
 		#if UNITY_ANDROID
 		private void authenticationSucceededEvent(string param)
 		{
-			ZedLogger.Log("authenticationSucceededEvent: " + param);
+			SendInitializedEvent();
+//			ZedLogger.Log("authenticationSucceededEvent: " + param);
 		}
 		
 		private void authenticationFailedEvent(string error)
 		{
-			ZedLogger.Log("authenticationFailedEvent: " + error);
+			SendInitializedEvent();
+			Debug.Log("Google Play Game services login failed: " + error);
+			PlayerDataManager.Instance.RequestGameCenterLogin();
+			PlayerDataManager.Instance.Save();
+//			ZedLogger.Log("authenticationFailedEvent: " + error);
 		}
 		
 		private void licenseCheckFailedEvent()
 		{
-			ZedLogger.Log("licenseCheckFailedEvent");
+//			ZedLogger.Log("licenseCheckFailedEvent");
 		}
 		
 		private void profileImageLoadedAtPathEvent(string path)
 		{
-			ZedLogger.Log("profileImageLoadedAtPathEvent: " + path);
+//			ZedLogger.Log("profileImageLoadedAtPathEvent: " + path);
 		}
 		
 		private void finishedSharingEvent(string errorOrNull)
 		{
-			ZedLogger.Log("finishedSharingEvent. errorOrNull param: " + errorOrNull);
+//			ZedLogger.Log("finishedSharingEvent. errorOrNull param: " + errorOrNull);
 		}
 		
 		private void userSignedOutEvent()
 		{
-			ZedLogger.Log("userSignedOutEvent");
+//			ZedLogger.Log("userSignedOutEvent");
 		}
 		
 		private void reloadDataForKeyFailedEvent(string error)
 		{
-			ZedLogger.Log("reloadDataForKeyFailedEvent: " + error);
+//			ZedLogger.Log("reloadDataForKeyFailedEvent: " + error);
 		}
 		
 		private void reloadDataForKeySucceededEvent(string param)
 		{
-			ZedLogger.Log("reloadDataForKeySucceededEvent: " + param);
+//			ZedLogger.Log("reloadDataForKeySucceededEvent: " + param);
 		}
 		
 		private void loadCloudDataForKeyFailedEvent(string error)
 		{
-			ZedLogger.Log("loadCloudDataForKeyFailedEvent: " + error);
+//			ZedLogger.Log("loadCloudDataForKeyFailedEvent: " + error);
 		}
 		
 		private void loadCloudDataForKeySucceededEvent(int key, string data)
 		{
-			ZedLogger.Log("loadCloudDataForKeySucceededEvent:" + data);
+//			ZedLogger.Log("loadCloudDataForKeySucceededEvent:" + data);
 		}
 		
 		private void updateCloudDataForKeyFailedEvent(string error)
 		{
-			ZedLogger.Log("updateCloudDataForKeyFailedEvent: " + error);
+//			ZedLogger.Log("updateCloudDataForKeyFailedEvent: " + error);
 		}
 		
 		private void updateCloudDataForKeySucceededEvent(int key, string data)
 		{
-			ZedLogger.Log("updateCloudDataForKeySucceededEvent: " + data);
+//			ZedLogger.Log("updateCloudDataForKeySucceededEvent: " + data);
 		}
 		
 		private void clearCloudDataForKeyFailedEvent(string error)
 		{
-			ZedLogger.Log("clearCloudDataForKeyFailedEvent: " + error);
+//			ZedLogger.Log("clearCloudDataForKeyFailedEvent: " + error);
 		}
 		
 		private void clearCloudDataForKeySucceededEvent(string param)
 		{
-			ZedLogger.Log("clearCloudDataForKeySucceededEvent: " + param);
+//			ZedLogger.Log("clearCloudDataForKeySucceededEvent: " + param);
 		}
 		
 		private void deleteCloudDataForKeyFailedEvent(string error)
 		{
-			ZedLogger.Log("deleteCloudDataForKeyFailedEvent: " + error);
+//			ZedLogger.Log("deleteCloudDataForKeyFailedEvent: " + error);
 		}
 		
 		private void deleteCloudDataForKeySucceededEvent(string param)
 		{
-			ZedLogger.Log("deleteCloudDataForKeySucceededEvent: " + param);
+//			ZedLogger.Log("deleteCloudDataForKeySucceededEvent: " + param);
 		}
 		
 		private void unlockAchievementFailedEvent(string achievementId, string error)
 		{
-			ZedLogger.Log("unlockAchievementFailedEvent. achievementId: " + achievementId + ", error: " + error);
+//			ZedLogger.Log("unlockAchievementFailedEvent. achievementId: " + achievementId + ", error: " + error);
 		}
 		
 		private void unlockAchievementSucceededEvent(string achievementId, bool newlyUnlocked)
 		{
-			ZedLogger.Log("unlockAchievementSucceededEvent. achievementId: " + achievementId + ", newlyUnlocked: " + newlyUnlocked);
+//			ZedLogger.Log("unlockAchievementSucceededEvent. achievementId: " + achievementId + ", newlyUnlocked: " + newlyUnlocked);
 		}
 		
 		private void incrementAchievementFailedEvent(string achievementId, string error)
 		{
-			ZedLogger.Log("incrementAchievementFailedEvent. achievementId: " + achievementId + ", error: " + error);
+//			ZedLogger.Log("incrementAchievementFailedEvent. achievementId: " + achievementId + ", error: " + error);
 		}
 		
 		private void incrementAchievementSucceededEvent(string achievementId, bool newlyUnlocked)
 		{
-			ZedLogger.Log("incrementAchievementSucceededEvent. achievementId: " + achievementId + ", newlyUnlocked: " + newlyUnlocked);
+//			ZedLogger.Log("incrementAchievementSucceededEvent. achievementId: " + achievementId + ", newlyUnlocked: " + newlyUnlocked);
 		}
 		
 		private void revealAchievementFailedEvent(string achievementId, string error)
 		{
-			ZedLogger.Log("revealAchievementFailedEvent. achievementId: " + achievementId + ", error: " + error);
+//			ZedLogger.Log("revealAchievementFailedEvent. achievementId: " + achievementId + ", error: " + error);
 		}
 		
 		private void revealAchievementSucceededEvent(string achievementId)
 		{
-			ZedLogger.Log("revealAchievementSucceededEvent: " + achievementId);
+//			ZedLogger.Log("revealAchievementSucceededEvent: " + achievementId);
 		}
 		
 		private void submitScoreFailedEvent(string leaderboardId, string error)
 		{
-			ZedLogger.Log("submitScoreFailedEvent. leaderboardId: " + leaderboardId + ", error: " + error);
+//			ZedLogger.Log("submitScoreFailedEvent. leaderboardId: " + leaderboardId + ", error: " + error);
 		}
 		
 		private void submitScoreSucceededEvent(string leaderboardId, Dictionary<string,object> scoreReport)
 		{
-			ZedLogger.Log("submitScoreSucceededEvent");
+//			ZedLogger.Log("submitScoreSucceededEvent");
 			Prime31.Utils.logObject(scoreReport);
 		}
 		
 		private void loadScoresFailedEvent(string leaderboardId, string error)
 		{
-			ZedLogger.Log("loadScoresFailedEvent. leaderboardId: " + leaderboardId + ", error: " + error);
+//			ZedLogger.Log("loadScoresFailedEvent. leaderboardId: " + leaderboardId + ", error: " + error);
 		}
 		
 		private void loadScoresSucceededEvent(List<GPGScore> scores)
 		{
-			ZedLogger.Log("loadScoresSucceededEvent");
+			//ZedLogger.Log("loadScoresSucceededEvent");
 			Prime31.Utils.logObject(scores);
 		}
 		#endif
 		#endregion
 
 		#region Event Handlers
-		private void OnGameCenterUseConfirm()
-		{
-			Login();
-		}
-		
-		private void OnGameCenterPopupClosing()
-		{
-			// TODO: fix this
-			//item.confirm -= OnGameCenterUseConfirm;
-			//item.closing -= OnGameCenterPopupClosing;
-		}
 		#endregion
 	}
-	#endif
 }

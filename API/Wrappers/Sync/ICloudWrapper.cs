@@ -6,7 +6,6 @@ using Zedarus.ToolKit;
 
 namespace Zedarus.ToolKit.API
 {
-	#if API_ICLOUD_P31
 	public class ICloudWrapper : APIWrapper<ICloudWrapper>, ISyncWrapperInterface 
 	{
 		#region Parameters
@@ -23,7 +22,7 @@ namespace Zedarus.ToolKit.API
 		#region Setup
 		protected override void Setup() 
 		{
-			#if UNITY_IPHONE
+			#if UNITY_IPHONE && API_SYNC_ICLOUD
 			_lastSync = new DateTime(1986, 1, 1);
 			iCloudBinding.getUbiquityIdentityToken();
 			Sync();
@@ -34,15 +33,15 @@ namespace Zedarus.ToolKit.API
 		#region Controls
 		public void Sync() 
 		{
-			#if UNITY_IPHONE
+			#if UNITY_IPHONE && API_SYNC_ICLOUD
 			ZedLogger.Log("Sync iCloud", LoggerContext.iCloud);
 			iCloudBinding.synchronize();
 			#endif
 		}
 		
-		public bool SavePlayerData(PlayerData data)
+		public bool SaveData(byte[] data)
 		{
-			#if UNITY_IPHONE
+			#if UNITY_IPHONE && API_SYNC_ICLOUD
 			if (!iCloudBinding.documentStoreAvailable())
 			{
 				ZedLogger.Log("Documetns store is not available", LoggerContext.iCloud);
@@ -54,7 +53,7 @@ namespace Zedarus.ToolKit.API
 				data.Merge(remoteData);
 			
 			byte[] bytes = UnitySerializer.Serialize(data);
-			bool result = P31CloudFile.writeAllBytes(APIManager.Instance.Settings.iCloudFilename, bytes);
+			bool result = P31CloudFile.writeAllBytes(GlobalSettings.Instance.API.iCloudFilename, bytes);
 			
 			ZedLogger.Log("File written in the cloud: " + result, LoggerContext.iCloud);
 			return result;
@@ -63,12 +62,12 @@ namespace Zedarus.ToolKit.API
 			#endif
 		}
 		
-		public PlayerData GetPlayerData()
+		public byte[] GetData()
 		{
-			#if UNITY_IPHONE
-			if (P31CloudFile.exists(APIManager.Instance.Settings.iCloudFilename))
+			#if UNITY_IPHONE && API_SYNC_ICLOUD
+			if (P31CloudFile.exists(GlobalSettings.Instance.API.iCloudFilename))
 			{
-				byte[] bytes = P31CloudFile.readAllBytes(APIManager.Instance.Settings.iCloudFilename);
+				byte[] bytes = P31CloudFile.readAllBytes(GlobalSettings.Instance.API.iCloudFilename);
 				PlayerData data = UnitySerializer.Deserialize<PlayerData>(bytes);
 				return data;
 			}
@@ -79,12 +78,14 @@ namespace Zedarus.ToolKit.API
 			return null;
 			#endif
 		}
+
+		public void DisplayUI() {}
 		#endregion
 		
 		#region Event Listeners
 		protected override void CreateEventListeners() 
 		{
-			#if UNITY_IPHONE
+			#if UNITY_IPHONE && API_SYNC_ICLOUD
 			iCloudManager.keyValueStoreDidChangeEvent += keyValueStoreDidChangeEvent;
 			iCloudManager.ubiquityIdentityDidChangeEvent += ubiquityIdentityDidChangeEvent;
 			iCloudManager.entitlementsMissingEvent += entitlementsMissingEvent;
@@ -94,7 +95,7 @@ namespace Zedarus.ToolKit.API
 		
 		protected override void RemoveEventListeners() 
 		{
-			#if UNITY_IPHONE
+			#if UNITY_IPHONE && API_SYNC_ICLOUD
 			iCloudManager.keyValueStoreDidChangeEvent -= keyValueStoreDidChangeEvent;
 			iCloudManager.ubiquityIdentityDidChangeEvent -= ubiquityIdentityDidChangeEvent;
 			iCloudManager.entitlementsMissingEvent -= entitlementsMissingEvent;
@@ -103,7 +104,7 @@ namespace Zedarus.ToolKit.API
 		}
 		#endregion
 
-		#if UNITY_IPHONE
+		#if UNITY_IPHONE && API_SYNC_ICLOUD
 		#region Event Handlers
 		private void keyValueStoreDidChangeEvent(List<object> keys)
 		{
@@ -132,7 +133,7 @@ namespace Zedarus.ToolKit.API
 			{
 				ZedLogger.Log(doc, LoggerContext.iCloud);
 				
-				if (doc.filename.Equals(APIManager.Instance.Settings.iCloudFilename))
+				if (doc.filename.Equals(GlobalSettings.Instance.API.iCloudFilename))
 				{
 					if (doc.isDownloaded)
 					{
@@ -165,5 +166,4 @@ namespace Zedarus.ToolKit.API
 		}
 		#endregion
 	}
-	#endif
 }

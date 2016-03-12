@@ -12,8 +12,9 @@ namespace Zedarus.ToolKit.API
 		
 		#region Controls
 		void Sync();
-		bool SetData<T>(T data);
-		T GetData<T>();
+		bool SaveData(byte[] data);
+		byte[] GetData();
+		void DisplayUI();
 		#endregion
 	}
 }
