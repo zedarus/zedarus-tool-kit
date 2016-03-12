@@ -33,12 +33,17 @@ namespace Zedarus.ToolKit.API
 		#endregion
 
 		#region Setup
-		protected override void Setup(object[] parameters)
+		protected override void Setup(APIWrapperSettings settings)
 		{
 			_formattedPrices = new Dictionary<string, string>();
 			_currencies = new Dictionary<string, string>();
 			_prices = new Dictionary<string, decimal>();
 			_pricesReceived = false;
+		}
+
+		protected override APIWrapperSettings ParseSettings(object[] settings)
+		{
+			return null;
 		}
 		#endregion
 

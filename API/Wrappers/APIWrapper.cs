@@ -17,12 +17,12 @@ namespace Zedarus.ToolKit.API
 		#endregion
 		
 		#region Initialization
-		public void Init(object[] parameters)
+		public void Init(object[] settings)
 		{
 			if (!_initialized)
 			{
 				CreateEventListeners();
-				Setup(parameters);
+				Setup(ParseSettings(settings));
 				_initialized = true;
 			}
 		}
@@ -40,7 +40,8 @@ namespace Zedarus.ToolKit.API
 		#endregion
 		
 		#region Setup
-		protected abstract void Setup(object[] parameters);
+		protected abstract void Setup(APIWrapperSettings settings);
+		protected abstract APIWrapperSettings ParseSettings(object[] settings);
 		#endregion
 		
 		#region Event Senders

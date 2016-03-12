@@ -10,9 +10,14 @@ namespace Zedarus.ToolKit.API
 	public class GameCenterWrapper : APIWrapper<GameCenterWrapper>, IScoreWrapperInterface 
 	{
 		#region Setup
-		protected override void Setup(object[] parameters) 
+		protected override void Setup(APIWrapperSettings settings) 
 		{
 //			Login();
+		}
+
+		protected override APIWrapperSettings ParseSettings(object[] settings)
+		{
+			return null;
 		}
 		#endregion
 		

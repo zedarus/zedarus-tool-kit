@@ -1,9 +1,28 @@
 ﻿using UnityEngine;
+using UnityEngine.Assertions;
 using System;
 using System.Collections;
 
 namespace Zedarus.ToolKit.API
 {
+	public class HeyZapWrapperSettings : APIWrapperSettings
+	{
+		private string _apiKey = "";
+
+		public HeyZapWrapperSettings(object[] settings) : base(settings)
+		{
+			Assert.IsTrue(settings.Length > 0, "Incorrect number of parameters for HeyZap wrapper");
+			Assert.IsTrue(settings[0].GetType() == typeof(string), "First parameter must be string");
+
+			_apiKey = settings[0].ToString();
+		}
+
+		public string APIKey
+		{
+			get { return _apiKey; }
+		}
+	}
+
 	public class HeyZapWrapper : APIWrapper<HeyZapWrapper>, IMediationAdsWrapperInterface
 	{
 		#region Events
@@ -18,11 +37,16 @@ namespace Zedarus.ToolKit.API
 		#endregion
 
 		#region Setup
-		protected override void Setup(object[] parameters)
+		protected override void Setup(APIWrapperSettings settings)
 		{
 			#if API_ADS_HEYZAP
-			HeyzapAds.start("88184f6964eeed3450fc12e251615bba", HeyzapAds.FLAG_NO_OPTIONS)
+			HeyzapAds.start(settings.APIKey, HeyzapAds.FLAG_NO_OPTIONS)
 			#endif
+		}
+
+		protected override APIWrapperSettings ParseSettings(object[] settings)
+		{
+			return new HeyZapWrapperSettings(settings);
 		}
 		#endregion
 

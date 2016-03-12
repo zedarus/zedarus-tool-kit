@@ -21,8 +21,9 @@ namespace Zedarus.ToolKit.API
 		#endregion
 		
 		#region Initialization
-		public void Use(int api, params object[] parameters)
+		public void Use(int api, float initializationDelay, params object[] parameters)
 		{
+			// TODO: implement initalization delay
 			_apis.Add(api);
 			_wrapperParameters = parameters;
 		}

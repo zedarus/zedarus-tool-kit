@@ -13,7 +13,12 @@ namespace Zedarus.ToolKit.API
 		#endregion
 
 		#region Setup
-		protected override void Setup(object[] parameters) {}
+		protected override void Setup(APIWrapperSettings settings) {}
+
+		protected override APIWrapperSettings ParseSettings(object[] settings)
+		{
+			return null;
+		}
 		#endregion
 
 		#region Controls

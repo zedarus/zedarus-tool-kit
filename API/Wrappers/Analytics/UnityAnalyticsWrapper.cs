@@ -8,9 +8,14 @@ namespace Zedarus.ToolKit.API
 	public class UnityAnalyticsWrapper : APIWrapper<UnityAnalyticsWrapper>, IAnalyticsWrapperInterface 
 	{	
 		#region Setup
-		protected override void Setup(object[] parameters) 
+		protected override void Setup(APIWrapperSettings settings) 
 		{
 			
+		}
+
+		protected override APIWrapperSettings ParseSettings(object[] settings)
+		{
+			return null;
 		}
 		#endregion
 

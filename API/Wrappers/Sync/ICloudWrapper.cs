@@ -20,13 +20,18 @@ namespace Zedarus.ToolKit.API
 		#endregion
 		
 		#region Setup
-		protected override void Setup(object[] parameters) 
+		protected override void Setup(APIWrapperSettings settings) 
 		{
 			#if UNITY_IPHONE && API_SYNC_ICLOUD
 			_lastSync = new DateTime(1986, 1, 1);
 			iCloudBinding.getUbiquityIdentityToken();
 			Sync();
 			#endif
+		}
+
+		protected override APIWrapperSettings ParseSettings(object[] settings)
+		{
+			return null;
 		}
 		#endregion
 		

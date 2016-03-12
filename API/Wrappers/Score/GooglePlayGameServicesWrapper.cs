@@ -14,7 +14,7 @@ namespace Zedarus.ToolKit.API
 		#endregion
 
 		#region Setup
-		protected override void Setup(object[] parameters)
+		protected override void Setup(APIWrapperSettings settings)
 		{
 			#if UNITY_ANDROID
 			if (!PlayGameServices.isSignedIn() && !PlayerDataManager.Instance.GameCenterLoginRequested)
@@ -23,6 +23,11 @@ namespace Zedarus.ToolKit.API
 				PlayGameServices.attemptSilentAuthentication();
 			}
 			#endif
+		}
+
+		protected override APIWrapperSettings ParseSettings(object[] settings)
+		{
+			return null;
 		}
 		#endregion
 		
