@@ -10,8 +10,6 @@ namespace Zedarus.ToolKit.UI
 		[SerializeField] 
 		private Text _label;
 		[SerializeField]
-		private Button _button;
-		[SerializeField]
 		private Image _colorElement;
 		#endregion
 

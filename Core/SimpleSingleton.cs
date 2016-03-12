@@ -14,18 +14,13 @@ namespace Zedarus.ToolKit
 			get
 			{
 				if (_instance == null)
-					Init();
+					CreateInstance<T>();
 			
 				return _instance;
 			}
 		}
-
-		public static void Init()
-		{
-			CreateInstance<T>();
-		}
 		
-		protected static void CreateInstance<InstanceType>() where InstanceType : T
+		public static void CreateInstance<InstanceType>() where InstanceType : T
 		{
 			if (_instance == null)
 			{
