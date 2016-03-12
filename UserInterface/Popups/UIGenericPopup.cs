@@ -16,11 +16,12 @@ namespace Zedarus.ToolKit.UI
 		[SerializeField]
 		private Text _message;
 		[SerializeField]
-		private UIGenericPopupButton _button;
+		private UIGenericPopupButton[] _originalButtons;
 		#endregion
 
 		#region Properties
 		private List<UIGenericPopupButton> _buttons;
+		private IEnumerator _closingRoutine = null;
 		#endregion
 
 		#region Initialization
@@ -29,11 +30,15 @@ namespace Zedarus.ToolKit.UI
 			base.Init();
 
 			_buttons = new List<UIGenericPopupButton>();
-			if (_button != null)
+			if (_originalButtons != null)
 			{
-				_button.ClosePopup += OnClosePopupRequest;
-				_button.Init();
-				_buttons.Add(_button);
+				foreach (UIGenericPopupButton button in _originalButtons)
+				{
+					button.ClosePopup += OnClosePopupRequest;
+					button.Init();
+				}
+
+				_buttons.AddRange(_originalButtons);
 			}
 		}
 
@@ -42,9 +47,12 @@ namespace Zedarus.ToolKit.UI
 			base.Cleanup();
 
 			CleanUpButtons();
-			if (_button != null)
+			if (_originalButtons != null)
 			{
-				_button.ClosePopup -= OnClosePopupRequest;
+				foreach (UIGenericPopupButton button in _originalButtons)
+				{
+					button.ClosePopup -= OnClosePopupRequest;
+				}
 			}
 		}
 		#endregion
@@ -52,6 +60,12 @@ namespace Zedarus.ToolKit.UI
 		#region Controls
 		override protected void ProcessCustomData(IUIScreenData customData) 
 		{
+			if (_closingRoutine != null)
+			{
+				StopCoroutine(_closingRoutine);
+				_closingRoutine = null;
+			}
+
 			base.ProcessCustomData(customData);
 
 			bool dataExists = customData != null;
@@ -60,7 +74,11 @@ namespace Zedarus.ToolKit.UI
 
 			_header.gameObject.SetActive(dataExists);
 			_message.gameObject.SetActive(dataExists);
-			_button.gameObject.SetActive(dataExists);
+
+			foreach (UIGenericPopupButton button in _originalButtons)
+			{
+				button.gameObject.SetActive(dataExists);
+			}
 
 			if (dataExists)
 			{
@@ -78,6 +96,11 @@ namespace Zedarus.ToolKit.UI
 					{
 						rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, data.Width);
 					}
+				}
+
+				if (data.Timeout > 0f)
+				{
+					CloseWithDelay(data.Timeout);
 				}
 			}
 		}
@@ -104,16 +127,18 @@ namespace Zedarus.ToolKit.UI
 
 		private void SetupButtons(UIGenericPopupButtonData[] buttons)
 		{
-			_button.gameObject.SetActive(buttons.Length > 0);
-
-			if (buttons.Length > 0)
+			for (int i = 0; i < _originalButtons.Length; i++)
 			{
-				_button.Reset();
+				_originalButtons[i].Reset();
+				_originalButtons[i].gameObject.SetActive(buttons.Length > i);
+			}
 
+			if (buttons.Length > 0 && _originalButtons.Length > 0)
+			{
 				while (_buttons.Count < buttons.Length)
 				{
-					UIGenericPopupButton newButton = Instantiate<UIGenericPopupButton>(_button);
-					newButton.transform.SetParent(_button.transform.parent, false);
+					UIGenericPopupButton newButton = Instantiate<UIGenericPopupButton>(_originalButtons[0]);
+					newButton.transform.SetParent(_originalButtons[0].transform.parent, false);
 					newButton.transform.localScale = Vector3.one;
 					newButton.Init();
 					newButton.Reset();
@@ -130,7 +155,7 @@ namespace Zedarus.ToolKit.UI
 
 		private void CleanUpButtons()
 		{
-			for (int i = _buttons.Count - 1; i > 0; i--)
+			for (int i = _buttons.Count - 1; i > _originalButtons.Length - 1; i--)
 			{
 				_buttons[i].ClosePopup -= OnClosePopupRequest;
 
@@ -139,6 +164,24 @@ namespace Zedarus.ToolKit.UI
 
 				_buttons.RemoveAt(i);
 			}
+		}
+
+		private void CloseWithDelay(float delay)
+		{
+			if (_closingRoutine != null)
+			{
+				StopCoroutine(_closingRoutine);
+				_closingRoutine = null;
+			}
+
+			_closingRoutine = CloseWithDelayRoutine(delay);
+			StartCoroutine(_closingRoutine);
+		}
+
+		private IEnumerator CloseWithDelayRoutine(float delay)
+		{
+			yield return new WaitForSeconds(delay);
+			Close();
 		}
 		#endregion
 	}

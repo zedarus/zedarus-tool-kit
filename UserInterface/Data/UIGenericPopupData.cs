@@ -10,7 +10,6 @@ namespace Zedarus.ToolKit.UI
 		private string _message;
 		private float _width;
 		private float _timeout;
-		private bool _skipInQueue;
 		private UIGenericPopupButtonData[] _buttons;
 		#endregion
 
@@ -21,17 +20,15 @@ namespace Zedarus.ToolKit.UI
 			_message = message;
 			_width = 0;
 			_timeout = 0;
-			_skipInQueue = false;
 			_buttons = buttons;
 		}
 
-		public UIGenericPopupData(string header, string message, bool skipInQueue = false, float timeout = 0, float width = 0, params UIGenericPopupButtonData[] buttons)
+		public UIGenericPopupData(string header, string message, float timeout, float width = 0, params UIGenericPopupButtonData[] buttons)
 		{
 			_header = header;
 			_message = message;
 			_width = width;
 			_timeout = timeout;
-			_skipInQueue = skipInQueue;
 			_buttons = buttons;
 		}
 
@@ -68,11 +65,6 @@ namespace Zedarus.ToolKit.UI
 		public float Timeout
 		{
 			get { return _timeout; }
-		}
-
-		public bool SkipInQueue
-		{
-			get { return _skipInQueue; }
 		}
 
 		public UIGenericPopupButtonData[] Buttons
