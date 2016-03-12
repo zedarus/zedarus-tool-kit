@@ -49,8 +49,15 @@ namespace Zedarus.ToolKit.UI
 		public event UIScreenManager<UIScreen>.ScreenClosingDelegate ScreenClosing;
 		#endregion
 
+		#region Unity Methods
+		private void OnDestroy()
+		{
+			Cleanup();
+		}
+		#endregion
+
 		#region Initialization
-		public void Init()
+		public virtual void Init()
 		{
 			_id = ID_COUNTER++;
 
@@ -64,6 +71,11 @@ namespace Zedarus.ToolKit.UI
 			}
 
 			Assert.IsTrue(_animator, "Animator for UI screen needs to be set!");
+		}
+
+		protected virtual void Cleanup()
+		{
+		
 		}
 		#endregion
 
@@ -104,9 +116,10 @@ namespace Zedarus.ToolKit.UI
 
 		public void SetCustomData(IUIScreenData data)
 		{
+			ProcessCustomData(data);
+
 			if (data != null)
 			{
-				ProcessCustomData(data);
 				data.Clear();
 				data = null;
 			}

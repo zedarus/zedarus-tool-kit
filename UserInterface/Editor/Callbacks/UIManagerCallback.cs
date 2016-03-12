@@ -40,10 +40,10 @@ namespace Zedarus.ToolKit.UI
 
 				if (gameObject.GetComponent<UIManager>() != null)
 					index = 0;
-				else if (gameObject.GetComponent<UIScreen>() != null)
-					index = 1;
 				else if (gameObject.GetComponent<UIPopup>() != null)
 					index = 2;
+				else if (gameObject.GetComponent<UIScreen>() != null)
+					index = 1;
 				else
 					index = -1;
 
