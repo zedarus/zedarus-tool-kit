@@ -47,6 +47,7 @@ namespace Zedarus.ToolKit.Data.Game
 		// supports JsonUtility.FromJson() for ScriptableObjects
 		public void ApplyRemoteData(string json)
 		{
+			float t = Time.realtimeSinceStartup;
 			JsonData data = JsonMapper.ToObject(json);
 
 			FieldInfo[] fields = GetFields(this);
@@ -75,7 +76,6 @@ namespace Zedarus.ToolKit.Data.Game
 												if (currentModel.ID.Equals(model.ID))
 												{
 													currentModel.OverrideValuesFrom(data[field.Name][i].ToJson());
-													//currentModel.CopyValuesFrom(model, true);
 													break;
 												}
 											}
@@ -90,16 +90,15 @@ namespace Zedarus.ToolKit.Data.Game
 					{
 						try
 						{
-							//IGameDataModel model = JsonUtility.FromJson(data[field.Name].ToJson(), field.FieldType) as IGameDataModel;
 							IGameDataModel currentModel = field.GetValue(this) as IGameDataModel;
-							//currentModel.CopyValuesFrom(model, true);
 							currentModel.OverrideValuesFrom(data[field.Name].ToJson());
-							//field.SetValue(this, JsonUtility.FromJson(data[field.Name].ToJson(), field.FieldType));
 						}
 						catch (System.Exception) { }
 					}
 				}
 			}
+
+			Debug.Log("Merge Time Elapsed: " + (Time.realtimeSinceStartup - t));
 		}
 
 		protected virtual void Init()
