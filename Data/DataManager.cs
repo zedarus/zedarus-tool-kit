@@ -8,6 +8,7 @@ using Zedarus.ToolKit.Helpers;
 using Zedarus.ToolKit.Data;
 using Zedarus.ToolKit.Data.Player;
 using Zedarus.ToolKit.Data.Game;
+using Zedarus.ToolKit.Data.Remote;
 
 namespace Zedarus.ToolKit.Data
 {
@@ -16,13 +17,17 @@ namespace Zedarus.ToolKit.Data
 		#region Data
 		private GD _gameData;
 		private PD _playerData;
+		private RemoteData<GD> _remoteData;
 		private string _playerDataFilename;
 		#endregion
 
 		private Action _dataLoadedCallback;
 
 		#region Init
-		public DataManager() { }
+		public DataManager() 
+		{
+			_remoteData = new RemoteData<GD>();
+		}
 		#endregion
 
 		#region Controls
@@ -60,6 +65,11 @@ namespace Zedarus.ToolKit.Data
 		public PD Player
 		{
 			get { return _playerData; }
+		}
+
+		public RemoteData<GD> Remote
+		{
+			get { return _remoteData; }
 		}
 		#endregion
 	}

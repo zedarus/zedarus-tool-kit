@@ -79,7 +79,19 @@ namespace Zedarus.ToolKit.Data.Game
 		{
 			EditorGUILayout.BeginVertical();
 			if (!DataLoaded) EditorGUILayout.LabelField("No database found. Please drag a database instance reference from Project view here");
+
+			EditorGUILayout.BeginHorizontal();
 			_data = EditorGUILayout.ObjectField("Database", _data, typeof(GameData), false) as GameData;
+
+			if (DataLoaded)
+			{
+				if (GUILayout.Button("JSON", GUILayout.Width(80)))
+				{
+					Debug.Log(JsonUtility.ToJson(_data, true));
+				}
+			}
+
+			EditorGUILayout.EndHorizontal();
 			EditorGUILayout.EndVertical();
 		}
 
