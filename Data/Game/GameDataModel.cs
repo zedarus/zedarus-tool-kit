@@ -4,6 +4,7 @@ using UnityEditor;
 using System.Reflection;
 #endif
 using System.Collections.Generic;
+using LitJson;
 
 namespace Zedarus.ToolKit.Data.Game
 {
@@ -239,8 +240,6 @@ namespace Zedarus.ToolKit.Data.Game
 				}
 			}
 		}
-		#endregion
-		#endif
 
 		private FieldInfo[] GetFields(IGameDataModel target)
 		{
@@ -290,9 +289,43 @@ namespace Zedarus.ToolKit.Data.Game
 				{
 					object value = field.GetValue(target);
 					currentField.SetValue(this, value);
-					#if UNITY_EDITOR
 					ValidateField(currentField);
-					#endif
+				}
+			}
+		}
+		#endregion
+		#endif
+
+		public virtual void OverrideValuesFrom(string json)
+		{
+			JsonData data = JsonMapper.ToObject(json);
+			FieldInfo[] fields = GetFields(this);
+			foreach (string key in data.Keys)
+			{
+				OverrideField(fields, key, data[key]);
+			}
+		}
+
+		protected virtual void OverrideField(FieldInfo[] fields, string fieldname, JsonData value)
+		{
+			//fieldname = fieldname.Trim();
+			foreach (FieldInfo field in fields)
+			{
+				if (field.Name.Equals(fieldname))
+				{
+					try
+					{
+						if (value.IsInt || value.IsLong)
+							field.SetValue(this, int.Parse(value.ToString()));
+						else if (value.IsBoolean)
+							field.SetValue(this, bool.Parse(value.ToString()));
+						else if (value.IsDouble)
+							field.SetValue(this, float.Parse(value.ToString()));
+						else if (value.IsString)
+							field.SetValue(this, value.ToString());
+					}
+					catch (System.Exception) { }
+					break;
 				}
 			}
 		}

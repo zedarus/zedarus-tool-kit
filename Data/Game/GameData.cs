@@ -74,7 +74,8 @@ namespace Zedarus.ToolKit.Data.Game
 											{
 												if (currentModel.ID.Equals(model.ID))
 												{
-													currentModel.CopyValuesFrom(model, true);
+													currentModel.OverrideValuesFrom(data[field.Name][i].ToJson());
+													//currentModel.CopyValuesFrom(model, true);
 													break;
 												}
 											}
@@ -89,9 +90,10 @@ namespace Zedarus.ToolKit.Data.Game
 					{
 						try
 						{
-							IGameDataModel model = JsonUtility.FromJson(data[field.Name].ToJson(), field.FieldType) as IGameDataModel;
+							//IGameDataModel model = JsonUtility.FromJson(data[field.Name].ToJson(), field.FieldType) as IGameDataModel;
 							IGameDataModel currentModel = field.GetValue(this) as IGameDataModel;
-							currentModel.CopyValuesFrom(model, true);
+							//currentModel.CopyValuesFrom(model, true);
+							currentModel.OverrideValuesFrom(data[field.Name].ToJson());
 							//field.SetValue(this, JsonUtility.FromJson(data[field.Name].ToJson(), field.FieldType));
 						}
 						catch (System.Exception) { }
