@@ -67,12 +67,15 @@ namespace Zedarus.ToolKit.Data.Game
 
 		public virtual string ListName { get { return "#" + ID.ToString(); } }
 
-		public void CopyValuesFrom(IGameDataModel data)
+		public void CopyValuesFrom(IGameDataModel data, bool copyID)
 		{
 			FieldInfo[] fields = GetFields(data);
 
 			foreach (FieldInfo field in fields)
 			{
+				if (field.Name.Equals("_id") && !copyID)
+					continue;
+				
 				object[] attrs = field.GetCustomAttributes(typeof(DataField), true);
 				foreach (object attr in attrs)
 				{

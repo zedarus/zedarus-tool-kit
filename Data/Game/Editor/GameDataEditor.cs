@@ -107,7 +107,7 @@ namespace Zedarus.ToolKit.Data.Game
 					{
 						GUI.FocusControl(null);
 						_model = _data.CreateNewModel(_currentModelID);
-						_model.CopyValuesFrom(selectedModel);
+						_model.CopyValuesFrom(selectedModel, true);
 						_selectedModelDataIndex = 0;
 						_editViewScrollPos = Vector2.zero;
 						_state = State.Edit;
@@ -140,7 +140,7 @@ namespace Zedarus.ToolKit.Data.Game
 					{
 						GUI.FocusControl(null);
 						_model = _data.CreateNewModel(_currentModelID);
-						_model.CopyValuesFrom(selectedModel);
+						_model.CopyValuesFrom(selectedModel, true);
 						_selectedModelDataIndex = modelIndex;
 						_editViewScrollPos = Vector2.zero;
 						_state = State.Edit;
@@ -254,7 +254,7 @@ namespace Zedarus.ToolKit.Data.Game
 					{
 						if (model != null)
 						{
-							model.CopyValuesFrom(_model);
+							model.CopyValuesFrom(_model, true);
 							EditorUtility.SetDirty(_data);
 						}
 						_model = null;
@@ -279,7 +279,19 @@ namespace Zedarus.ToolKit.Data.Game
 
 				if (_data.IsModelDataAList(_currentModelID))
 				{
-					if (GUILayout.Button("Delete", GUILayout.Width(100)))
+					if (GUILayout.Button("Duplicate", GUILayout.Width(100)))
+					{
+						if (EditorUtility.DisplayDialog("Warning!", "Are you sure you want to create duplicate of " + _model.ListName + "? All unsaved changes will be lost", "Yes", "No"))
+						{
+							GUI.FocusControl(null);
+							IGameDataModel copy = _data.CreateNewModel(_currentModelID);
+							copy.CopyValuesFrom(_model, false);
+							_model = copy;
+							_editViewScrollPos = Vector2.zero;
+							_state = State.Add;
+						}
+					}
+					else if (GUILayout.Button("Delete", GUILayout.Width(100)))
 					{
 						GUI.FocusControl(null);
 

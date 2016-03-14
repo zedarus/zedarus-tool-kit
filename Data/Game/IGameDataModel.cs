@@ -8,7 +8,7 @@ namespace Zedarus.ToolKit.Data.Game
 		int ID { get; }
 		void RenderForm(bool included);
 		string ListName { get; }
-		void CopyValuesFrom(IGameDataModel data);
+		void CopyValuesFrom(IGameDataModel data, bool copyID);
 		#endif
 	}
 }
