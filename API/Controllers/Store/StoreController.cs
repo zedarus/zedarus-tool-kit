@@ -3,6 +3,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Zedarus.ToolKit;
+using Zedarus.ToolKit.Events;
+using Zedarus.ToolKit.Settings;
 
 namespace Zedarus.ToolKit.API
 {
@@ -109,7 +111,9 @@ namespace Zedarus.ToolKit.API
 		public void SimulateRemoveAdsPurchase()
 		{
 			// TODO: PlayerDataManager.Instance.DisableAds();
-			APIManager.Instance.Ads.DisableAds();
+			EventManager.SendEvent(IDs.Events.DisableAds);
+
+			//APIManager.Instance.Ads.DisableAds();
 			//APIManager.Instance.BannerAds.DisableAds();
 			if (OnDisableAds != null)
 				OnDisableAds();

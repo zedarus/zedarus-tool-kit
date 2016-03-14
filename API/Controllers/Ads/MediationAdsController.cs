@@ -2,6 +2,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Zedarus.ToolKit.Data;
+using Zedarus.ToolKit.Settings;
+using Zedarus.ToolKit.Events;
 
 namespace Zedarus.ToolKit.API
 {
@@ -14,20 +17,12 @@ namespace Zedarus.ToolKit.API
 		public event Action BannerRemoved;
 		#endregion
 
-		#region Settings
-		private const string defaultTag = "default";
-		private const string bootup = "bootup";
-		private const string crosspromo = "cross_promo";
-		private const string postLevelTag = "post_level";
-		private const int postLevelMax = 2;
-		#endregion
-
 		#region Properties
 		private bool _cached = false;
 		#endregion
 
 		#region Initialization
-		protected override void Setup() {}	
+		protected override void Setup() { }
 		#endregion
 
 		#region Wrappers Initialization
@@ -48,16 +43,8 @@ namespace Zedarus.ToolKit.API
 		{
 			if (_cached)
 				return;
-			
-			CacheInterstitial(bootup);
 
-			//CacheRewardedVideo("coins_shop");
-
-			for (int i = 0; i < postLevelMax; i++)
-			{
-				CacheInterstitial(GetPostLevelTag(i));
-				CacheVideo(GetPostLevelTag(i));
-			}
+			// TODO: cache here
 
 			_cached = true;
 		}
@@ -69,39 +56,11 @@ namespace Zedarus.ToolKit.API
 				wrapper.CacheInterstitial(tag);
 		}
 
-		public void CacheVideo(string tag)
-		{
-			IMediationAdsWrapperInterface wrapper = Wrapper;
-			if (Enabled && wrapper != null)
-				wrapper.CacheVideo(tag);
-		}
-
 		public void CacheRewardedVideo(string tag)
 		{
 			IMediationAdsWrapperInterface wrapper = Wrapper;
 			if (Enabled && wrapper != null)
 				wrapper.CacheRewardedVideo(tag);
-		}
-		#endregion
-
-		#region Helpers
-		public void ShowBootup()
-		{
-			ShowIntersitital(bootup, false);
-		}
-
-		public void ShowCrossPromo()
-		{
-			ShowIntersitital(crosspromo, false);
-		}
-
-		public void ShowBetweenLevelAd()
-		{
-			// TODO; check interstitial counter here:
-			/*ShowIntersitital(GetPostLevelTag(PlayerDataManager.Instance.InterstitialsCounter), true);
-			PlayerDataManager.Instance.InterstitialsCounter++;
-			if (PlayerDataManager.Instance.InterstitialsCounter >= postLevelMax)
-				PlayerDataManager.Instance.InterstitialsCounter = 0;*/
 		}
 		#endregion
 
@@ -130,8 +89,8 @@ namespace Zedarus.ToolKit.API
 					if (ShouldDisplayBetweenLevelAd())
 					{
 						Debug.Log("Display interstitial: " + tag);
-						//PlayerDataManager.Instance.ResetIntersititalsEvents();
-						//AudioManager.Instance.SetMusicVolume(0f);
+						APIManager.Instance.State.ResetInterstitialCounter();
+						EventManager.SendEvent(IDs.Events.DisableMusicDuringAd);
 						#if UNITY_EDITOR
 						OnInterstitialClosed();
 						#else
@@ -141,32 +100,13 @@ namespace Zedarus.ToolKit.API
 				}
 				else
 				{
-					//AudioManager.Instance.SetMusicVolume(0f);
+					EventManager.SendEvent(IDs.Events.DisableMusicDuringAd);
 					#if UNITY_EDITOR
 					OnInterstitialClosed();
 					#else
 					wrapper.ShowIntersitital(tag);
 					#endif
 				}
-			}
-		}
-
-		public void ShowVideo(string tag, bool useBetweenLevelCounter)
-		{
-			IMediationAdsWrapperInterface wrapper = Wrapper;
-			if (Enabled && wrapper != null)
-			{
-				if (useBetweenLevelCounter)
-				{
-					if (ShouldDisplayBetweenLevelAd())
-					{
-						Debug.Log("Display video: " + tag);
-						//PlayerDataManager.Instance.ResetIntersititalsEvents();
-						wrapper.ShowVideo(tag);
-					}
-				}
-				else
-					wrapper.ShowVideo(tag);
 			}
 		}
 
@@ -179,8 +119,7 @@ namespace Zedarus.ToolKit.API
 				{
 					if (ShouldDisplayBetweenLevelAd())
 					{
-						// TODO: AudioManager.Instance.SetMusicVolume(0f);
-						// TODO: PlayerDataManager.Instance.ResetIntersititalsEvents();
+						EventManager.SendEvent(IDs.Events.DisableMusicDuringAd);
 						wrapper.ShowRewardedVideo(tag);
 						#if UNITY_EDITOR
 						OnInterstitialClosed();
@@ -191,7 +130,7 @@ namespace Zedarus.ToolKit.API
 				}
 				else
 				{
-					// TODO: AudioManager.Instance.SetMusicVolume(0f);
+					EventManager.SendEvent(IDs.Events.DisableMusicDuringAd);
 					#if UNITY_EDITOR
 					OnInterstitialClosed();
 					#else
@@ -201,7 +140,7 @@ namespace Zedarus.ToolKit.API
 			}
 		}
 
-		public void DisableAds()
+		private void DisableAds()
 		{
 			HideBanner();
 		}
@@ -226,11 +165,10 @@ namespace Zedarus.ToolKit.API
 				return false;
 		}
 
-		public bool ShouldDisplayBetweenLevelAd()
+		private bool ShouldDisplayBetweenLevelAd()
 		{
 			if (Enabled)
-				return true;
-				// TODO: return PlayerDataManager.Instance.GetInterstitialsEvents() >= GlobalSettings.Instance.InterstitialsLevelsInterval;
+				return APIManager.Instance.State.IntertitialCounter >= APIManager.Instance.Settings.IntertitialsDelay;
 			else
 				return false;
 		}
@@ -240,6 +178,8 @@ namespace Zedarus.ToolKit.API
 		protected override void CreateEventListeners() 
 		{
 			base.CreateEventListeners();
+
+			EventManager.AddListener(IDs.Events.DisableAds, OnDisableAds);
 
 			foreach (IMediationAdsWrapperInterface wrapper in Wrappers)
 			{
@@ -254,6 +194,8 @@ namespace Zedarus.ToolKit.API
 		{
 			base.RemoveEventListeners();
 
+			EventManager.RemoveListener(IDs.Events.DisableAds, OnDisableAds);
+
 			foreach (IMediationAdsWrapperInterface wrapper in Wrappers)
 			{
 				wrapper.InterstitialClosed -= OnInterstitialClosed;
@@ -265,16 +207,21 @@ namespace Zedarus.ToolKit.API
 		#endregion
 
 		#region Event Handlers
+		private void OnDisableAds()
+		{
+			DisableAds();
+		}
+
 		private void OnInterstitialClosed()
 		{
-			// TODO: AudioManager.Instance.SetMusicVolume(1f);
+			EventManager.SendEvent(IDs.Events.EnableMusicAfterAd);
 			if (InterstitialClosed != null)
 				InterstitialClosed();
 		}
 
 		private void OnGrantReward()
 		{
-			// TODO: AudioManager.Instance.SetMusicVolume(1f);
+			EventManager.SendEvent(IDs.Events.EnableMusicAfterAd);
 			if (GrantReward != null)
 				GrantReward();
 		}
@@ -304,14 +251,8 @@ namespace Zedarus.ToolKit.API
 		{
 			get 
 			{
-				return true;
-				// TODO: return GlobalSettings.Instance.AdsEnabled && PlayerDataManager.Instance.AdsEnabled;
+				return APIManager.Instance.State.AdsEnabled && APIManager.Instance.Settings.AdsEnabled;
 			}
-		}
-
-		private string GetPostLevelTag(int counter)
-		{
-			return postLevelTag + "_" + (counter + 1).ToString();
 		}
 		#endregion
 	}

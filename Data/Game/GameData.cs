@@ -12,6 +12,10 @@ namespace Zedarus.ToolKit.Data.Game
 	{
 		#region Properties
 		[SerializeField] private int _modelsIDCoutner = 0;
+
+		[SerializeField]
+		[DataTable(1001, "API Settings", typeof(APISettingsData))]
+		private APISettingsData _apiSettings;
 		#endregion
 
 		#region Settings
@@ -45,6 +49,13 @@ namespace Zedarus.ToolKit.Data.Game
 			#if UNITY_EDITOR
 			LoadTables();
 			#endif
+		}
+		#endregion
+
+		#region Getters
+		public APISettingsData APISettings
+		{
+			get { return _apiSettings; }
 		}
 		#endregion
 
@@ -148,19 +159,22 @@ namespace Zedarus.ToolKit.Data.Game
 
 		private List<string> GetGameModelListNamesForID(int id)
 		{
-			List<string> names = new List<string>();
 			IList list = GetListForTable(id);
 
 			if (list != null)
 			{
+				List<string> names = new List<string>();
+
 				foreach (IGameDataModel modelData in list)
 				{
 					if (modelData != null)
 						names.Add(modelData.ListName);
 				}
-			}
 
-			return names;
+				return names;
+			}
+			else
+				return null;
 		}
 
 		public int RenderModelsView()
@@ -199,6 +213,8 @@ namespace Zedarus.ToolKit.Data.Game
 			IList list = GetListForTable(tableID);
 			if (list != null && modelDataIndex >= 0 && modelDataIndex < list.Count)
 				return list[modelDataIndex] as IGameDataModel;
+			else if (list == null)
+				return GetSingleModelForTable(tableID);
 			else
 				return null;
 		}
@@ -206,6 +222,11 @@ namespace Zedarus.ToolKit.Data.Game
 		public void RemoveModelDataAt(int tableID, int modelDataIndex)
 		{
 			RemoteItemFromList(GetListForTable(tableID), modelDataIndex);
+		}
+
+		public bool IsModelDataAList(int modelID)
+		{
+			return GetGameModelListNamesForID(modelID) != null;
 		}
 
 		public int RenderModelsDataListView(int modelID)
@@ -235,6 +256,17 @@ namespace Zedarus.ToolKit.Data.Game
 			{
 				FieldInfo field = _tables[tableID];
 				return field.GetValue(this) as IList;
+			}
+			else
+				return null;
+		}
+
+		private IGameDataModel GetSingleModelForTable(int tableID)
+		{
+			if (_tables.ContainsKey(tableID))
+			{
+				FieldInfo field = _tables[tableID];
+				return field.GetValue(this) as IGameDataModel;
 			}
 			else
 				return null;

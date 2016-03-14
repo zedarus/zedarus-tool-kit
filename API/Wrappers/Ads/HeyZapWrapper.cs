@@ -59,14 +59,6 @@ namespace Zedarus.ToolKit.API
 			#endif
 		}
 
-		public void CacheVideo(string tag)
-		{
-			#if API_ADS_HEYZAP
-			Debug.Log("CacheVideo: " + tag);
-			HZVideoAd.fetch(tag);
-			#endif
-		}
-
 		public void CacheRewardedVideo(string tag)
 		{
 			#if API_ADS_HEYZAP
@@ -112,14 +104,6 @@ namespace Zedarus.ToolKit.API
 			#if API_ADS_HEYZAP
 			HZInterstitialAd.show(tag);
 			HZInterstitialAd.fetch(tag);
-			#endif
-		}
-
-		public void ShowVideo(string tag)
-		{
-			#if API_ADS_HEYZAP
-			HZVideoAd.show(tag);
-			HZVideoAd.fetch(tag);
 			#endif
 		}
 

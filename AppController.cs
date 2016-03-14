@@ -4,6 +4,7 @@ using Zedarus.ToolKit.Data;
 using Zedarus.ToolKit.Data.Player;
 using Zedarus.ToolKit.Data.Game;
 using Zedarus.ToolKit.API;
+using Zedarus.ToolKit.Settings;
 
 namespace Zedarus.ToolKit
 {
@@ -41,7 +42,7 @@ namespace Zedarus.ToolKit
 
 		protected virtual void InitEvents()
 		{
-			
+			IDs.Init();
 		}
 
 		protected virtual void InitAPI()
@@ -52,18 +53,19 @@ namespace Zedarus.ToolKit
 		protected virtual void InitGameData()
 		{
 			_data = new DataManager<GameDataClass, PlayerDataClass>();
+			APIManager.Instance.UseAPISettingsModel(_data.Game.APISettings);
 		}
 
 		protected virtual void InitPlayerData(string filename)
 		{
 			_data.Load(filename);
-			/*DataManager.Instance.Load(filename);
-			if (customAPIState == null)
+			_data.Player.AddModel<APIState>();
+
+			APIState state = _data.Player.GetModel<APIState>();
+			if (state != null)
 			{
-				DataManager.Instance.Player.AddModel<APIState>();
-				customAPIState = DataManager.Instance.Player.GetModel<APIState>();
+				APIManager.Instance.UseAPIStateModel(state);
 			}
-			APIManager.Instance.UseState(customAPIState);*/
 		}
 
 		protected virtual void Launch()

@@ -1,6 +1,8 @@
 using UnityEngine;
 using System.Collections;
 using Zedarus.ToolKit;
+using Zedarus.ToolKit.Data.Game;
+using Zedarus.ToolKit.Data.Player;
 
 namespace Zedarus.ToolKit.API
 {
@@ -45,13 +47,15 @@ namespace Zedarus.ToolKit.API
 	
 	public class APIManager : SimpleSingleton<APIManager>
 	{
-		#region Parameter
+		#region Properties
 		private StoreController _storeController;
 		private SocialController _socialController;
 		private ScoreController _scoreController;
 		private SyncController _syncController;
 		private AnalyticsController _analyticsController;
 		private MediationAdsController _mediationAdsController;
+		private APIState _stateModelRef = null;
+		private APISettingsData _settingsModelRef = null;
 		#endregion
 		
 		#region Initalization
@@ -82,6 +86,16 @@ namespace Zedarus.ToolKit.API
 			_syncController.Init();
 			_analyticsController.Init();
 			_mediationAdsController.Init();
+		}
+
+		public void UseAPISettingsModel(APISettingsData settingsModel)
+		{
+			_settingsModelRef = settingsModel;
+		}
+
+		public void UseAPIStateModel(APIState stateModel)
+		{
+			_stateModelRef = stateModel;
 		}
 		#endregion
 		
@@ -121,6 +135,16 @@ namespace Zedarus.ToolKit.API
 		public MediationAdsController Ads
 		{
 			get { return _mediationAdsController; }
+		}
+
+		internal APIState State
+		{
+			get { return _stateModelRef; }
+		}
+
+		internal APISettingsData Settings
+		{
+			get { return _settingsModelRef; }
 		}
 		#endregion
 	}

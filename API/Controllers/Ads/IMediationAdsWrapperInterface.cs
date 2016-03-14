@@ -16,7 +16,6 @@ namespace Zedarus.ToolKit.API
 
 		#region Controls - Caching
 		void CacheInterstitial(string tag);
-		void CacheVideo(string tag);
 		void CacheRewardedVideo(string tag);
 		#endregion
 
@@ -24,7 +23,6 @@ namespace Zedarus.ToolKit.API
 		void ShowBanner(string tag);
 		void HideBanner();
 		void ShowIntersitital(string tag);
-		void ShowVideo(string tag);
 		void ShowRewardedVideo(string tag);
 		#endregion
 

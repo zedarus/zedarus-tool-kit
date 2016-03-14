@@ -94,9 +94,25 @@ namespace Zedarus.ToolKit.Data.Game
 
 			if (modelID > 0 && modelID != _currentModelID)
 			{
-				GUI.FocusControl(null);
-				_state = State.Blank;
 				_currentModelID = modelID;
+				if (_data.IsModelDataAList(_currentModelID))
+				{
+					GUI.FocusControl(null);
+					_state = State.Blank;
+				}
+				else
+				{
+					IGameDataModel selectedModel = _data.GetModelDataAt(_currentModelID, 0);
+					if (selectedModel != null)
+					{
+						GUI.FocusControl(null);
+						_model = _data.CreateNewModel(_currentModelID);
+						_model.CopyValuesFrom(selectedModel);
+						_selectedModelDataIndex = 0;
+						_editViewScrollPos = Vector2.zero;
+						_state = State.Edit;
+					}
+				}
 			}
 
 			EditorGUILayout.EndScrollView();
@@ -107,7 +123,7 @@ namespace Zedarus.ToolKit.Data.Game
 
 		private void RenderModelsListView()
 		{
-			if (_currentModelID > 0)
+			if (_currentModelID > 0 && _data.IsModelDataAList(_currentModelID))
 			{
 				EditorGUILayout.BeginVertical(GUILayout.Width(250));
 				EditorGUILayout.Space();
@@ -243,6 +259,11 @@ namespace Zedarus.ToolKit.Data.Game
 						}
 						_model = null;
 						_state = State.Blank;
+
+						if (!_data.IsModelDataAList(_currentModelID))
+						{
+							_currentModelID = 0;
+						}
 					}
 					else
 					{
@@ -255,16 +276,20 @@ namespace Zedarus.ToolKit.Data.Game
 					_model = null;
 					_state = State.Blank;
 				}
-				else if (GUILayout.Button("Delete", GUILayout.Width(100)))
-				{
-					GUI.FocusControl(null);
 
-					if (EditorUtility.DisplayDialog("Warning!", "Are you sure you want to delete " + _model.ListName + "?", "Yes", "No"))
+				if (_data.IsModelDataAList(_currentModelID))
+				{
+					if (GUILayout.Button("Delete", GUILayout.Width(100)))
 					{
-						_data.RemoveModelDataAt(_currentModelID, _selectedModelDataIndex);
-						EditorUtility.SetDirty(_data);
-						_model = null;
-						_state = State.Blank;
+						GUI.FocusControl(null);
+
+						if (EditorUtility.DisplayDialog("Warning!", "Are you sure you want to delete " + _model.ListName + "?", "Yes", "No"))
+						{
+							_data.RemoveModelDataAt(_currentModelID, _selectedModelDataIndex);
+							EditorUtility.SetDirty(_data);
+							_model = null;
+							_state = State.Blank;
+						}
 					}
 				}
 
