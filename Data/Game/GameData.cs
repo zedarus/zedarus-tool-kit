@@ -11,8 +11,6 @@ namespace Zedarus.ToolKit.Data.Game
 	public class GameData : ScriptableObject
 	{
 		#region Properties
-		[SerializeField] private int _modelsIDCoutner = 0;
-
 		[SerializeField]
 		[DataTable(1001, "API Settings", typeof(APISettingsData))]
 		private APISettingsData _apiSettings;
@@ -82,32 +80,29 @@ namespace Zedarus.ToolKit.Data.Game
 			}
 		}
 
-		private int NextModelID
+		private int GetNextModelID(int modelID)
 		{
-			get
+			int maxID = 0;
+
+			if (_tables.ContainsKey(modelID))
 			{
-				int maxID = 0;
-				_modelsIDCoutner = 0;
-
-				foreach (KeyValuePair<int, FieldInfo> table in _tables)
+				IList list = GetListForTable(modelID);
+				if (list != null)
 				{
-					IList list = GetListForTable(table.Key);
-
-					if (list != null)
+					foreach (IGameDataModel modelData in list)
 					{
-						foreach (IGameDataModel modelData in list)
-						{
-							if (modelData != null && modelData.ID > maxID)
-								maxID = modelData.ID;
-						}
+						if (modelData != null && modelData.ID > maxID)
+							maxID = modelData.ID;
 					}
 				}
-
-				if (_modelsIDCoutner < maxID)
-					_modelsIDCoutner = maxID;
-
-				return ++_modelsIDCoutner;
 			}
+
+			int newID = 0;
+
+			if (maxID > 0)
+				newID = maxID + Random.Range(1, 32);
+
+			return newID;
 		}
 
 		/// <summary>
@@ -201,7 +196,7 @@ namespace Zedarus.ToolKit.Data.Game
 				DataTable table = GetTableAttributeForField(_tables[tableID]);
 				if (table != null)
 				{
-					return System.Activator.CreateInstance(table.Type, NextModelID) as IGameDataModel;
+					return System.Activator.CreateInstance(table.Type, GetNextModelID(tableID)) as IGameDataModel;
 				}
 			}
 
