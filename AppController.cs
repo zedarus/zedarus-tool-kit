@@ -3,7 +3,6 @@ using System.Collections;
 using Zedarus.ToolKit.Data;
 using Zedarus.ToolKit.Data.Player;
 using Zedarus.ToolKit.Data.Game;
-using Zedarus.ToolKit.Data.Remote;
 using Zedarus.ToolKit.API;
 using Zedarus.ToolKit.Settings;
 
@@ -54,12 +53,13 @@ namespace Zedarus.ToolKit
 		protected virtual void InitGameData()
 		{
 			_data = new DataManager<GameDataClass, PlayerDataClass>();
+			_data.LoadGameData();
 			APIManager.Instance.UseAPISettingsModel(_data.Game.APISettings);
 		}
 
 		protected virtual void InitPlayerData(string filename)
 		{
-			_data.Load(filename);
+			_data.LoadPlayerData(filename);
 			_data.Player.AddModel<APIState>();
 
 			APIState state = _data.Player.GetModel<APIState>();

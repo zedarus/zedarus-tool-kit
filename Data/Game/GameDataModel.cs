@@ -67,27 +67,6 @@ namespace Zedarus.ToolKit.Data.Game
 
 		public virtual string ListName { get { return "#" + ID.ToString(); } }
 
-		public void CopyValuesFrom(IGameDataModel data, bool copyID)
-		{
-			FieldInfo[] fields = GetFields(data);
-
-			foreach (FieldInfo field in fields)
-			{
-				if (field.Name.Equals("_id") && !copyID)
-					continue;
-				
-				object[] attrs = field.GetCustomAttributes(typeof(DataField), true);
-				foreach (object attr in attrs)
-				{
-					DataField fieldAttr = attr as DataField;
-					if (fieldAttr != null)
-					{
-						ReplaceValueForFieldInCurrentInstance(field, data);
-					}
-				}
-			}
-		}
-
 		#region Helpers
 		protected string RenderPrefabField(string label, string value, System.Type type, bool includePreview, int previewWidth = 100, int previewHeight = 100)
 		{
@@ -261,21 +240,7 @@ namespace Zedarus.ToolKit.Data.Game
 			}
 		}
 		#endregion
-
-		private void ReplaceValueForFieldInCurrentInstance(FieldInfo field, object target)
-		{
-			FieldInfo[] fields = GetFields(this);
-
-			foreach (FieldInfo currentField in fields)
-			{
-				if (currentField.Equals(field))
-				{
-					object value = field.GetValue(target);
-					currentField.SetValue(this, value);
-					ValidateField(currentField);
-				}
-			}
-		}
+		#endif
 
 		private FieldInfo[] GetFields(IGameDataModel target)
 		{
@@ -293,7 +258,44 @@ namespace Zedarus.ToolKit.Data.Game
 
 			return fields.ToArray();
 		}
-		#endif
+
+		public void CopyValuesFrom(IGameDataModel data, bool copyID)
+		{
+			FieldInfo[] fields = GetFields(data);
+
+			foreach (FieldInfo field in fields)
+			{
+				if (field.Name.Equals("_id") && !copyID)
+					continue;
+
+				object[] attrs = field.GetCustomAttributes(typeof(DataField), true);
+				foreach (object attr in attrs)
+				{
+					DataField fieldAttr = attr as DataField;
+					if (fieldAttr != null)
+					{
+						ReplaceValueForFieldInCurrentInstance(field, data);
+					}
+				}
+			}
+		}
+
+		private void ReplaceValueForFieldInCurrentInstance(FieldInfo field, object target)
+		{
+			FieldInfo[] fields = GetFields(this);
+
+			foreach (FieldInfo currentField in fields)
+			{
+				if (currentField.Equals(field))
+				{
+					object value = field.GetValue(target);
+					currentField.SetValue(this, value);
+					#if UNITY_EDITOR
+					ValidateField(currentField);
+					#endif
+				}
+			}
+		}
 	}
 }
 

@@ -1,10 +1,11 @@
 ﻿using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
-using System.Reflection;
 #endif
+using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
+using LitJson;
 
 namespace Zedarus.ToolKit.Data.Game
 {
@@ -42,6 +43,63 @@ namespace Zedarus.ToolKit.Data.Game
 		#endregion
 
 		#region Initialization
+		// We need this method because since 5.3.0 unity no longer
+		// supports JsonUtility.FromJson() for ScriptableObjects
+		public void ApplyRemoteData(string json)
+		{
+			JsonData data = JsonMapper.ToObject(json);
+
+			FieldInfo[] fields = GetFields(this);
+			foreach (FieldInfo field in fields)
+			{
+				if (data.Keys.Contains(field.Name))
+				{
+					if (field.FieldType.GetInterface("IList") != null)
+					{
+						DataTable dataField = GetTableAttributeForField(field);
+						if (dataField != null)
+						{
+							IList list = field.GetValue(this) as IList;
+
+							if (list != null)
+							{
+								for (int i = 0; i < data[field.Name].Count; i++)
+								{
+									try
+									{
+										IGameDataModel model = JsonUtility.FromJson(data[field.Name][i].ToJson(), dataField.Type) as IGameDataModel;
+										if (model != null)
+										{
+											foreach (IGameDataModel currentModel in list)
+											{
+												if (currentModel.ID.Equals(model.ID))
+												{
+													currentModel.CopyValuesFrom(model, true);
+													break;
+												}
+											}
+										}
+									}
+									catch (System.Exception) { }
+								}
+							}
+						}
+					}
+					else
+					{
+						try
+						{
+							IGameDataModel model = JsonUtility.FromJson(data[field.Name].ToJson(), field.FieldType) as IGameDataModel;
+							IGameDataModel currentModel = field.GetValue(this) as IGameDataModel;
+							currentModel.CopyValuesFrom(model, true);
+							//field.SetValue(this, JsonUtility.FromJson(data[field.Name].ToJson(), field.FieldType));
+						}
+						catch (System.Exception) { }
+					}
+				}
+			}
+		}
+
 		protected virtual void Init()
 		{
 			#if UNITY_EDITOR
@@ -54,6 +112,40 @@ namespace Zedarus.ToolKit.Data.Game
 		public APISettingsData APISettings
 		{
 			get { return _apiSettings; }
+		}
+		#endregion
+
+		#region Helpers
+		private FieldInfo[] GetFields(GameData target)
+		{
+			List<FieldInfo> fields = new List<FieldInfo>();
+
+			fields.AddRange(target.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance));
+
+			System.Type baseType = target.GetType().BaseType;
+
+			while (baseType != null)
+			{
+				fields.InsertRange(0, baseType.GetFields(BindingFlags.NonPublic | BindingFlags.Instance));
+				baseType = baseType.BaseType;
+			}
+
+			return fields.ToArray();
+		}
+
+		private DataTable GetTableAttributeForField(FieldInfo field)
+		{
+			object[] attrs = field.GetCustomAttributes(typeof(DataTable), true);
+			foreach (object attr in attrs)
+			{
+				DataTable fieldAttr = attr as DataTable;
+				if (fieldAttr != null)
+				{
+					return fieldAttr;
+				}
+			}
+
+			return null;
 		}
 		#endregion
 
@@ -271,38 +363,6 @@ namespace Zedarus.ToolKit.Data.Game
 		{
 			if (list != null && index >= 0 && index < list.Count)
 				list.RemoveAt(index);
-		}
-
-		private FieldInfo[] GetFields(GameData target)
-		{
-			List<FieldInfo> fields = new List<FieldInfo>();
-
-			fields.AddRange(target.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance));
-
-			System.Type baseType = target.GetType().BaseType;
-
-			while (baseType != null)
-			{
-				fields.InsertRange(0, baseType.GetFields(BindingFlags.NonPublic | BindingFlags.Instance));
-				baseType = baseType.BaseType;
-			}
-
-			return fields.ToArray();
-		}
-
-		private DataTable GetTableAttributeForField(FieldInfo field)
-		{
-			object[] attrs = field.GetCustomAttributes(typeof(DataTable), true);
-			foreach (object attr in attrs)
-			{
-				DataTable fieldAttr = attr as DataTable;
-				if (fieldAttr != null)
-				{
-					return fieldAttr;
-				}
-			}
-
-			return null;
 		}
 		#endregion
 		#endif

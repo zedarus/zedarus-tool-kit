@@ -8,7 +8,6 @@ using Zedarus.ToolKit.Helpers;
 using Zedarus.ToolKit.Data;
 using Zedarus.ToolKit.Data.Player;
 using Zedarus.ToolKit.Data.Game;
-using Zedarus.ToolKit.Data.Remote;
 
 namespace Zedarus.ToolKit.Data
 {
@@ -17,27 +16,29 @@ namespace Zedarus.ToolKit.Data
 		#region Data
 		private GD _gameData;
 		private PD _playerData;
-		private RemoteData<GD> _remoteData;
 		private string _playerDataFilename;
 		#endregion
 
 		private Action _dataLoadedCallback;
 
 		#region Init
-		public DataManager() 
-		{
-			_remoteData = new RemoteData<GD>();
-		}
+		public DataManager() { }
 		#endregion
 
 		#region Controls
-		public void Load(string playerDataFilename)
+		public void LoadGameData()
 		{
-			_playerDataFilename = playerDataFilename;
-			_gameData = Resources.Load<GD>(GameData.DATABASE_LOCAL_PATH);
+			// We need to use Object.Instantiate here because GameData is going
+			// to change at runtime by rematoe overrides and we don't want those
+			// changes to actually save in .asset file when testing in editor
+			_gameData = UnityEngine.Object.Instantiate(Resources.Load<GD>(GameData.DATABASE_LOCAL_PATH));
+		}
 
+		public void LoadPlayerData(string dataFilename)
+		{
+			_playerDataFilename = dataFilename;
 			_playerData = PlayerData.Load<PD>(_playerDataFilename);
-			//_playerData = typeof(PD).GetMethod("Load",BindingFlags.FlattenHierarchy | BindingFlags.Static | BindingFlags.Public).Invoke(null, new object[] { _playerDataFilename }) as PD;
+			//_playerData = typeof(PD).GetMethod("Load",BindingFlags.FlattenHierarchy | BindingFlags.Static | BindingFlags.Public).Invoke(null, new object[] { _playerDataFilename }) as PD
 		}
 
 		public void Save()
@@ -46,30 +47,25 @@ namespace Zedarus.ToolKit.Data
 			PlayerData.Save<PD>(_playerData, _playerDataFilename);
 			//typeof(PD).GetMethod("Save", BindingFlags.FlattenHierarchy | BindingFlags.Static | BindingFlags.Public).Invoke(null, new object[] { _playerData, _playerDataFilename });
 		}
+
+		public void ApplyRemoteData(string json)
+		{
+			if (_gameData != null)
+			{
+				_gameData.ApplyRemoteData(json);
+			}
+		}
 		#endregion
 
 		#region Queries
 		public GD Game
 		{
-			get
-			{
-				if (_gameData == null)
-				{
-					_gameData = Resources.Load<GD>(GameData.DATABASE_LOCAL_PATH);
-				}
-
-				return _gameData;
-			}
+			get { return _gameData; }
 		}
 
 		public PD Player
 		{
 			get { return _playerData; }
-		}
-
-		public RemoteData<GD> Remote
-		{
-			get { return _remoteData; }
 		}
 		#endregion
 	}
