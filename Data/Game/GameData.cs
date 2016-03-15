@@ -81,7 +81,10 @@ namespace Zedarus.ToolKit.Data.Game
 											}
 										}
 									}
-									catch (System.Exception) { }
+									catch (System.Exception e) 
+									{
+										Debug.Log(e.ToString());
+									}
 								}
 							}
 						}
@@ -93,7 +96,10 @@ namespace Zedarus.ToolKit.Data.Game
 							IGameDataModel currentModel = field.GetValue(this) as IGameDataModel;
 							currentModel.OverrideValuesFrom(data[field.Name].ToJson());
 						}
-						catch (System.Exception) { }
+						catch (System.Exception e) 
+						{
+							Debug.Log(e.ToString());
+						}
 					}
 				}
 			}
