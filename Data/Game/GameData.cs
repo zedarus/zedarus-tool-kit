@@ -15,6 +15,8 @@ namespace Zedarus.ToolKit.Data.Game
 		[SerializeField]
 		[DataTable(1001, "Settings", typeof(SettingsData))]
 		private SettingsData _settings;
+
+		[SerializeField]
 		[DataTable(1002, "API Settings", typeof(APISettingsData))]
 		private APISettingsData _apiSettings;
 		#endregion
