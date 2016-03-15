@@ -4,6 +4,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using Zedarus.ToolKit;
+using Zedarus.ToolKit.Settings;
+using Zedarus.ToolKit.Events;
 using Zedarus.ToolKit.Helpers;
 using Zedarus.ToolKit.Data;
 using Zedarus.ToolKit.Data.Player;
@@ -19,10 +21,15 @@ namespace Zedarus.ToolKit.Data
 		private string _playerDataFilename;
 		#endregion
 
-		private Action _dataLoadedCallback;
+		#region Properties
+		private string _queuedRemoteData = null;
+		#endregion
 
 		#region Init
-		public DataManager() { }
+		public DataManager() 
+		{
+			EventManager.AddListener<string>(IDs.Events.RemoteDataReceived, OnRemoteDataReceived, true);
+		}
 		#endregion
 
 		#region Controls
@@ -32,28 +39,24 @@ namespace Zedarus.ToolKit.Data
 			// to change at runtime by rematoe overrides and we don't want those
 			// changes to actually save in .asset file when testing in editor
 			_gameData = UnityEngine.Object.Instantiate(Resources.Load<GD>(GameData.DATABASE_LOCAL_PATH));
+
+			if (Game != null && _queuedRemoteData != null)
+			{
+				Game.ApplyRemoteData(_queuedRemoteData);
+				_queuedRemoteData = null;
+			}
 		}
 
 		public void LoadPlayerData(string dataFilename)
 		{
 			_playerDataFilename = dataFilename;
 			_playerData = PlayerData.Load<PD>(_playerDataFilename);
-			//_playerData = typeof(PD).GetMethod("Load",BindingFlags.FlattenHierarchy | BindingFlags.Static | BindingFlags.Public).Invoke(null, new object[] { _playerDataFilename }) as PD
 		}
 
 		public void Save()
 		{
-			_playerData.UpdateVersionAndTimestamp("0.0.0", 20);  // TODO: use actial values here
-			PlayerData.Save<PD>(_playerData, _playerDataFilename);
-			//typeof(PD).GetMethod("Save", BindingFlags.FlattenHierarchy | BindingFlags.Static | BindingFlags.Public).Invoke(null, new object[] { _playerData, _playerDataFilename });
-		}
-
-		public void ApplyRemoteData(string json)
-		{
-			if (_gameData != null)
-			{
-				_gameData.ApplyRemoteData(json);
-			}
+			Player.UpdateVersionAndTimestamp(Game.Settings.Version, Game.Settings.Build);
+			PlayerData.Save<PD>(Player, _playerDataFilename);
 		}
 		#endregion
 
@@ -66,6 +69,20 @@ namespace Zedarus.ToolKit.Data
 		public PD Player
 		{
 			get { return _playerData; }
+		}
+		#endregion
+
+		#region Event Handlers
+		private void OnRemoteDataReceived(string json)
+		{
+			if (Game != null)
+			{
+				Game.ApplyRemoteData(json);
+			}
+			else
+			{
+				_queuedRemoteData = json;
+			}
 		}
 		#endregion
 	}

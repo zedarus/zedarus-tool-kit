@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
-using System.Reflection;
 #endif
+using System.Reflection;
 using System.Collections.Generic;
 using LitJson;
 
@@ -32,6 +32,7 @@ namespace Zedarus.ToolKit.Data.Game
 		#endregion
 
 		#if UNITY_EDITOR
+		#region Helpers - Editor
 		public void RenderForm(bool included)
 		{
 			FieldInfo[] fields = GetFields(this);
@@ -68,7 +69,6 @@ namespace Zedarus.ToolKit.Data.Game
 
 		public virtual string ListName { get { return "#" + ID.ToString(); } }
 
-		#region Helpers
 		protected string RenderPrefabField(string label, string value, System.Type type, bool includePreview, int previewWidth = 100, int previewHeight = 100)
 		{
 			EditorGUILayout.BeginHorizontal();
@@ -241,23 +241,6 @@ namespace Zedarus.ToolKit.Data.Game
 			}
 		}
 
-		private FieldInfo[] GetFields(IGameDataModel target)
-		{
-			List<FieldInfo> fields = new List<FieldInfo>();
-
-			fields.AddRange(target.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance));
-
-			System.Type baseType = target.GetType().BaseType;
-
-			while (baseType != null)
-			{
-				fields.InsertRange(0, baseType.GetFields(BindingFlags.NonPublic | BindingFlags.Instance));
-				baseType = baseType.BaseType;
-			}
-
-			return fields.ToArray();
-		}
-
 		public void CopyValuesFrom(IGameDataModel data, bool copyID)
 		{
 			FieldInfo[] fields = GetFields(data);
@@ -296,6 +279,24 @@ namespace Zedarus.ToolKit.Data.Game
 		#endregion
 		#endif
 
+		#region Helpers - Runtime
+		private FieldInfo[] GetFields(IGameDataModel target)
+		{
+			List<FieldInfo> fields = new List<FieldInfo>();
+
+			fields.AddRange(target.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance));
+
+			System.Type baseType = target.GetType().BaseType;
+
+			while (baseType != null)
+			{
+				fields.InsertRange(0, baseType.GetFields(BindingFlags.NonPublic | BindingFlags.Instance));
+				baseType = baseType.BaseType;
+			}
+
+			return fields.ToArray();
+		}
+
 		public virtual void OverrideValuesFrom(string json)
 		{
 			JsonData data = JsonMapper.ToObject(json);
@@ -329,6 +330,7 @@ namespace Zedarus.ToolKit.Data.Game
 				}
 			}
 		}
+		#endregion
 	}
 }
 

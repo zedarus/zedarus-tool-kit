@@ -13,7 +13,9 @@ namespace Zedarus.ToolKit.Data.Game
 	{
 		#region Properties
 		[SerializeField]
-		[DataTable(1001, "API Settings", typeof(APISettingsData))]
+		[DataTable(1001, "Settings", typeof(SettingsData))]
+		private SettingsData _settings;
+		[DataTable(1002, "API Settings", typeof(APISettingsData))]
 		private APISettingsData _apiSettings;
 		#endregion
 
@@ -119,6 +121,11 @@ namespace Zedarus.ToolKit.Data.Game
 		public APISettingsData APISettings
 		{
 			get { return _apiSettings; }
+		}
+
+		public SettingsData Settings
+		{
+			get { return _settings; }
 		}
 		#endregion
 

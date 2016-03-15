@@ -12,6 +12,7 @@ namespace Zedarus.ToolKit.Settings
 			public const int DisableMusicDuringAd = EVENT_OFFSET + 1;
 			public const int EnableMusicAfterAd = EVENT_OFFSET + 2;
 			public const int DisableAds = EVENT_OFFSET + 3;
+			public const int RemoteDataReceived = EVENT_OFFSET + 4;
 		}
 
 		private static bool _initialized = false;
@@ -22,6 +23,7 @@ namespace Zedarus.ToolKit.Settings
 				EventManager.RegisterEvent(Events.DisableMusicDuringAd);
 				EventManager.RegisterEvent(Events.EnableMusicAfterAd);
 				EventManager.RegisterEvent(Events.DisableAds);
+				EventManager.RegisterEvent(Events.RemoteDataReceived);
 				_initialized = true;
 			}
 		}
