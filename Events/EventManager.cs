@@ -7,40 +7,47 @@ namespace Zedarus.ToolKit.Events
 {
 	public class EventManager : SimplePrivateSingleton<EventManager>
 	{
+		private EventRegister _register;
 		private List<Event> _events;
 		private List<EventListener> _listeners;
 
 		public EventManager()
 		{
+			_register = new EventRegister();
 			_events = new List<Event>();
 			_listeners = new List<EventListener>();
-			InitSceneObject();
+			//InitSceneObject();
 		}
 
 		#region Controls
+		static public bool RegisterEvent(int e)
+		{
+			return Instance.AddEventToRegister(e);
+		}
+
 		static public void SendEvent(int e)
 		{
-			Instance.RegisterEvent(e);
+			Instance.CreateEvent(e);
 		}
 
 		static public void SendEvent<T1>(int e, T1 param1)
 		{
-			Instance.RegisterEvent<T1>(e, param1);
+			Instance.CreateEvent<T1>(e, param1);
 		}
 
 		static public void SendEvent<T1,T2>(int e, T1 param1, T2 param2)
 		{
-			Instance.RegisterEvent<T1,T2>(e, param1, param2);
+			Instance.CreateEvent<T1,T2>(e, param1, param2);
 		}
 
 		static public void SendEvent<T1,T2,T3>(int e, T1 param1, T2 param2, T3 param3)
 		{
-			Instance.RegisterEvent<T1,T2,T3>(e, param1, param2, param3);
+			Instance.CreateEvent<T1,T2,T3>(e, param1, param2, param3);
 		}
 
 		static public void SendEvent<T1,T2,T3,T4>(int e, T1 param1, T2 param2, T3 param3, T4 param4)
 		{
-			Instance.RegisterEvent<T1,T2,T3,T4>(e, param1, param2, param3, param4);
+			Instance.CreateEvent<T1,T2,T3,T4>(e, param1, param2, param3, param4);
 		}
 
 		/// <summary>
@@ -112,6 +119,11 @@ namespace Zedarus.ToolKit.Events
 		{
 			Instance.ClearEventsAndListeners();
 		}
+
+		static public bool IsListenerExists(int e)
+		{
+			return Instance.GetListenersCountForEvent(e) > 0;
+		}
 		#endregion
 
 		#region Events
@@ -132,7 +144,7 @@ namespace Zedarus.ToolKit.Events
 						if (listener.Expired)
 							_listeners.RemoveAt(l);
 
-						if (listener.Consume)
+						if (listener.Consume && _events.Count > e)
 						{
 							_events.RemoveAt(e);
 							break;
@@ -145,43 +157,79 @@ namespace Zedarus.ToolKit.Events
 			_events.Clear();
 		}
 
-		public void RegisterEvent(int e)
+		public bool AddEventToRegister(int e)
 		{
-			_events.Add(new Event(e));
-			UpdateSceneObject();
-			ProcessEvents();
+			return _register.Register(e);
 		}
 
-		public void RegisterEvent<T1>(int e, T1 param1)
+		public void CreateEvent(int e)
 		{
-			_events.Add(new Event<T1>(e, param1));
-			UpdateSceneObject();
-			ProcessEvents();
+			if (_register.IsRegistered(e))
+			{
+				_events.Add(new Event(e));
+				UpdateSceneObject();
+				ProcessEvents();
+			} else
+				Debug.LogError("Can't send event with ID " + e + " because it's not registerd");
 		}
 
-		public void RegisterEvent<T1,T2>(int e, T1 param1, T2 param2)
+		public void CreateEvent<T1>(int e, T1 param1)
 		{
-			_events.Add(new Event<T1,T2>(e, param1, param2));
-			UpdateSceneObject();
-			ProcessEvents();
+			if (_register.IsRegistered(e))
+			{
+				_events.Add(new Event<T1>(e, param1));
+				UpdateSceneObject();
+				ProcessEvents();
+			} else
+				Debug.LogError("Can't send event with ID " + e + " because it's not registerd");
 		}
 
-		public void RegisterEvent<T1,T2,T3>(int e, T1 param1, T2 param2, T3 param3)
+		public void CreateEvent<T1,T2>(int e, T1 param1, T2 param2)
 		{
-			_events.Add(new Event<T1,T2,T3>(e, param1, param2, param3));
-			UpdateSceneObject();
-			ProcessEvents();
+			if (_register.IsRegistered(e))
+			{
+				_events.Add(new Event<T1,T2>(e, param1, param2));
+				UpdateSceneObject();
+				ProcessEvents();
+			} else
+				Debug.LogError("Can't send event with ID " + e + " because it's not registerd");
 		}
 
-		public void RegisterEvent<T1,T2,T3,T4>(int e, T1 param1, T2 param2, T3 param3, T4 param4)
+		public void CreateEvent<T1,T2,T3>(int e, T1 param1, T2 param2, T3 param3)
 		{
-			_events.Add(new Event<T1,T2,T3,T4>(e, param1, param2, param3, param4));
-			UpdateSceneObject();
-			ProcessEvents();
+			if (_register.IsRegistered(e))
+			{
+				_events.Add(new Event<T1,T2,T3>(e, param1, param2, param3));
+				UpdateSceneObject();
+				ProcessEvents();
+			} else
+				Debug.LogError("Can't send event with ID " + e + " because it's not registerd");
+		}
+
+		public void CreateEvent<T1,T2,T3,T4>(int e, T1 param1, T2 param2, T3 param3, T4 param4)
+		{
+			if (_register.IsRegistered(e))
+			{
+				_events.Add(new Event<T1,T2,T3,T4>(e, param1, param2, param3, param4));
+				UpdateSceneObject();
+				ProcessEvents();
+			} else
+				Debug.LogError("Can't send event with ID " + e + " because it's not registerd");
 		}
 		#endregion
 
 		#region Listeners
+		public int GetListenersCountForEvent(int e)
+		{
+			int count = 0;
+			foreach (EventListener listener in _listeners)
+			{
+				if (listener.Event == e)
+					count++;
+			}
+			return count;
+		}
+
 		public void CreateListener(int e, System.Action handler, bool consume, bool oneTime)
 		{
 			_listeners.Add(new EventListener(e, handler, consume, oneTime));
@@ -287,7 +335,7 @@ namespace Zedarus.ToolKit.Events
 		#endregion
 	}
 
-	public class EventManagerProcessor : MonoBehaviour
+	/*public class EventManagerProcessor : MonoBehaviour
 	{
 		private void Start()
 		{
@@ -298,5 +346,5 @@ namespace Zedarus.ToolKit.Events
 		{
 			EventManager.Update();
 		}
-	}
+	}*/
 }
