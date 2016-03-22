@@ -124,6 +124,8 @@ namespace Zedarus.ToolKit.Data.Game
 				RenderFloatField(field, attribute);
 			else if (field.FieldType == typeof(bool))
 				RenderBoolField(field, attribute);
+			else if (field.FieldType.IsEnum)
+				RenderEnumField(field, attribute);
 			else if (field.FieldType.GetInterface(typeof(IGameDataModel).Name) != null)
 				RenderIGameDataModelField(field, attribute, fieldCount);
 			else
@@ -195,6 +197,14 @@ namespace Zedarus.ToolKit.Data.Game
 		{
 			// TODO: add errors check here too
 			field.SetValue(this, EditorGUILayout.Toggle(attribute.EditorLabel, bool.Parse(field.GetValue(this).ToString())));
+		}
+
+		private void RenderEnumField(FieldInfo field, DataField attribute)
+		{
+			object value = field.GetValue(this);
+			System.Enum newValue = EditorGUILayout.EnumPopup(attribute.EditorLabel, (System.Enum) System.Enum.Parse(value.GetType(), value.ToString()));
+			object uv = System.Convert.ChangeType(newValue, System.Enum.GetUnderlyingType(value.GetType()));
+			field.SetValue(this, uv);
 		}
 
 		private void ValidateField(FieldInfo field)
