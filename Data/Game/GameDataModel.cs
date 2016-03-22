@@ -171,7 +171,7 @@ namespace Zedarus.ToolKit.Data.Game
 			
 		}
 
-		private void RenderStringField(FieldInfo field, DataField attribute)
+		protected void RenderStringField(FieldInfo field, DataField attribute)
 		{
 			object value = field.GetValue(this);
 			string currentValue = "";
@@ -181,25 +181,25 @@ namespace Zedarus.ToolKit.Data.Game
 			field.SetValue(this, EditorGUILayout.TextField(attribute.EditorLabel, currentValue));
 		}
 
-		private void RenderIntField(FieldInfo field, DataField attribute)
+		protected void RenderIntField(FieldInfo field, DataField attribute)
 		{
 			// TODO: add errors check here too
 			field.SetValue(this, EditorGUILayout.IntField(attribute.EditorLabel, int.Parse(field.GetValue(this).ToString())));
 		}
 
-		private void RenderFloatField(FieldInfo field, DataField attribute)
+		protected void RenderFloatField(FieldInfo field, DataField attribute)
 		{
 			// TODO: add errors check here too
 			field.SetValue(this, EditorGUILayout.FloatField(attribute.EditorLabel, float.Parse(field.GetValue(this).ToString())));
 		}
 
-		private void RenderBoolField(FieldInfo field, DataField attribute)
+		protected void RenderBoolField(FieldInfo field, DataField attribute)
 		{
 			// TODO: add errors check here too
 			field.SetValue(this, EditorGUILayout.Toggle(attribute.EditorLabel, bool.Parse(field.GetValue(this).ToString())));
 		}
 
-		private void RenderEnumField(FieldInfo field, DataField attribute)
+		protected void RenderEnumField(FieldInfo field, DataField attribute)
 		{
 			object value = field.GetValue(this);
 			System.Enum newValue = EditorGUILayout.EnumPopup(attribute.EditorLabel, (System.Enum) System.Enum.Parse(value.GetType(), value.ToString()));
