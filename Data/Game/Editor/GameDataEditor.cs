@@ -85,9 +85,11 @@ namespace Zedarus.ToolKit.Data.Game
 
 			if (DataLoaded)
 			{
-				if (GUILayout.Button("JSON", GUILayout.Width(80)))
+				if (GUILayout.Button("Generate JSON", GUILayout.Width(120)))
 				{
-					Debug.Log(JsonUtility.ToJson(_data, true));
+					string json = JsonUtility.ToJson(_data, true);
+					EditorGUIUtility.systemCopyBuffer = json;
+					Debug.Log("Also copied to your clipboard: \n" + json);
 				}
 			}
 
