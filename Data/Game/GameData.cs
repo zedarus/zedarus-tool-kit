@@ -190,7 +190,7 @@ namespace Zedarus.ToolKit.Data.Game
 
 		private int GetNextModelID(int modelID)
 		{
-			int maxID = 0;
+			int maxID = -1;
 
 			if (_tables.ContainsKey(modelID))
 			{
@@ -207,7 +207,7 @@ namespace Zedarus.ToolKit.Data.Game
 
 			int newID = 0;
 
-			if (maxID > 0)
+			if (maxID >= 0)
 				newID = maxID + Random.Range(1, 32);
 
 			return newID;
