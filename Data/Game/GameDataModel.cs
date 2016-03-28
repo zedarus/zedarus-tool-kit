@@ -207,6 +207,64 @@ namespace Zedarus.ToolKit.Data.Game
 			field.SetValue(this, uv);
 		}
 
+		protected void RenderDateTimeField(FieldInfo field, DataField attribute)
+		{
+			EditorGUILayout.BeginHorizontal();
+
+			string[] months = new string[] { 
+				"01 January",
+				"02 Februrary",
+				"03 March",
+				"04 April",
+				"05 May",
+				"06 June",
+				"07 July",
+				"08 August",
+				"09 September",
+				"10 October",
+				"11 November",
+				"12 December"
+			};
+
+			int[] monthsInt = new int[] { 
+				1, 2, 3, 4, 5, 6,
+				7, 8, 9, 10, 11, 12
+			};
+
+			DateData date = (DateData) field.GetValue(this);
+
+			List<string> yearsNames = new List<string>();
+			List<int> yearsValues = new List<int>();
+
+			for (int y = System.DateTime.Now.Year; y < System.DateTime.Now.Year + 20; y++)
+			{
+				yearsNames.Add(y.ToString());
+				yearsValues.Add(y);
+			}
+
+			int days = System.DateTime.DaysInMonth(date.Year, date.Month);
+
+			List<string> daysNames = new List<string>();
+			List<int> daysValues = new List<int>();
+			for (int monthDay = 1; monthDay <= days; monthDay++)
+			{
+				daysNames.Add(monthDay.ToString());
+				daysValues.Add(monthDay);
+			}
+
+			int year = EditorGUILayout.IntPopup(attribute.EditorLabel, date.Year, yearsNames.ToArray(), yearsValues.ToArray());
+			int month = EditorGUILayout.IntPopup(date.Month, months, monthsInt);
+			int day = EditorGUILayout.IntPopup(date.Day, daysNames.ToArray(), daysValues.ToArray());
+
+			date.SetYear(year);
+			date.SetMonth(month);
+			date.SetDay(day);
+
+			field.SetValue(this, date);
+
+			EditorGUILayout.EndHorizontal();
+		}
+
 		private void ValidateField(FieldInfo field)
 		{
 			object[] attrs = null;
