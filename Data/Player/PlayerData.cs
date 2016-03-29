@@ -31,12 +31,10 @@ namespace Zedarus.ToolKit.Data.Player
 		public PlayerData()
 		{
 			_models = new Dictionary<string, IPlayerDataModel>();
-			EventManager.AddListener(IDs.Events.GameDataUpdated, OnGameDataUpdated);
 		}
 
 		protected virtual void SetupModelsList()
 		{
-			
 		}
 		#endregion
 
@@ -95,13 +93,6 @@ namespace Zedarus.ToolKit.Data.Player
 		public DateTime Timestamp
 		{
 			get { return _timestamp; }
-		}
-		#endregion
-
-		#region Event Handlers
-		protected virtual void OnGameDataUpdated()
-		{
-			
 		}
 		#endregion
 

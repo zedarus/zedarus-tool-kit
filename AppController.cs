@@ -21,9 +21,6 @@ namespace Zedarus.ToolKit
 		{
 			if (!initialized)
 				Init();
-
-			Launch();
-			//Destroy(gameObject);
 		}
 		#endregion
 
@@ -69,7 +66,7 @@ namespace Zedarus.ToolKit
 			}
 		}
 
-		protected virtual void Launch()
+		public virtual void Launch()
 		{
 			
 		}
