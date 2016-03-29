@@ -78,6 +78,8 @@ namespace Zedarus.ToolKit.Data
 			if (Game != null)
 			{
 				Game.ApplyRemoteData(json);
+				if (Player != null)
+					Player.OnGameDataChange();
 			}
 			else
 			{

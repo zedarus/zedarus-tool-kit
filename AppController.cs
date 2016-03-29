@@ -28,11 +28,15 @@ namespace Zedarus.ToolKit
 		private void Init()
 		{
 			InitEvents();
-			InitAPI();
-			APIManager.Instance.Init();
 
 			InitGameData();
 			InitPlayerData("default.dat");
+
+			// It's important to initalize APIs after data because:
+			// - they rely on some data values heavily
+			// - remote game data is loaded through APIs, so we need to make sure to load local data first
+			InitAPI();
+			APIManager.Instance.Init();
 			
 			initialized = true;
 		}
@@ -40,11 +44,6 @@ namespace Zedarus.ToolKit
 		protected virtual void InitEvents()
 		{
 			IDs.Init();
-		}
-
-		protected virtual void InitAPI()
-		{
-			
 		}
 
 		protected virtual void InitGameData()
@@ -66,9 +65,15 @@ namespace Zedarus.ToolKit
 			}
 		}
 
+		protected virtual void InitAPI()
+		{
+
+		}
+
 		public virtual void Launch()
 		{
-			
+			if (Data.Player != null)
+				Data.Player.PostInit();
 		}
 		#endregion
 

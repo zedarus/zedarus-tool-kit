@@ -58,6 +58,11 @@ namespace Zedarus.ToolKit.Data.Player
 		#endregion
 
 		#region Controls
+		public virtual void PostInit()
+		{
+			
+		}
+
 		public void AddModel<T>() where T : IPlayerDataModel
 		{
 			string t = typeof(T).FullName;
@@ -72,6 +77,11 @@ namespace Zedarus.ToolKit.Data.Player
 		{
 			_buildNumber = build;
 			_timestamp = DateTime.UtcNow;
+		}
+
+		public void OnGameDataChange()
+		{
+			PostInit();
 		}
 		#endregion
 		
