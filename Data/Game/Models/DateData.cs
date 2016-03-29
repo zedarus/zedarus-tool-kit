@@ -57,6 +57,11 @@ namespace Zedarus.ToolKit.Data.Game
 		{
 			get { return _day; }
 		}
+
+		public DateTime Date
+		{
+			get { return new DateTime(Year, Month, Day); }
+		}
 		#endregion
 	}
 }

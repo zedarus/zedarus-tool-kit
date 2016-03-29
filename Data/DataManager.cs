@@ -45,6 +45,8 @@ namespace Zedarus.ToolKit.Data
 				Game.ApplyRemoteData(_queuedRemoteData);
 				_queuedRemoteData = null;
 			}
+
+			EventManager.SendEvent(IDs.Events.GameDataUpdated);
 		}
 
 		public void LoadPlayerData(string dataFilename)
@@ -78,6 +80,7 @@ namespace Zedarus.ToolKit.Data
 			if (Game != null)
 			{
 				Game.ApplyRemoteData(json);
+				EventManager.SendEvent(IDs.Events.GameDataUpdated);
 			}
 			else
 			{
