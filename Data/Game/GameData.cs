@@ -52,12 +52,12 @@ namespace Zedarus.ToolKit.Data.Game
 		public void ApplyRemoteData(string json)
 		{
 			float t = Time.realtimeSinceStartup;
-			JsonData data = JsonMapper.ToObject(json);
+			JsonData jasonData = JsonMapper.ToObject(json);
 
 			FieldInfo[] fields = GetFields(this);
 			foreach (FieldInfo field in fields)
 			{
-				if (data.Keys.Contains(field.Name))
+				if (jasonData.Keys.Contains(field.Name))
 				{
 					if (field.FieldType.GetInterface("IList") != null)
 					{
@@ -68,24 +68,31 @@ namespace Zedarus.ToolKit.Data.Game
 
 							if (list != null)
 							{
-								for (int i = 0; i < data[field.Name].Count; i++)
+								for (int i = 0; i < jasonData[field.Name].Count; i++)
 								{
 									try
 									{
-										IGameDataModel model = JsonUtility.FromJson(data[field.Name][i].ToJson(), dataField.Type) as IGameDataModel;
+										IGameDataModel model = JsonUtility.FromJson(jasonData[field.Name][i].ToJson(), dataField.Type) as IGameDataModel;
 										if (model != null)
 										{
+											bool modelFound = false;
 											foreach (IGameDataModel currentModel in list)
 											{
 												if (currentModel.ID.Equals(model.ID))
 												{
-													currentModel.OverrideValuesFrom(data[field.Name][i].ToJson());
+													modelFound = true;
+													currentModel.OverrideValuesFrom(jasonData[field.Name][i].ToJson());
 													break;
 												}
 											}
+
+											if (!modelFound)
+											{
+												list.Add(model);
+											}
 										}
 									}
-									catch (System.Exception e) 
+									catch (System.Exception e)
 									{
 										Debug.Log(e.ToString());
 									}
@@ -98,9 +105,9 @@ namespace Zedarus.ToolKit.Data.Game
 						try
 						{
 							IGameDataModel currentModel = field.GetValue(this) as IGameDataModel;
-							currentModel.OverrideValuesFrom(data[field.Name].ToJson());
+							currentModel.OverrideValuesFrom(jasonData[field.Name].ToJson());
 						}
-						catch (System.Exception e) 
+						catch (System.Exception e)
 						{
 							Debug.Log(e.ToString());
 						}
