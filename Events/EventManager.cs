@@ -334,17 +334,4 @@ namespace Zedarus.ToolKit.Events
 		}
 		#endregion
 	}
-
-	/*public class EventManagerProcessor : MonoBehaviour
-	{
-		private void Start()
-		{
-			DontDestroyOnLoad(gameObject);
-		}
-
-		private void Update()
-		{
-			EventManager.Update();
-		}
-	}*/
 }
