@@ -57,6 +57,15 @@ namespace Zedarus.ToolKit.PoolManagement
 
 		public PoolManager(Transform container, int size, T prefab, bool autoReuse = false) : this(container, size, autoReuse, new T[] { prefab }, 1) { }
 
+		public virtual void ReturnInactiveItemsToPool()
+		{
+			for (int i = _active.Count - 1; i >= 0; i--)
+			{
+				if (_active[i].ReturnToPool)
+					ReturnItemToPoolAtIndex(i);
+			}
+		}
+
 		public virtual T GetItemFromPool()
 		{
 			if (_pool.Count > 0)

@@ -8,5 +8,6 @@ namespace Zedarus.ToolKit.PoolManagement
 		void Init();
 		void Activate(Vector3 position);
 		void Deactivate();
+		bool ReturnToPool { get; }
 	}
 }
