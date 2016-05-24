@@ -212,7 +212,7 @@ namespace Zedarus.ToolKit.Data.Game
 				}
 			}
 
-			int newID = 0;
+			int newID = 1;
 
 			if (maxID >= 0)
 				newID = maxID + Random.Range(1, 32);
