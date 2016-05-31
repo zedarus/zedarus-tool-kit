@@ -9,21 +9,14 @@ namespace Zedarus.ToolKit.UI.Elements
 		#region Properties
 		private UICarouselScrollSettings _settings;
 		private int _page;
-		private float _pageWidth;
 		private float _dragDistance;
 		#endregion
 
 		#region Init
-		public UICarouselScroll(float pageWidth, UICarouselScrollSettings settings)
+		public UICarouselScroll(UICarouselScrollSettings settings)
 		{
 			_page = 0;
-			_pageWidth = pageWidth;
 			_settings = settings;
-
-			foreach (UICarouselScrollLayer layer in _settings.Layers)
-			{
-				layer.Init(_pageWidth);
-			}
 		}
 
 		public void CreatePage(IUICarouselScrollPage page, int layer)
@@ -40,7 +33,7 @@ namespace Zedarus.ToolKit.UI.Elements
 		#endregion
 
 		#region Controls
-		public void Update(float deltaTime, bool drag)
+		public void Update(float deltaTime)
 		{
 			foreach (UICarouselScrollLayer layer in _settings.Layers)
 			{
@@ -98,21 +91,10 @@ namespace Zedarus.ToolKit.UI.Elements
 			return result;
 		}
 
-		private float GetPageWidth(int layer)
-		{
-			return PageWidth;
-		}
-
 		private float SwipeThreshold
 		{
-			get { return PageWidth * _settings.SwipeThreshold; } 
-		}
-		#endregion
-
-		#region Getters
-		private float PageWidth
-		{
-			get { return _pageWidth; }
+			// TODO: use different value here
+			get { return _settings.Layers[0].PageWidth * _settings.SwipeThreshold; } 
 		}
 		#endregion
 	}

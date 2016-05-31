@@ -7,6 +7,6 @@ namespace Zedarus.ToolKit.UI.Elements
 	{
 		void InitAsPage(float pageWidth, float parallax);
 		Transform PageTransform { get; }
-		float PageSize { get; }
+		float GraphicsSize { get; }
 	}
 }

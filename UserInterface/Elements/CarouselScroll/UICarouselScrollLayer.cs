@@ -17,8 +17,8 @@ namespace Zedarus.ToolKit.UI.Elements
 		[Range(0f, 0.5f)]
 		private float _nextPageShowPercent = 0f;	// how much of a surface area of next page should be visible on screen
 
-		[SerializeField] 
-		private bool _pullAllowed = false;
+//		[SerializeField] 
+//		private bool _pullAllowed = false;
 
 		[SerializeField]
 		[Range(0f, 1f)]
@@ -32,34 +32,85 @@ namespace Zedarus.ToolKit.UI.Elements
 		[SerializeField]
 		[Range(0.0001f, 1f)]
 		private float _speedEasing = 0.5f;
+
+		/*[Header("Page size providers")]
+		[SerializeField]
+		private RectTransform _canvas = null;
+
+		[SerializeField]
+		private Camera _worldCamera = null;*/
 		#endregion
 
 		#region Properties
-		private float _pageWidth;
 		private int _pages = 0;
+		private float _dragScale = 1f;
+		private float _pageWidth = 0;
 		private float _scrollPosition = 0;
 		private float _targetScrollPosition = 0;
 		private float _velocity = 0f;
 		private float _targetVelocity = 0f;
-		#endregion
-
-		#region Init
-		public void Init(float pageWidth)
-		{
-			_pageWidth = pageWidth;
-		}
+		private bool _pageSizeCached = false;
 		#endregion
 
 		#region Controls
 		public void CreatePage(IUICarouselScrollPage page)
 		{
+			if (!_pageSizeCached && _pivot != null)
+			{
+				if (_pivot is RectTransform)
+				{
+					RectTransform c = GetCanvasTransform(_pivot as RectTransform);
+					if (c != null)
+					{
+						_pageWidth = c.sizeDelta.x;
+						_dragScale = 1f;
+					}
+				}
+				else
+				{
+					Vector3 p1 = Camera.main.ViewportToWorldPoint(new Vector2(0f, 0f));
+					Vector3 p2 = Camera.main.ViewportToWorldPoint(new Vector2(1f, 0f));
+
+					_pageWidth = Vector3.Distance(p1, p2);
+
+					p1 = Camera.main.ViewportToScreenPoint(new Vector2(0f, 0f));
+					p2 = Camera.main.ViewportToScreenPoint(new Vector2(1f, 0f));
+
+					float screenWidth = Vector2.Distance(p1, p2);
+
+					_dragScale = _pageWidth / screenWidth;
+				}
+
+				/*if (_canvas != null)
+				{
+					_pageWidth = _canvas.sizeDelta.x;
+					_dragScale = 1f;
+				}
+				else
+				{
+					Vector3 p1 = _worldCamera.ViewportToWorldPoint(new Vector2(0f, 0f));
+					Vector3 p2 = _worldCamera.ViewportToWorldPoint(new Vector2(1f, 0f));
+
+					_pageWidth = Vector3.Distance(p1, p2);
+
+					p1 = _worldCamera.ViewportToScreenPoint(new Vector2(0f, 0f));
+					p2 = _worldCamera.ViewportToScreenPoint(new Vector2(1f, 0f));
+
+					float screenWidth = Vector2.Distance(p1, p2);
+
+					_dragScale = _pageWidth / screenWidth;
+				}*/
+
+				_pageSizeCached = true;
+			}
+
 			if (_nextPageShowPercent > 0f)
 			{
-				float pageSize = PageWidth * 0.5f - (page.PageSize * _nextPageShowPercent) + page.PageSize * 0.5f;
+				float pageSize = PageWidth * 0.5f - (page.GraphicsSize * _nextPageShowPercent) + page.GraphicsSize * 0.5f;
 				_parallax = pageSize / PageWidth;
 			}
 
-			page.InitAsPage(_pageWidth, Parallax);
+			page.InitAsPage(PageWidth, Parallax);
 
 			Vector3 scale = page.PageTransform.localScale;
 			page.PageTransform.SetParent(Pivot);
@@ -80,7 +131,7 @@ namespace Zedarus.ToolKit.UI.Elements
 
 		public void Drag(float delta)
 		{
-			TargetScrollPosition += delta;
+			TargetScrollPosition += delta * _dragScale; 
 		}
 
 		public bool ShowPage(int page, bool tween = true)
@@ -103,13 +154,47 @@ namespace Zedarus.ToolKit.UI.Elements
 		}
 		#endregion
 
+		#region Helpers
+		private RectTransform GetCanvasTransform(RectTransform t)
+		{
+			int attempts = 100;
+			while (attempts > 0)
+			{
+				if (t.GetComponent<Canvas>() != null)
+				{
+					return t;
+				}
+				else if (t.parent != null)
+				{
+					RectTransform parent = t.parent.GetComponent<RectTransform>();
+					if (parent != null)
+					{
+						t = parent;
+					}
+					else
+					{
+						break;
+					}
+				}
+				else
+				{
+					break;
+				}
+
+				attempts--;
+			}
+
+			return null;
+		}
+		#endregion
+
 		#region Getters
 		private float ScrollPosition
 		{
 			get { return _scrollPosition; }
 			set 
 			{
-				if (_pullAllowed)
+				if (PullAllowed)
 					_scrollPosition = value; 
 				else
 					_scrollPosition = Mathf.Clamp(value, MinDrag, MaxDrag);
@@ -137,16 +222,14 @@ namespace Zedarus.ToolKit.UI.Elements
 			get { return _parallax; }
 		}
 
-		private float PageWidth
+		public float PageWidth
 		{
 			get { return _pageWidth; }
 		}
 
 		private float MinDrag
 		{
-			// TODO: use scale here
 			get { return -((Pages - 1) * PageWidth) - PullDistance; }
-//			return -((MaxPages - 1) * PageWidth * _scale) - (allowOffBoard ? OffBorderDragDistance : 0f);
 		}
 
 		private float MaxDrag
@@ -156,7 +239,7 @@ namespace Zedarus.ToolKit.UI.Elements
 
 		private float PullDistance
 		{
-			get { return _pullAllowed ? PageWidth * _pullPercentFromPageWidth : 0f; }
+			get { return PullAllowed ? PageWidth * _pullPercentFromPageWidth : 0f; }
 		}
 
 		private float ScrollSpeed
@@ -167,6 +250,11 @@ namespace Zedarus.ToolKit.UI.Elements
 		private float SpeedEasing
 		{
 			get { return _speedEasing; }
+		}
+
+		private bool PullAllowed
+		{
+			get { return _pullPercentFromPageWidth > 0f; }
 		}
 		#endregion
 	}
