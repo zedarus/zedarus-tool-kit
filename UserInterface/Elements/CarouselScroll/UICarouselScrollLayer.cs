@@ -42,12 +42,18 @@ namespace Zedarus.ToolKit.UI.Elements
 		#region Controls
 		public void CreatePage(IUICarouselScrollPage page)
 		{
+			if (_nextPageShowPercent > 0f)
+			{
+				float pageSize = PageWidth * 0.5f - (page.PageSize * _nextPageShowPercent) + page.PageSize * 0.5f;
+				_parallax = pageSize / PageWidth;
+			}
+
 			page.InitAsPage(_pageWidth, Parallax);
 
 			Vector3 scale = page.PageTransform.localScale;
 			page.PageTransform.SetParent(Pivot);
 			page.PageTransform.localScale = scale;
-			page.PageTransform.localPosition = new Vector2(PageWidth * Pages, 0);
+			page.PageTransform.localPosition = new Vector2(PageWidth * Parallax * Pages, 0);
 
 			_pages++;
 		}
