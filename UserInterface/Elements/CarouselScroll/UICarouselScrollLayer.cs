@@ -23,6 +23,15 @@ namespace Zedarus.ToolKit.UI.Elements
 		[SerializeField]
 		[Range(0f, 1f)]
 		private float _pullPercentFromPageWidth = 0.5f;
+
+		[Header("Scroll Settings")]
+		[SerializeField]
+		[Range(0.1f, 100f)]
+		private float _scrollSpeed = 10f;
+
+		[SerializeField]
+		[Range(0.0001f, 1f)]
+		private float _speedEasing = 0.5f;
 		#endregion
 
 		#region Properties
@@ -30,6 +39,8 @@ namespace Zedarus.ToolKit.UI.Elements
 		private int _pages = 0;
 		private float _scrollPosition = 0;
 		private float _targetScrollPosition = 0;
+		private float _velocity = 0f;
+		private float _targetVelocity = 0f;
 		#endregion
 
 		#region Init
@@ -58,27 +69,29 @@ namespace Zedarus.ToolKit.UI.Elements
 			_pages++;
 		}
 
-		public void Update(float easing)
+		public void Update(float deltaTime)
 		{
-			_scrollPosition += (_targetScrollPosition - _scrollPosition) * easing;
-			Pivot.localPosition = new Vector2(_scrollPosition * Parallax, 0);
+			_targetVelocity = (TargetScrollPosition - ScrollPosition);
+			_velocity += (_targetVelocity - _velocity) * SpeedEasing;
+			ScrollPosition += _velocity * ScrollSpeed * deltaTime;
+
+			Pivot.localPosition = new Vector2(ScrollPosition * Parallax, 0);
 		}
 
 		public void Drag(float delta)
 		{
-			_targetScrollPosition = Mathf.Clamp(_targetScrollPosition + delta, MinDrag, MaxDrag);
+			TargetScrollPosition += delta;
 		}
 
 		public bool ShowPage(int page, bool tween = true)
 		{
 			if (page >= 0 && page < Pages)
 			{
-//				_targetDrag = -_pageWidth * _scale * page;
-				_targetScrollPosition = -PageWidth * page;
+				TargetScrollPosition = -PageWidth * page;
 
 				if (!tween) 
 				{
-					_scrollPosition = _targetScrollPosition;
+					ScrollPosition = TargetScrollPosition;
 				}
 
 				return true;
@@ -91,6 +104,24 @@ namespace Zedarus.ToolKit.UI.Elements
 		#endregion
 
 		#region Getters
+		private float ScrollPosition
+		{
+			get { return _scrollPosition; }
+			set 
+			{
+				if (_pullAllowed)
+					_scrollPosition = value; 
+				else
+					_scrollPosition = Mathf.Clamp(value, MinDrag, MaxDrag);
+			}
+		}
+
+		private float TargetScrollPosition
+		{
+			get { return _targetScrollPosition; }
+			set { _targetScrollPosition = Mathf.Clamp(value, MinDrag, MaxDrag); }
+		}
+
 		private Transform Pivot
 		{
 			get { return _pivot; }
@@ -126,6 +157,16 @@ namespace Zedarus.ToolKit.UI.Elements
 		private float PullDistance
 		{
 			get { return _pullAllowed ? PageWidth * _pullPercentFromPageWidth : 0f; }
+		}
+
+		private float ScrollSpeed
+		{
+			get { return _scrollSpeed; }
+		}
+
+		private float SpeedEasing
+		{
+			get { return _speedEasing; }
 		}
 		#endregion
 	}

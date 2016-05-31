@@ -42,10 +42,9 @@ namespace Zedarus.ToolKit.UI.Elements
 		#region Controls
 		public void Update(float deltaTime, bool drag)
 		{
-			float easing = _settings.GetEasing(deltaTime);
 			foreach (UICarouselScrollLayer layer in _settings.Layers)
 			{
-				layer.Update(easing);
+				layer.Update(deltaTime);
 			}
 		}
 
