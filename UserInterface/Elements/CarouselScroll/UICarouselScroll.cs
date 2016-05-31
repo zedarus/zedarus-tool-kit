@@ -12,6 +12,10 @@ namespace Zedarus.ToolKit.UI.Elements
 		private float _dragDistance;
 		#endregion
 
+		#region Events
+		public event System.Action<int, int> UpdateNavigation;
+		#endregion
+
 		#region Init
 		public UICarouselScroll(UICarouselScrollSettings settings)
 		{
@@ -72,10 +76,20 @@ namespace Zedarus.ToolKit.UI.Elements
 
 			ShowPage(_page);
 		}
+
+		public void NextPage()
+		{
+			ShowPage(_page + 1);
+		}
+
+		public void PreviousPage()
+		{
+			ShowPage(_page - 1);
+		}
 		#endregion
 
 		#region Helpers
-		private bool ShowPage(int page, bool tween = true)
+		public bool ShowPage(int page, bool tween = true)
 		{
 			bool result = true;
 
@@ -86,7 +100,14 @@ namespace Zedarus.ToolKit.UI.Elements
 			}
 
 			if (result)
+			{
 				_page = page;
+
+				if (UpdateNavigation != null)
+				{
+					UpdateNavigation(_page, MaxPages);		
+				}
+			}
 
 			return result;
 		}
@@ -95,6 +116,22 @@ namespace Zedarus.ToolKit.UI.Elements
 		{
 			// TODO: use different value here
 			get { return _settings.Layers[0].PageWidth * _settings.SwipeThreshold; } 
+		}
+		#endregion
+
+		#region Getters
+		private int MaxPages
+		{
+			get 
+			{
+				int pages = 0;
+				foreach (UICarouselScrollLayer layer in _settings.Layers)
+				{
+					if (layer.Pages > pages)
+						pages = layer.Pages;
+				}
+				return pages;
+			}
 		}
 		#endregion
 	}

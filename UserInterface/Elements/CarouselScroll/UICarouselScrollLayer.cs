@@ -212,7 +212,7 @@ namespace Zedarus.ToolKit.UI.Elements
 			get { return _pivot; }
 		}
 
-		private int Pages
+		public int Pages
 		{
 			get { return _pages; }
 		}
