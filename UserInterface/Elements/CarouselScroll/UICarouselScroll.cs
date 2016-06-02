@@ -120,6 +120,11 @@ namespace Zedarus.ToolKit.UI.Elements
 		#endregion
 
 		#region Getters
+		public int CurrentPage
+		{
+			get { return _page; }
+		}
+
 		private int MaxPages
 		{
 			get 
