@@ -26,7 +26,7 @@ namespace Zedarus.ToolKit.PoolManagement
 				_pool.Add(child);
 			}
 
-			if (_pool.Count < size && prefabs != null && prefabs.Length > 0)
+			if (_pool.Count < size && prefabs != null && prefabs.Length > 0 && prefabs[0] != null)
 			{
 				ShuffleBag<int> bag = new ShuffleBag<int>();
 				for (int i = 0; i < prefabs.Length; i++)
@@ -37,12 +37,18 @@ namespace Zedarus.ToolKit.PoolManagement
 				int attempts = size + 200;
 				while (_pool.Count < size && attempts > 0)
 				{
-					T newPoolObject = GameObject.Instantiate(prefabs[bag.Next()]) as T;
-					if (newPoolObject != null)
+					T prefab = prefabs[bag.Next()];
+					if (prefab != null)
 					{
-						newPoolObject.transform.parent = container;
-						newPoolObject.Init();
-						_pool.Add(newPoolObject);
+						T newPoolObject = GameObject.Instantiate(prefabs[bag.Next()]) as T;
+						if (newPoolObject != null)
+						{
+							newPoolObject.transform.parent = container;
+							newPoolObject.Init();
+							_pool.Add(newPoolObject);
+						}
+						else
+							attempts--;
 					}
 					else
 						attempts--;
@@ -56,6 +62,8 @@ namespace Zedarus.ToolKit.PoolManagement
 		}
 
 		public PoolManager(Transform container, int size, T prefab, bool autoReuse = false) : this(container, size, autoReuse, new T[] { prefab }, 1) { }
+
+		public PoolManager(Transform container, int size, bool autoReuse = false) : this(container, size, null, autoReuse) { }
 
 		public virtual void ReturnInactiveItemsToPool()
 		{
