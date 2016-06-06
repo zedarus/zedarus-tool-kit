@@ -53,7 +53,7 @@ namespace Zedarus.ToolKit.UI
 		#endregion
 
 		#region Controls
-		public void ProcessCustomData(IUIScreenData customData)
+		public virtual void ProcessCustomData(IUIScreenData customData)
 		{
 			if (customData != null)
 			{
@@ -64,8 +64,15 @@ namespace Zedarus.ToolKit.UI
 				_closePopupOnPress = data.ClosePopupOnPress;
 
 				if (data.Color.HasValue)
-					_colorElement.color = data.Color.Value;
+					ApplyColor(data.Color.Value);
 			}
+		}
+		#endregion
+
+		#region Helpers
+		protected virtual void ApplyColor(Color color)
+		{
+			_colorElement.color = color;
 		}
 		#endregion
 	}
