@@ -81,6 +81,9 @@ namespace Zedarus.ToolKit.UI
 		private Color? _color;
 		private System.Action _callback;
 		private bool _closePopupOnPress;
+		private float _hue;
+		private float _saturation;
+		private float _value;
 		#endregion
 
 		#region Init
@@ -90,30 +93,28 @@ namespace Zedarus.ToolKit.UI
 			_callback = null;
 			_color = null;
 			_closePopupOnPress = true;
+			_hue = 0f;
+			_saturation = 1f;
+			_value = 1f;
 		}
 
-		public UIGenericPopupButtonData(string label, System.Action callback, bool closePopupOnPress = true)
+		public UIGenericPopupButtonData(string label, System.Action callback, bool closePopupOnPress = true) : this(label)
 		{
-			_label = label;
 			_callback = callback;
 			_color = null;
 			_closePopupOnPress = closePopupOnPress;
 		}
 
-		public UIGenericPopupButtonData(string label, System.Action callback, Color color, bool closePopupOnPress = true)
+		public UIGenericPopupButtonData(string label, System.Action callback, Color color, bool closePopupOnPress = true) : this(label, callback, closePopupOnPress)
 		{
-			_label = label;
-			_callback = callback;
 			_color = color;
-			_closePopupOnPress = closePopupOnPress;
 		}
 
-		public UIGenericPopupButtonData(string label, System.Action callback, byte red, byte green, byte blue, byte alpha = 255, bool closePopupOnPress = true)
+		public UIGenericPopupButtonData(string label, System.Action callback, float hueShift, float saturation = 1f, float value = 1f, bool closePopupOnPress = true) : this(label, callback, closePopupOnPress)
 		{
-			_label = label;
-			_callback = callback;
-			_color = new Color32(red, green, blue, alpha);
-			_closePopupOnPress = closePopupOnPress;
+			_hue = hueShift;
+			_saturation = saturation;
+			_value = value;
 		}
 
 		public void Clear()
@@ -143,6 +144,21 @@ namespace Zedarus.ToolKit.UI
 		public bool ClosePopupOnPress
 		{
 			get { return _closePopupOnPress; }
+		}
+
+		public float HueShift
+		{
+			get { return _hue; }
+		}
+
+		public float Saturation
+		{
+			get { return _saturation; }
+		}
+
+		public float Value
+		{
+			get { return _value; }
 		}
 		#endregion
 	}

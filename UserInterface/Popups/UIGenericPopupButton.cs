@@ -65,6 +65,8 @@ namespace Zedarus.ToolKit.UI
 
 				if (data.Color.HasValue)
 					ApplyColor(data.Color.Value);
+
+				ApplyColorShift(data.HueShift, data.Saturation, data.Value);
 			}
 		}
 		#endregion
@@ -73,6 +75,11 @@ namespace Zedarus.ToolKit.UI
 		protected virtual void ApplyColor(Color color)
 		{
 			_colorElement.color = color;
+		}
+
+		protected virtual void ApplyColorShift(float hueShift, float saturation, float value)
+		{
+			
 		}
 		#endregion
 	}
