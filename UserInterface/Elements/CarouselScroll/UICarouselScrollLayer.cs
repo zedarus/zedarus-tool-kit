@@ -14,11 +14,8 @@ namespace Zedarus.ToolKit.UI.Elements
 		private float _parallax = 1f;
 
 		[SerializeField] 
-		[Range(0f, 0.5f)]
+		[Range(0f, 2f)]
 		private float _nextPageShowPercent = 0f;	// how much of a surface area of next page should be visible on screen
-
-//		[SerializeField] 
-//		private bool _pullAllowed = false;
 
 		[SerializeField]
 		[Range(0f, 1f)]
@@ -32,13 +29,6 @@ namespace Zedarus.ToolKit.UI.Elements
 		[SerializeField]
 		[Range(0.0001f, 1f)]
 		private float _speedEasing = 0.5f;
-
-		/*[Header("Page size providers")]
-		[SerializeField]
-		private RectTransform _canvas = null;
-
-		[SerializeField]
-		private Camera _worldCamera = null;*/
 		#endregion
 
 		#region Properties
@@ -80,26 +70,6 @@ namespace Zedarus.ToolKit.UI.Elements
 
 					_dragScale = _pageWidth / screenWidth;
 				}
-
-				/*if (_canvas != null)
-				{
-					_pageWidth = _canvas.sizeDelta.x;
-					_dragScale = 1f;
-				}
-				else
-				{
-					Vector3 p1 = _worldCamera.ViewportToWorldPoint(new Vector2(0f, 0f));
-					Vector3 p2 = _worldCamera.ViewportToWorldPoint(new Vector2(1f, 0f));
-
-					_pageWidth = Vector3.Distance(p1, p2);
-
-					p1 = _worldCamera.ViewportToScreenPoint(new Vector2(0f, 0f));
-					p2 = _worldCamera.ViewportToScreenPoint(new Vector2(1f, 0f));
-
-					float screenWidth = Vector2.Distance(p1, p2);
-
-					_dragScale = _pageWidth / screenWidth;
-				}*/
 
 				_pageSizeCached = true;
 			}
