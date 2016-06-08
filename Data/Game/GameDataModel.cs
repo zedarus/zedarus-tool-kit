@@ -192,8 +192,6 @@ namespace Zedarus.ToolKit.Data.Game
 
 		protected void RenderArrayField(FieldInfo field, DataField attribute)
 		{
-			EditorGUILayout.Space();
-
 			System.Array array = field.GetValue(this) as System.Array;
 			System.Type arrayElementType = field.FieldType.GetElementType();
 			var listType = typeof(List<>).MakeGenericType(arrayElementType);
