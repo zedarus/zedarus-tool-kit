@@ -3,6 +3,7 @@
 using UnityEditor;
 #endif
 using System.Reflection;
+using System.Collections;
 using System.Collections.Generic;
 using LitJson;
 
@@ -126,6 +127,8 @@ namespace Zedarus.ToolKit.Data.Game
 				RenderBoolField(field, attribute);
 			else if (field.FieldType.IsEnum)
 				RenderEnumField(field, attribute);
+			else if (field.FieldType.IsArray)
+				RenderArrayField(field, attribute);
 			else if (field.FieldType.GetInterface(typeof(IGameDataModel).Name) != null)
 				RenderIGameDataModelField(field, attribute, fieldCount);
 			else
@@ -169,6 +172,155 @@ namespace Zedarus.ToolKit.Data.Game
 		protected virtual void RenderUnhandledEditorField(FieldInfo field, DataField attribute)
 		{
 			
+		}
+
+		private T GetAttribute<T>(FieldInfo field) where T : PropertyAttribute
+		{
+			object[] attributes = field.GetCustomAttributes(typeof(T), true);
+
+			foreach (object attribute in attributes)
+			{
+				T a = attribute as T;
+				if (a != null)
+				{
+					return a;
+				}
+			}
+
+			return null;
+		}
+
+		protected void RenderArrayField(FieldInfo field, DataField attribute)
+		{
+			EditorGUILayout.Space();
+
+			System.Array array = field.GetValue(this) as System.Array;
+			System.Type arrayElementType = field.FieldType.GetElementType();
+			var listType = typeof(List<>).MakeGenericType(arrayElementType);
+			IList list = (IList)System.Activator.CreateInstance(listType);
+
+			for (int i = 0; i < array.Length; i++)
+			{
+				list.Add(array.GetValue(i));
+			}
+
+			if (list.Count == 0)
+			{
+				EditorGUILayout.BeginHorizontal();
+				EditorGUILayout.PrefixLabel(attribute.EditorLabel + string.Format(" ({0:N0})", list.Count));
+			}
+
+			int indexToRemove = -1;
+			string label = "";
+			for (int i = 0; i < list.Count; i++)
+			{
+				label = string.Format("Element {0:D}", i);
+				EditorGUILayout.BeginHorizontal();
+
+				if (i == 0)
+				{
+					EditorGUILayout.PrefixLabel(attribute.EditorLabel + string.Format(" ({0:N0})", list.Count));
+				}
+				else
+				{
+					GUILayout.Space(EditorGUIUtility.labelWidth);
+				}
+
+				if (arrayElementType == typeof(string))
+				{
+					list[i] = EditorGUILayout.TextField(label, list[i] as string);
+				}
+				else if (arrayElementType == typeof(int))
+				{
+					UnityEngine.RangeAttribute rangeAttr = GetAttribute<UnityEngine.RangeAttribute>(field);
+
+					if (rangeAttr != null)
+					{
+						list[i] = EditorGUILayout.IntSlider(label, (int)list[i], Mathf.FloorToInt(rangeAttr.min), Mathf.FloorToInt(rangeAttr.max));
+					}
+					else
+					{
+						list[i] = EditorGUILayout.IntField(label, (int)list[i]);
+					}
+				}
+				else if (arrayElementType == typeof(float))
+				{
+					UnityEngine.RangeAttribute rangeAttr = GetAttribute<UnityEngine.RangeAttribute>(field);
+
+					if (rangeAttr != null)
+					{
+						list[i] = EditorGUILayout.Slider(label, (float)list[i], rangeAttr.min, rangeAttr.max);
+					}
+					else
+					{
+						list[i] = EditorGUILayout.FloatField(label, (float)list[i]);
+					}
+				}
+				else if (arrayElementType == typeof(bool))
+				{
+					list[i] = EditorGUILayout.Toggle(label, (bool)list[i]);
+				}
+				else if (arrayElementType == typeof(AnimationCurve))
+				{
+					list[i] = EditorGUILayout.CurveField(label, (AnimationCurve)list[i]);
+				}
+				else if (arrayElementType.IsEnum)
+				{
+					System.Enum newValue = EditorGUILayout.EnumPopup(label, (System.Enum) System.Enum.Parse(list[i].GetType(), list[i].ToString()));
+					list[i] = System.Convert.ChangeType(newValue, System.Enum.GetUnderlyingType(list[i].GetType()));
+				}
+				else
+				{
+					EditorGUILayout.LabelField(label, "Field type is not supported");
+				}
+
+				if (GUILayout.Button("-", GUILayout.MaxWidth(20)))
+				{
+					if (EditorUtility.DisplayDialog("Warning!", "Are you sure?", "Yes", "No"))
+					{
+						indexToRemove = i;
+					}
+				}
+
+				EditorGUILayout.EndHorizontal();
+			}
+
+			if (indexToRemove >= 0)
+			{
+				list.RemoveAt(indexToRemove);
+			}
+
+			if (list.Count == 0)
+			{
+				if (GUILayout.Button("+", GUILayout.MaxWidth(20)))
+				{
+					list.Add(System.Activator.CreateInstance(arrayElementType));
+				}
+				EditorGUILayout.EndHorizontal();
+			}
+			else
+			{
+				EditorGUILayout.BeginHorizontal();
+				EditorGUILayout.Space();
+
+				if (GUILayout.Button("+", GUILayout.MaxWidth(20)))
+				{
+					list.Add(System.Activator.CreateInstance(arrayElementType));
+				}
+
+				EditorGUILayout.EndHorizontal();
+			}
+
+			EditorGUILayout.Space();
+
+			System.Array newArray = System.Array.CreateInstance(arrayElementType, list.Count);
+
+			for (int i = 0; i < list.Count; i++)
+			{
+				newArray.SetValue(list[i], i);
+			}
+
+			field.SetValue(this, newArray);
 		}
 
 		protected void RenderStringField(FieldInfo field, DataField attribute)
