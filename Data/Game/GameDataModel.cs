@@ -336,13 +336,32 @@ namespace Zedarus.ToolKit.Data.Game
 		protected void RenderIntField(FieldInfo field, DataField attribute)
 		{
 			// TODO: add errors check here too
-			field.SetValue(this, EditorGUILayout.IntField(attribute.EditorLabel, int.Parse(field.GetValue(this).ToString())));
+			UnityEngine.RangeAttribute rangeAttr = GetAttribute<UnityEngine.RangeAttribute>(field);
+
+			if (rangeAttr != null)
+			{
+				field.SetValue(this, EditorGUILayout.IntSlider(attribute.EditorLabel, int.Parse(field.GetValue(this).ToString()), Mathf.FloorToInt(rangeAttr.min), Mathf.FloorToInt(rangeAttr.max)));
+			}
+			else
+			{
+				field.SetValue(this, EditorGUILayout.IntField(attribute.EditorLabel, int.Parse(field.GetValue(this).ToString())));
+			}
 		}
 
 		protected void RenderFloatField(FieldInfo field, DataField attribute)
 		{
 			// TODO: add errors check here too
-			field.SetValue(this, EditorGUILayout.FloatField(attribute.EditorLabel, float.Parse(field.GetValue(this).ToString())));
+			UnityEngine.RangeAttribute rangeAttr = GetAttribute<UnityEngine.RangeAttribute>(field);
+
+			if (rangeAttr != null)
+			{
+				field.SetValue(this, EditorGUILayout.Slider(attribute.EditorLabel, float.Parse(field.GetValue(this).ToString()), rangeAttr.min, rangeAttr.max));
+			}
+			else
+			{
+				field.SetValue(this, EditorGUILayout.FloatField(attribute.EditorLabel, float.Parse(field.GetValue(this).ToString())));
+			}
+
 		}
 
 		protected void RenderBoolField(FieldInfo field, DataField attribute)
