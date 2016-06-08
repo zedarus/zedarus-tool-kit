@@ -49,6 +49,7 @@ namespace Zedarus.ToolKit.Data.Game
 		public bool customFieldPreview = true;
 		public bool autoRender = true;
 		public bool renderWhenIncluded = true;
+		public System.Type foreignKeyFor = null;
 
 		public DataField(string editorLabel)
 		{

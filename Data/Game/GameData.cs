@@ -90,6 +90,8 @@ namespace Zedarus.ToolKit.Data.Game
 											{
 												list.Add(model);
 											}
+
+											model.SetDataReference(this);
 										}
 									}
 									catch (System.Exception e)
@@ -106,6 +108,7 @@ namespace Zedarus.ToolKit.Data.Game
 						{
 							IGameDataModel currentModel = field.GetValue(this) as IGameDataModel;
 							currentModel.OverrideValuesFrom(jasonData[field.Name].ToJson());
+							currentModel.SetDataReference(this);
 						}
 						catch (System.Exception e)
 						{
@@ -176,6 +179,40 @@ namespace Zedarus.ToolKit.Data.Game
 		#region Editor
 		private Dictionary<int, FieldInfo> _tables = new Dictionary<int, FieldInfo>();
 
+		public virtual T[] GetModels<T>()
+		{
+			FieldInfo[] fields = GetFields(this);
+			System.Type targetType = typeof(T);
+			List<T> models = new List<T>();
+
+			foreach (FieldInfo field in fields)
+			{
+				if (field.FieldType.Equals(targetType))	// single value fields
+				{
+					models.Add((T)field.GetValue(this));
+				}
+				else if (field.FieldType.HasElementType)	// Treat arrays
+				{
+					if (field.FieldType.GetElementType().Equals(targetType))
+					{
+//						models.AddRange(field.GetValue(this) as IEnumerable);
+					}
+				}
+				else if (field.FieldType.IsGenericType)	// Treat lists and dictionaries
+				{
+					foreach (System.Type type in field.FieldType.GetGenericArguments())
+					{
+						if (type.Equals(targetType))
+						{
+							models.AddRange(field.GetValue(this) as IEnumerable<T>);
+						}
+					}
+				}
+			}
+
+			return models.ToArray();
+		}
+
 		private void LoadTables()
 		{
 			FieldInfo[] fields = GetFields(this);
@@ -234,7 +271,10 @@ namespace Zedarus.ToolKit.Data.Game
 			IList list = GetListForTable(tableID);
 
 			if (list != null)
+			{
 				list.Add(modelData);
+				modelData.SetDataReference(this);
+			}
 
 			return true;
 		}
@@ -311,7 +351,9 @@ namespace Zedarus.ToolKit.Data.Game
 				DataTable table = GetTableAttributeForField(_tables[tableID]);
 				if (table != null)
 				{
-					return System.Activator.CreateInstance(table.Type, GetNextModelID(tableID)) as IGameDataModel;
+					IGameDataModel model = System.Activator.CreateInstance(table.Type, GetNextModelID(tableID)) as IGameDataModel;
+					model.SetDataReference(this);
+					return model;
 				}
 			}
 
@@ -321,12 +363,21 @@ namespace Zedarus.ToolKit.Data.Game
 		public IGameDataModel GetModelDataAt(int tableID, int modelDataIndex)
 		{
 			IList list = GetListForTable(tableID);
+			IGameDataModel model = null;
+
 			if (list != null && modelDataIndex >= 0 && modelDataIndex < list.Count)
-				return list[modelDataIndex] as IGameDataModel;
+				model = list[modelDataIndex] as IGameDataModel;
 			else if (list == null)
-				return GetSingleModelForTable(tableID);
+				model = GetSingleModelForTable(tableID);
 			else
-				return null;
+				model = null;
+
+			if (model != null)
+			{
+				model.SetDataReference(this);
+			}
+
+			return model;
 		}
 
 		public void RemoveModelDataAt(int tableID, int modelDataIndex)
@@ -376,7 +427,9 @@ namespace Zedarus.ToolKit.Data.Game
 			if (_tables.ContainsKey(tableID))
 			{
 				FieldInfo field = _tables[tableID];
-				return field.GetValue(this) as IGameDataModel;
+				IGameDataModel model = field.GetValue(this) as IGameDataModel;
+				model.SetDataReference(this);
+				return model;
 			}
 			else
 				return null;

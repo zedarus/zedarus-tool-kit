@@ -34,6 +34,31 @@ namespace Zedarus.ToolKit.Data.Game
 
 		#if UNITY_EDITOR
 		#region Helpers - Editor
+		private GameData _dataReference;
+
+		protected GameData DataRererence
+		{
+			get { return _dataReference; }
+		}
+
+		public void SetDataReference(GameData dataReference)
+		{
+			_dataReference = dataReference;
+
+			FieldInfo[] fields = GetFields(this);
+			foreach (FieldInfo field in fields)
+			{
+				if (field.FieldType.GetInterface(typeof(IGameDataModel).Name) != null)
+				{
+					IGameDataModel model = field.GetValue(this) as IGameDataModel;
+					if (model != null)
+					{
+						model.SetDataReference(dataReference);
+					}
+				}
+			}
+		}
+
 		public void RenderForm(bool included)
 		{
 			FieldInfo[] fields = GetFields(this);
@@ -115,6 +140,12 @@ namespace Zedarus.ToolKit.Data.Game
 
 			if (!attribute.autoRender)
 				RenderUnhandledEditorField(field, attribute);
+			else if (attribute.foreignKeyFor != null)
+			{
+				MethodInfo method = this.GetType().GetMethod("RenderForeignKeyField", BindingFlags.Instance | BindingFlags.NonPublic);
+				method = method.MakeGenericMethod(attribute.foreignKeyFor);
+				method.Invoke(this, new object[] { field, attribute });
+			}
 			else if (attribute.customFieldType != DataField.CustomFieldType.Default)
 				RenderCustomEditorForField(field, attribute);
 			else if (field.FieldType == typeof(string))
@@ -174,24 +205,32 @@ namespace Zedarus.ToolKit.Data.Game
 			
 		}
 
-		private T GetAttribute<T>(FieldInfo field) where T : PropertyAttribute
+		protected void RenderForeignKeyField<T>(FieldInfo field, DataField attribute) where T : IGameDataModel
 		{
-			object[] attributes = field.GetCustomAttributes(typeof(T), true);
+			T[] allValues = DataRererence.GetModels<T>();
 
-			foreach (object attribute in attributes)
+			Debug.Log(allValues.Length);
+
+			foreach (T val in allValues)
 			{
-				T a = attribute as T;
-				if (a != null)
-				{
-					return a;
-				}
+				// TODO: use either RenderArrayField code or specific code for options from Traffico
+				// to render list selection of objects depending on if we're using array or a single value
+				// for a foreign key
+				Debug.Log(val.ListName);
 			}
-
-			return null;
+//			string vd = "models: ";
+//			foreach (int v in allValues)
+//			{
+//				vd += v.ToString() + ", ";
+//			}
+//
+//			Debug.Log(vd);
 		}
 
 		protected void RenderArrayField(FieldInfo field, DataField attribute)
 		{
+			
+
 			System.Array array = field.GetValue(this) as System.Array;
 			System.Type arrayElementType = field.FieldType.GetElementType();
 			var listType = typeof(List<>).MakeGenericType(arrayElementType);
@@ -512,6 +551,22 @@ namespace Zedarus.ToolKit.Data.Game
 					ValidateField(currentField);
 				}
 			}
+		}
+
+		private T GetAttribute<T>(FieldInfo field) where T : PropertyAttribute
+		{
+			object[] attributes = field.GetCustomAttributes(typeof(T), true);
+
+			foreach (object attribute in attributes)
+			{
+				T a = attribute as T;
+				if (a != null)
+				{
+					return a;
+				}
+			}
+
+			return null;
 		}
 		#endregion
 		#endif
