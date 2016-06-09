@@ -95,6 +95,11 @@ namespace Zedarus.ToolKit.Data.Game
 
 		public virtual string ListName { get { return "#" + ID.ToString(); } }
 
+		public virtual void RenderPreviewForForeignKey()
+		{
+			
+		}
+
 		protected string RenderPrefabField(string label, string value, System.Type type, bool includePreview, int previewWidth = 100, int previewHeight = 100)
 		{
 			EditorGUILayout.BeginHorizontal();
@@ -241,6 +246,15 @@ namespace Zedarus.ToolKit.Data.Game
 					currentID = EditorGUILayout.IntPopup(attribute.EditorLabel, currentID, strings.ToArray(), values.ToArray());
 					field.SetValue(this, currentID);
 
+					T[] models = DataRererence.GetModels<T>();
+					foreach (T model in models)
+					{
+						if (model.ID.Equals(currentID))
+						{
+							model.RenderPreviewForForeignKey();
+						}
+					}
+
 					if (GUILayout.Button("Open", GUILayout.MaxWidth(40)))
 					{
 						DataRererence.RegisterOpenModelRequest<T>(currentID);
@@ -300,9 +314,22 @@ namespace Zedarus.ToolKit.Data.Game
 						int newValue = EditorGUILayout.IntPopup(label, int.Parse(list[i].ToString()), options, values);
 						list[i] = newValue;
 
+						MethodInfo method = DataRererence.GetType().GetMethod("GetModels", BindingFlags.Instance | BindingFlags.Public);
+						method = method.MakeGenericMethod(modelType);
+						System.Array models = method.Invoke(DataRererence, new object[] {  }) as System.Array;
+
+						for (int index = 0; index < models.Length; index++)
+						{
+							IGameDataModel model = models.GetValue(index) as IGameDataModel;
+							if (model != null && model.ID.Equals(newValue))
+							{
+								model.RenderPreviewForForeignKey();
+							}
+						}
+
 						if (GUILayout.Button("Open", GUILayout.MaxWidth(40)))
 						{
-							MethodInfo method = DataRererence.GetType().GetMethod("RegisterOpenModelRequest", BindingFlags.Instance | BindingFlags.Public);
+							method = DataRererence.GetType().GetMethod("RegisterOpenModelRequest", BindingFlags.Instance | BindingFlags.Public);
 							method = method.MakeGenericMethod(modelType);
 							method.Invoke(DataRererence, new object[] { newValue });
 						}
