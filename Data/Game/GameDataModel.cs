@@ -140,10 +140,10 @@ namespace Zedarus.ToolKit.Data.Game
 
 			if (!attribute.autoRender)
 				RenderUnhandledEditorField(field, attribute);
-			else if (attribute.foreignKeyFor != null)
+			else if (attribute.foreignKeyForTable != null)
 			{
 				MethodInfo method = this.GetType().GetMethod("RenderForeignKeyField", BindingFlags.Instance | BindingFlags.NonPublic);
-				method = method.MakeGenericMethod(attribute.foreignKeyFor);
+				method = method.MakeGenericMethod(attribute.foreignKeyForTable);
 				method.Invoke(this, new object[] { field, attribute });
 			}
 			else if (attribute.customFieldType != DataField.CustomFieldType.Default)
@@ -209,28 +209,44 @@ namespace Zedarus.ToolKit.Data.Game
 		{
 			T[] allValues = DataRererence.GetModels<T>();
 
-			Debug.Log(allValues.Length);
+			List<string> strings = new List<string>();
+			List<int> values = new List<int>();
 
-			foreach (T val in allValues)
+			foreach (T value in allValues)
 			{
-				// TODO: use either RenderArrayField code or specific code for options from Traffico
-				// to render list selection of objects depending on if we're using array or a single value
-				// for a foreign key
-				Debug.Log(val.ListName);
+				strings.Add(value.ListName);
+				values.Add(value.ID);
 			}
-//			string vd = "models: ";
-//			foreach (int v in allValues)
-//			{
-//				vd += v.ToString() + ", ";
-//			}
-//
-//			Debug.Log(vd);
+
+			if (field.FieldType.IsArray)
+			{
+				if (field.FieldType.GetElementType().Equals(typeof(int)))
+				{
+					RenderArrayField(field, attribute, strings.ToArray(), values.ToArray());
+				}
+				else
+				{
+					Debug.LogError("Only int fields are current supported as foreign keys");
+				}
+			}
+			else
+			{
+				if (field.FieldType.Equals(typeof(int)))
+				{
+					int currentID = 0;
+					int.TryParse(field.GetValue(this).ToString(), out currentID);
+
+					field.SetValue(this, EditorGUILayout.IntPopup(attribute.EditorLabel, currentID, strings.ToArray(), values.ToArray()));
+				}
+				else
+				{
+					Debug.LogError("Only int fields are current supported as foreign keys");
+				}
+			}
 		}
 
-		protected void RenderArrayField(FieldInfo field, DataField attribute)
+		protected void RenderArrayField(FieldInfo field, DataField attribute, string[] options = null, int[] values = null)
 		{
-			
-
 			System.Array array = field.GetValue(this) as System.Array;
 			System.Type arrayElementType = field.FieldType.GetElementType();
 			var listType = typeof(List<>).MakeGenericType(arrayElementType);
@@ -269,15 +285,22 @@ namespace Zedarus.ToolKit.Data.Game
 				}
 				else if (arrayElementType == typeof(int))
 				{
-					UnityEngine.RangeAttribute rangeAttr = GetAttribute<UnityEngine.RangeAttribute>(field);
-
-					if (rangeAttr != null)
+					if (options != null && values != null)
 					{
-						list[i] = EditorGUILayout.IntSlider(label, (int)list[i], Mathf.FloorToInt(rangeAttr.min), Mathf.FloorToInt(rangeAttr.max));
+						list[i] = EditorGUILayout.IntPopup(label, int.Parse(list[i].ToString()), options, values);
 					}
 					else
 					{
-						list[i] = EditorGUILayout.IntField(label, (int)list[i]);
+						UnityEngine.RangeAttribute rangeAttr = GetAttribute<UnityEngine.RangeAttribute>(field);
+
+						if (rangeAttr != null)
+						{
+							list[i] = EditorGUILayout.IntSlider(label, (int)list[i], Mathf.FloorToInt(rangeAttr.min), Mathf.FloorToInt(rangeAttr.max));
+						}
+						else
+						{
+							list[i] = EditorGUILayout.IntField(label, (int)list[i]);
+						}
 					}
 				}
 				else if (arrayElementType == typeof(float))
