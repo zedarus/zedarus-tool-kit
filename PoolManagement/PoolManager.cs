@@ -61,7 +61,7 @@ namespace Zedarus.ToolKit.PoolManagement
 			prefabs = null;
 		}
 
-		public PoolManager(Transform container, int size, bool autoReuse, T prefab) : this(container, size, autoReuse, new T[] { prefab }, 1) { }
+		public PoolManager(T prefab, Transform container, int size, bool autoReuse) : this(container, size, autoReuse, new T[] { prefab }, 1) { }
 
 		public virtual void ReturnInactiveItemsToPool()
 		{
