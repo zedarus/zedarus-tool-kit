@@ -23,6 +23,9 @@ namespace Zedarus.ToolKit.Data.Game
 		private int _currentModelID = 0;
 		private int _selectedModelDataIndex = -1;
 
+		private int _previousModelID = -1;
+		private int _previousSelectedModelDataIndex = -1;
+
 		private GameData _data = null;
 		private IGameDataModel _model = null;
 
@@ -63,6 +66,9 @@ namespace Zedarus.ToolKit.Data.Game
 			{
 				if (_data.CheckForOpenModelRequest())
 				{
+					_previousModelID = _currentModelID;
+					_previousSelectedModelDataIndex = _selectedModelDataIndex;
+
 					_currentModelID = _data.GetOpenModelRequestID();
 					_selectedModelDataIndex = _data.GetOpenModelRequestDataIndex();
 
@@ -108,6 +114,24 @@ namespace Zedarus.ToolKit.Data.Game
 					string json = JsonUtility.ToJson(_data, true);
 					EditorGUIUtility.systemCopyBuffer = json;
 					Debug.Log("Also copied to your clipboard: \n" + json);
+				}
+
+				if (GUILayout.Button("Back", GUILayout.Width(120)) && _previousModelID > 0)
+				{
+					_currentModelID = _previousModelID;
+					_selectedModelDataIndex = _previousSelectedModelDataIndex;
+
+					IGameDataModel selectedModel = _data.GetModelDataAt(_currentModelID, _selectedModelDataIndex);
+					if (selectedModel != null)
+					{
+						GUI.FocusControl(null);
+						_model = _data.CreateNewModel(_currentModelID);
+						_model.CopyValuesFrom(selectedModel, true);
+						_state = State.Edit;
+					}
+
+					_modelsViewScrollPos = _modelsListViewScrollPos = _editViewScrollPos = Vector2.zero;
+					_previousModelID = _previousSelectedModelDataIndex = -1;
 				}
 			}
 
