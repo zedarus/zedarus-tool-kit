@@ -178,6 +178,74 @@ namespace Zedarus.ToolKit.Data.Game
 		#if UNITY_EDITOR
 		#region Editor
 		private Dictionary<int, FieldInfo> _tables = new Dictionary<int, FieldInfo>();
+		private int _openModelID = 0;
+		private int _openModelDataIndex = 0;
+
+		public void RegisterOpenModelRequest<T>(int id)
+		{
+			System.Type targetType = typeof(T);
+			bool match = false;
+
+			foreach (KeyValuePair<int, FieldInfo> t in _tables)
+			{
+				if (t.Value.FieldType.Equals(targetType))	// single value fields
+				{
+					match = true;
+				}
+				else if (t.Value.FieldType.HasElementType)	// Treat arrays
+				{
+					match = true;
+				}
+				else if (t.Value.FieldType.IsGenericType)	// Treat lists and dictionaries
+				{
+					foreach (System.Type type in t.Value.FieldType.GetGenericArguments())
+					{
+						if (type.Equals(targetType))
+						{
+							match = true;
+						}
+					}
+				}
+
+				if (match)
+				{
+					_openModelID = t.Key;
+				 	IList list = GetListForTable(_openModelID);
+					if (list != null)
+					{
+						foreach (IGameDataModel modelData in list)
+						{
+							if (modelData != null && modelData.ID == id)
+							{
+								_openModelDataIndex = list.IndexOf(modelData);
+							}
+						}
+					}
+					break;
+				}
+			}
+		}
+
+		public bool CheckForOpenModelRequest()
+		{
+			return _openModelID > 0 && _openModelDataIndex >= 0;
+		}
+
+		public int GetOpenModelRequestID()
+		{
+			return _openModelID;
+		}
+
+		public int GetOpenModelRequestDataIndex()
+		{
+			return _openModelDataIndex;
+		}
+
+		public void ResetOpenModelRequest()
+		{
+			_openModelID = 0;
+			_openModelDataIndex = 0;
+		}
 
 		public virtual T[] GetModels<T>()
 		{

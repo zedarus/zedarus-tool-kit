@@ -61,6 +61,24 @@ namespace Zedarus.ToolKit.Data.Game
 
 			if (DataLoaded)
 			{
+				if (_data.CheckForOpenModelRequest())
+				{
+					_currentModelID = _data.GetOpenModelRequestID();
+					_selectedModelDataIndex = _data.GetOpenModelRequestDataIndex();
+
+					IGameDataModel selectedModel = _data.GetModelDataAt(_currentModelID, _selectedModelDataIndex);
+					if (selectedModel != null)
+					{
+						GUI.FocusControl(null);
+						_model = _data.CreateNewModel(_currentModelID);
+						_model.CopyValuesFrom(selectedModel, true);
+						_state = State.Edit;
+					}
+
+					_modelsViewScrollPos = _modelsListViewScrollPos = _editViewScrollPos = Vector2.zero;
+					_data.ResetOpenModelRequest();
+				}
+
 				EditorGUILayout.BeginHorizontal(GUILayout.ExpandWidth(true));
 				RenderModelsView();
 				RenderModelsListView();

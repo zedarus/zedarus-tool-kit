@@ -222,7 +222,7 @@ namespace Zedarus.ToolKit.Data.Game
 			{
 				if (field.FieldType.GetElementType().Equals(typeof(int)))
 				{
-					RenderArrayField(field, attribute, strings.ToArray(), values.ToArray());
+					RenderArrayField(field, attribute, strings.ToArray(), values.ToArray(), typeof(T));
 				}
 				else
 				{
@@ -236,7 +236,17 @@ namespace Zedarus.ToolKit.Data.Game
 					int currentID = 0;
 					int.TryParse(field.GetValue(this).ToString(), out currentID);
 
-					field.SetValue(this, EditorGUILayout.IntPopup(attribute.EditorLabel, currentID, strings.ToArray(), values.ToArray()));
+					EditorGUILayout.BeginHorizontal();
+
+					currentID = EditorGUILayout.IntPopup(attribute.EditorLabel, currentID, strings.ToArray(), values.ToArray());
+					field.SetValue(this, currentID);
+
+					if (GUILayout.Button("Open", GUILayout.MaxWidth(40)))
+					{
+						DataRererence.RegisterOpenModelRequest<T>(currentID);
+					}
+
+					EditorGUILayout.EndHorizontal();
 				}
 				else
 				{
@@ -245,7 +255,7 @@ namespace Zedarus.ToolKit.Data.Game
 			}
 		}
 
-		protected void RenderArrayField(FieldInfo field, DataField attribute, string[] options = null, int[] values = null)
+		protected void RenderArrayField(FieldInfo field, DataField attribute, string[] options = null, int[] values = null, System.Type modelType = null)
 		{
 			System.Array array = field.GetValue(this) as System.Array;
 			System.Type arrayElementType = field.FieldType.GetElementType();
@@ -287,7 +297,15 @@ namespace Zedarus.ToolKit.Data.Game
 				{
 					if (options != null && values != null)
 					{
-						list[i] = EditorGUILayout.IntPopup(label, int.Parse(list[i].ToString()), options, values);
+						int newValue = EditorGUILayout.IntPopup(label, int.Parse(list[i].ToString()), options, values);
+						list[i] = newValue;
+
+						if (GUILayout.Button("Open", GUILayout.MaxWidth(40)))
+						{
+							MethodInfo method = DataRererence.GetType().GetMethod("RegisterOpenModelRequest", BindingFlags.Instance | BindingFlags.Public);
+							method = method.MakeGenericMethod(modelType);
+							method.Invoke(DataRererence, new object[] { newValue });
+						}
 					}
 					else
 					{
