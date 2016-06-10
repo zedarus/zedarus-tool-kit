@@ -135,7 +135,7 @@ namespace Zedarus.ToolKit.Data.Game
 			}
 		}
 
-		private void RenderEditorForField(FieldInfo field, DataField attribute, int fieldCount, bool included)
+		protected void RenderEditorForField(FieldInfo field, DataField attribute, int fieldCount, bool included, bool parseUnhandledFields = true)
 		{
 			if (included && !attribute.renderWhenIncluded)
 				return;
@@ -143,7 +143,7 @@ namespace Zedarus.ToolKit.Data.Game
 			if (attribute.locked)
 				GUI.enabled = false;
 
-			if (!attribute.autoRender)
+			if (!attribute.autoRender && parseUnhandledFields)
 				RenderUnhandledEditorField(field, attribute);
 			else if (attribute.foreignKeyForTable != null)
 			{
@@ -169,7 +169,7 @@ namespace Zedarus.ToolKit.Data.Game
 				RenderArrayField(field, attribute);
 			else if (field.FieldType.GetInterface(typeof(IGameDataModel).Name) != null)
 				RenderIGameDataModelField(field, attribute, fieldCount);
-			else
+			else if (parseUnhandledFields)
 				RenderUnhandledEditorField(field, attribute);
 			
 			ValidateField(field);
@@ -275,6 +275,12 @@ namespace Zedarus.ToolKit.Data.Game
 		{
 			System.Array array = field.GetValue(this) as System.Array;
 			System.Type arrayElementType = field.FieldType.GetElementType();
+
+			if (array == null)
+			{
+				array = System.Array.CreateInstance(arrayElementType, 0);
+			}
+
 			var listType = typeof(List<>).MakeGenericType(arrayElementType);
 			IList list = (IList)System.Activator.CreateInstance(listType);
 
