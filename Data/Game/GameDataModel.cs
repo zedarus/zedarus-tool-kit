@@ -161,6 +161,8 @@ namespace Zedarus.ToolKit.Data.Game
 				RenderFloatField(field, attribute);
 			else if (field.FieldType == typeof(bool))
 				RenderBoolField(field, attribute);
+			else if (field.FieldType == typeof(AnimationCurve))
+				RenderCurveField(field, attribute);
 			else if (field.FieldType.IsEnum)
 				RenderEnumField(field, attribute);
 			else if (field.FieldType.IsArray)
@@ -473,6 +475,11 @@ namespace Zedarus.ToolKit.Data.Game
 		{
 			// TODO: add errors check here too
 			field.SetValue(this, EditorGUILayout.Toggle(attribute.EditorLabel, bool.Parse(field.GetValue(this).ToString())));
+		}
+
+		protected void RenderCurveField(FieldInfo field, DataField attribute)
+		{
+			field.SetValue(this, EditorGUILayout.CurveField(attribute.EditorLabel, field.GetValue(this) as AnimationCurve));
 		}
 
 		protected void RenderEnumField(FieldInfo field, DataField attribute)
