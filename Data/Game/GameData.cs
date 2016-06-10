@@ -139,6 +139,17 @@ namespace Zedarus.ToolKit.Data.Game
 		{
 			get { return _settings; }
 		}
+
+		protected T GetDataTableEntry<T>(int id, List<T> table) where T : IGameDataModel
+		{
+			foreach (IGameDataModel entry in table)
+			{
+				if (entry.ID.Equals(id))
+					return (T)entry;
+			}
+
+			return default(T);
+		}
 		#endregion
 
 		#region Helpers
