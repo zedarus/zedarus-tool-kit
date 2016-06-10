@@ -8,6 +8,35 @@ namespace Zedarus.ToolKit.Extentions
 {
 	public static class Extensions
 	{
+		public static T[] Concat<T>(T[] array1, T[] array2)
+		{
+			int length = 0;
+
+			if (array1 != null)
+			{
+				length += array1.Length;
+			}
+
+			if (array2 != null)
+			{
+				length += array2.Length;
+			}
+
+			T[] combined = new T[length];
+
+			if (array1 != null)
+			{
+				Array.Copy(array1, combined, array1.Length);
+			}
+
+			if (array2 != null)
+			{
+				Array.Copy(array2, 0, combined, (array1 != null) ? array1.Length : 0, array2.Length);
+			}
+
+			return combined;
+		}
+
 		public static void Shuffle<T>(this IList<T> list)
 		{  
 			System.Random rng = new System.Random();  
