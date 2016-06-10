@@ -376,6 +376,16 @@ namespace Zedarus.ToolKit.Data.Game
 					System.Enum newValue = EditorGUILayout.EnumPopup(label, (System.Enum) System.Enum.Parse(list[i].GetType(), list[i].ToString()));
 					list[i] = System.Convert.ChangeType(newValue, System.Enum.GetUnderlyingType(list[i].GetType()));
 				}
+				else if (arrayElementType.GetInterface(typeof(IGameDataModel).Name) != null)
+				{
+					EditorGUILayout.LabelField(label, EditorStyles.boldLabel);
+
+					IGameDataModel model = list[i] as IGameDataModel;
+					model.SetDataReference(DataRererence);
+					EditorGUILayout.BeginVertical();
+					model.RenderForm(true);
+					EditorGUILayout.EndVertical();
+				}
 				else
 				{
 					EditorGUILayout.LabelField(label, "Field type is not supported");
