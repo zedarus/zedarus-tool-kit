@@ -91,7 +91,9 @@ namespace Zedarus.ToolKit.Data.Game
 												list.Add(model);
 											}
 
+											#if UNITY_EDITOR
 											model.SetDataReference(this);
+											#endif
 										}
 									}
 									catch (System.Exception e)
@@ -108,7 +110,9 @@ namespace Zedarus.ToolKit.Data.Game
 						{
 							IGameDataModel currentModel = field.GetValue(this) as IGameDataModel;
 							currentModel.OverrideValuesFrom(jasonData[field.Name].ToJson());
+							#if UNITY_EDITOR
 							currentModel.SetDataReference(this);
+							#endif
 						}
 						catch (System.Exception e)
 						{
