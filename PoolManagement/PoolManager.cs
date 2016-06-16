@@ -65,12 +65,19 @@ namespace Zedarus.ToolKit.PoolManagement
 
 		public PoolManager(string prefab, Transform container, int size, bool autoReuse) : this(Resources.Load<T>(prefab), container, size, autoReuse) { }
 
-		public virtual void ReturnInactiveItemsToPool()
+		public virtual void ReturnInactiveItemsToPool(System.Action<T> returnToPoolCallback = null)
 		{
 			for (int i = _active.Count - 1; i >= 0; i--)
 			{
 				if (_active[i].ReturnToPool)
+				{
+					if (returnToPoolCallback != null)
+					{
+						returnToPoolCallback(_active[i]);
+					}
+
 					ReturnItemToPoolAtIndex(i);
+				}
 			}
 		}
 
