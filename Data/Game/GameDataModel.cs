@@ -728,7 +728,14 @@ namespace Zedarus.ToolKit.Data.Game
 						}
 						else if (value.IsObject)
 						{
-							if (value.Keys.Contains("m_Curve"))
+							if (field.FieldType.GetInterface(typeof(IGameDataModel).Name) != null)
+							{
+								IGameDataModel newObject = System.Activator.CreateInstance(field.FieldType) as IGameDataModel;
+								newObject.OverrideValuesFrom(value.ToJson());
+
+								field.SetValue(target, newObject);
+							}
+							else if (value.Keys.Contains("m_Curve"))
 							{
 								AnimationCurve curve = new AnimationCurve();
 
