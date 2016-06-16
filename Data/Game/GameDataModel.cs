@@ -726,6 +726,29 @@ namespace Zedarus.ToolKit.Data.Game
 
 							field.SetValue(target, array);
 						}
+						else if (value.IsObject)
+						{
+							if (value.Keys.Contains("m_Curve"))
+							{
+								AnimationCurve curve = new AnimationCurve();
+
+								JsonData keys = value["m_Curve"];
+
+								for (int i = 0; i < keys.Count; i++)
+								{
+									Keyframe frame = new Keyframe();
+									frame.time = float.Parse(keys[i]["time"].ToString());
+									frame.value = float.Parse(keys[i]["value"].ToString());
+									frame.inTangent = float.Parse(keys[i]["inSlope"].ToString());
+									frame.outTangent = float.Parse(keys[i]["outSlope"].ToString());
+									frame.tangentMode = int.Parse(keys[i]["tangentMode"].ToString());
+
+									curve.AddKey(frame);
+								}
+
+								field.SetValue(target, curve);
+							}
+						}
 					}
 					catch (System.Exception e) 
 					{
