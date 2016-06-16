@@ -686,13 +686,12 @@ namespace Zedarus.ToolKit.Data.Game
 			FieldInfo[] fields = GetFields(this);
 			foreach (string key in data.Keys)
 			{
-				OverrideField(fields, key, data[key]);
+				OverrideField(this, fields, key, data[key]);
 			}
 		}
 
-		protected virtual void OverrideField(FieldInfo[] fields, string fieldname, JsonData value)
+		protected virtual void OverrideField(object target, FieldInfo[] fields, string fieldname, JsonData value)
 		{
-			//fieldname = fieldname.Trim();
 			foreach (FieldInfo field in fields)
 			{
 				if (field.Name.Equals(fieldname))
@@ -700,15 +699,38 @@ namespace Zedarus.ToolKit.Data.Game
 					try
 					{
 						if (value.IsInt || value.IsLong)
-							field.SetValue(this, int.Parse(value.ToString()));
+							field.SetValue(target, int.Parse(value.ToString()));
 						else if (value.IsBoolean)
-							field.SetValue(this, bool.Parse(value.ToString()));
+							field.SetValue(target, bool.Parse(value.ToString()));
 						else if (value.IsDouble)
-							field.SetValue(this, float.Parse(value.ToString()));
+							field.SetValue(target, float.Parse(value.ToString()));
 						else if (value.IsString)
-							field.SetValue(this, value.ToString());
+							field.SetValue(target, value.ToString());
+						else if (value.IsArray)
+						{
+							System.Array array = System.Array.CreateInstance(field.FieldType.GetElementType(), value.Count);
+
+							for (int i = 0; i < value.Count; i++)
+							{
+								object newObject = System.Activator.CreateInstance(field.FieldType.GetElementType());
+								FieldInfo[] subobjectFields = GetFields(newObject as IGameDataModel);
+								JsonData subobjectData = JsonMapper.ToObject(value[i].ToJson());
+
+								foreach (string key in subobjectData.Keys)
+								{
+									OverrideField(newObject, subobjectFields, key, subobjectData[key]);
+								}
+
+								array.SetValue(newObject, i);
+							}
+
+							field.SetValue(target, array);
+						}
 					}
-					catch (System.Exception) { }
+					catch (System.Exception e) 
+					{
+						Debug.Log(e.ToString());
+					}
 					break;
 				}
 			}
