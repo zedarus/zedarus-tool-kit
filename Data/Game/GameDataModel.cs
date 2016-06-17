@@ -187,7 +187,16 @@ namespace Zedarus.ToolKit.Data.Game
 			EditorGUILayout.LabelField(attribute.EditorLabel, EditorStyles.boldLabel);
 
 			IGameDataModel model = field.GetValue(this) as IGameDataModel;
-			model.RenderForm(true);
+
+			if (model == null)
+			{
+				model = System.Activator.CreateInstance(field.FieldType) as IGameDataModel;
+			}
+
+			if (model != null)
+			{
+				model.RenderForm(true);
+			}
 
 			//EditorGUILayout.EndToggleGroup();
 		}
