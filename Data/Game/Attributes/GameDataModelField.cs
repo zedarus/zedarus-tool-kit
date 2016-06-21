@@ -63,6 +63,23 @@ namespace Zedarus.ToolKit.Data.Game
 	}
 
 	[System.AttributeUsage(System.AttributeTargets.Field)]
+	public class DataFieldCurve : System.Attribute
+	{
+		public float height = 0f;
+		public Color color = Color.green;
+		public float[] range = new float[4] { 0, 0, 0, 0 };
+
+		public DataFieldCurve()
+		{
+		}
+
+		public Rect RangeBounds
+		{
+			get { return Rect.MinMaxRect(range[0], range[1], range[2], range[3]); }
+		}
+	}
+
+	[System.AttributeUsage(System.AttributeTargets.Field)]
 	public class DataValidateMin : System.Attribute
 	{
 		private int _min = 0;

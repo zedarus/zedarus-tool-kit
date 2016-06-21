@@ -495,7 +495,78 @@ namespace Zedarus.ToolKit.Data.Game
 
 		protected void RenderCurveField(FieldInfo field, DataField attribute)
 		{
-			field.SetValue(this, EditorGUILayout.CurveField(attribute.EditorLabel, field.GetValue(this) as AnimationCurve));
+			DataFieldCurve curveAttribute = GetAttribute<DataFieldCurve>(field);
+
+			List<GUILayoutOption> layoutOptions = new List<GUILayoutOption>();
+
+			Color color = Color.green;
+
+			if (curveAttribute != null)
+			{ 
+				if (curveAttribute.height > 0)
+				{
+					layoutOptions.Add(GUILayout.Height(curveAttribute.height));
+				}
+
+				color = curveAttribute.color;
+			}
+
+			AnimationCurve curve = field.GetValue(this) as AnimationCurve;
+
+			if (curve == null)
+			{
+				curve = AnimationCurve.Linear(0,0, 1f, 1f);
+			}
+
+			Rect bounds = new Rect(0, 0, 1, 1);
+
+			if (curveAttribute != null && curveAttribute.RangeBounds.width > 0)
+			{
+				bounds = curveAttribute.RangeBounds;
+			}
+			else
+			{
+				float minX = float.MaxValue;
+				float maxX = float.MinValue;
+				float minY = float.MaxValue;
+				float maxY = float.MinValue;
+
+				foreach (Keyframe key in curve.keys)
+				{
+//					if (key.time > maxX)
+//					{
+//						maxX = key.time;
+//					}
+//					if (key.time < minX)
+//					{
+//						minX = key.time;
+//					}
+//
+//					if (key.value > maxY)
+//					{
+//						maxY = key.value;
+//					}
+//					if (key.value < minY)
+//					{
+//						minY = key.value;
+//					}
+				}
+
+				bounds = Rect.MinMaxRect(minX, minY, maxX, maxY);
+			}
+
+
+			curve = EditorGUILayout.CurveField(
+				attribute.EditorLabel, 
+				curve, 
+				color, 
+				bounds,
+				layoutOptions.ToArray()
+			);
+
+//			EditorGUIUtility.DrawCurveSwatch(new Rect(0, 0, 100, 100), curve, null, Color.red, Color.blue);
+
+			field.SetValue(this, curve);
 		}
 
 		protected void RenderEnumField(FieldInfo field, DataField attribute)
@@ -644,7 +715,7 @@ namespace Zedarus.ToolKit.Data.Game
 			}
 		}
 
-		private T GetAttribute<T>(FieldInfo field) where T : PropertyAttribute
+		private T GetAttribute<T>(FieldInfo field) where T : System.Attribute
 		{
 			object[] attributes = field.GetCustomAttributes(typeof(T), true);
 
