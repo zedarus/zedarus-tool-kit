@@ -66,11 +66,16 @@ namespace Zedarus.ToolKit.Data.Game
 	public class DataFieldCurve : System.Attribute
 	{
 		public float height = 0f;
-		public Color color = Color.green;
+		public float[] color = new float[3] { Color.green.r, Color.green.g, Color.green.b };
 		public float[] range = new float[4] { 0, 0, 0, 0 };
 
 		public DataFieldCurve()
 		{
+		}
+
+		public Color ColorValue
+		{
+			get { return new Color(color[0], color[1], color[2], 1f); }
 		}
 
 		public Rect RangeBounds

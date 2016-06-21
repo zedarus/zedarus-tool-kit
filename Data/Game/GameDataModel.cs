@@ -517,7 +517,7 @@ namespace Zedarus.ToolKit.Data.Game
 					layoutOptions.Add(GUILayout.Height(curveAttribute.height));
 				}
 
-				color = curveAttribute.color;
+				color = curveAttribute.ColorValue;
 			}
 
 			AnimationCurve curve = field.GetValue(this) as AnimationCurve;
@@ -542,28 +542,26 @@ namespace Zedarus.ToolKit.Data.Game
 
 				foreach (Keyframe key in curve.keys)
 				{
-//					if (key.time > maxX)
-//					{
-//						maxX = key.time;
-//					}
-//					if (key.time < minX)
-//					{
-//						minX = key.time;
-//					}
-//
-//					if (key.value > maxY)
-//					{
-//						maxY = key.value;
-//					}
-//					if (key.value < minY)
-//					{
-//						minY = key.value;
-//					}
-				}
+					if (key.time > maxX)
+					{
+						maxX = key.time;
+					}
+					if (key.time < minX)
+					{
+						minX = key.time;
+					}
 
+					if (key.value > maxY)
+					{
+						maxY = key.value;
+					}
+					if (key.value < minY)
+					{
+						minY = key.value;
+					}
+				}
 				bounds = Rect.MinMaxRect(minX, minY, maxX, maxY);
 			}
-
 
 			curve = EditorGUILayout.CurveField(
 				attribute.EditorLabel, 
@@ -572,6 +570,24 @@ namespace Zedarus.ToolKit.Data.Game
 				bounds,
 				layoutOptions.ToArray()
 			);
+
+			Keyframe minValueFrame = new Keyframe(0f, float.MaxValue);
+			Keyframe maxValueFrame = new Keyframe(0f, float.MinValue);
+
+			foreach (Keyframe frame in curve.keys)
+			{
+				if (frame.value < minValueFrame.value)
+				{
+					minValueFrame = frame;
+				}
+
+				if (frame.value > maxValueFrame.value)
+				{
+					maxValueFrame = frame;
+				}
+			}
+
+			EditorGUILayout.LabelField(" ", string.Format("Min: {0} at {1},  Max: {2} at {3}", minValueFrame.value, minValueFrame.time, maxValueFrame.value, maxValueFrame.time));
 
 //			EditorGUIUtility.DrawCurveSwatch(new Rect(0, 0, 100, 100), curve, null, Color.red, Color.blue);
 
