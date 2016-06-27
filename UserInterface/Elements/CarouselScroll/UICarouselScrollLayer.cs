@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace Zedarus.ToolKit.UI.Elements
 {
@@ -32,7 +33,6 @@ namespace Zedarus.ToolKit.UI.Elements
 		#endregion
 
 		#region Properties
-		private int _pages = 0;
 		private float _dragScale = 1f;
 		private float _pageWidth = 0;
 		private float _scrollPosition = 0;
@@ -40,6 +40,7 @@ namespace Zedarus.ToolKit.UI.Elements
 		private float _velocity = 0f;
 		private float _targetVelocity = 0f;
 		private bool _pageSizeCached = false;
+		private List<IUICarouselScrollPage> _pages = new List<IUICarouselScrollPage>();
 		#endregion
 
 		#region Controls
@@ -86,8 +87,7 @@ namespace Zedarus.ToolKit.UI.Elements
 			page.PageTransform.SetParent(Pivot);
 			page.PageTransform.localScale = scale;
 			page.PageTransform.localPosition = new Vector2(PageWidth * Parallax * Pages, 0);
-
-			_pages++;
+			_pages.Add(page);
 		}
 
 		public void Update(float deltaTime)
@@ -96,7 +96,14 @@ namespace Zedarus.ToolKit.UI.Elements
 			_velocity += (_targetVelocity - _velocity) * SpeedEasing;
 			ScrollPosition += _velocity * ScrollSpeed * deltaTime;
 
+			// TODO: only change position if change is significant enough
 			Pivot.localPosition = new Vector2(ScrollPosition * Parallax, 0);
+
+			// TODO: optimize this
+			foreach (IUICarouselScrollPage page in _pages)
+			{
+				page.UpdateScrollPivot(Pivot.parent.transform.position);
+			}
 		}
 
 		public void Drag(float delta)
@@ -184,7 +191,7 @@ namespace Zedarus.ToolKit.UI.Elements
 
 		public int Pages
 		{
-			get { return _pages; }
+			get { return _pages.Count; }
 		}
 
 		private float Parallax

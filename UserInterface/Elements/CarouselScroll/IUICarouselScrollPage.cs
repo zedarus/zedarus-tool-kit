@@ -8,5 +8,6 @@ namespace Zedarus.ToolKit.UI.Elements
 		void InitAsPage(float pageWidth, float parallax);
 		Transform PageTransform { get; }
 		float GraphicsSize { get; }
+		void UpdateScrollPivot(Vector2 pivot);
 	}
 }
