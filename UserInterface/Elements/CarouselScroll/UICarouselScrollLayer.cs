@@ -108,6 +108,9 @@ namespace Zedarus.ToolKit.UI.Elements
 
 		public void Drag(float delta)
 		{
+			// TODO: delta here are screen pixels
+			// TODO: so we need to convert those pixels either in canvas pixels
+			// or in world units (depending on the pivot)
 			TargetScrollPosition += delta * _dragScale; 
 		}
 
