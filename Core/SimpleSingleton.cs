@@ -20,7 +20,7 @@ namespace Zedarus.ToolKit
 			}
 		}
 		
-		public static void CreateInstance<InstanceType>() where InstanceType : T
+		public static T CreateInstance<InstanceType>() where InstanceType : T
 		{
 			if (_instance == null)
 			{
@@ -38,6 +38,8 @@ namespace Zedarus.ToolKit
 				// Create an instance via the private constructor
 				_instance = (InstanceType)Activator.CreateInstance(t, true);
 			}
+
+			return _instance;
 		}
 	}
 }

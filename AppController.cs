@@ -14,6 +14,7 @@ namespace Zedarus.ToolKit
 		#region Properties
 		static private bool initialized = false;
 		private DataManager<GameDataClass, PlayerDataClass> _data;
+		private bool _postInit = false;
 		#endregion
 
 		#region Unity Methods
@@ -39,6 +40,23 @@ namespace Zedarus.ToolKit
 			APIManager.Instance.Init();
 			
 			initialized = true;
+		}
+
+		public void PostInit()
+		{
+			if (!_postInit)
+			{
+				OnPostInit();
+				_postInit = true;
+			}
+		}
+
+		protected virtual void OnPostInit()
+		{
+			if (Data.Player != null)
+			{
+				Data.Player.PostInit();
+			}
 		}
 
 		protected virtual void InitEvents()
@@ -68,12 +86,6 @@ namespace Zedarus.ToolKit
 		protected virtual void InitAPI()
 		{
 
-		}
-
-		public virtual void Launch()
-		{
-			if (Data.Player != null)
-				Data.Player.PostInit();
 		}
 		#endregion
 
