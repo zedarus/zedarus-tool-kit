@@ -50,7 +50,10 @@ namespace Zedarus.ToolKit.ScenesManagement
 			}
 
 			if (_useLoadingScene)
-				SceneManager.LoadScene(LoadingSceneName);
+			{
+//				Resources.UnloadUnusedAssets();
+				SceneManager.LoadScene(_loadingScene);
+			}
 			else
 			{
 				Resources.UnloadUnusedAssets();
@@ -91,8 +94,9 @@ namespace Zedarus.ToolKit.ScenesManagement
 		}
 		#endregion
 
-		public void UseLoadingScene()
+		public void UseLoadingScene(string loadingSceneName)
 		{
+			_loadingScene = loadingSceneName;
 			_useLoadingScene = true;
 		}
 
@@ -106,12 +110,6 @@ namespace Zedarus.ToolKit.ScenesManagement
 		{
 			get { return _defaultScene; }
 			set { _defaultScene = value; }
-		}
-
-		public string LoadingSceneName
-		{
-			get { return _loadingScene; }
-			set { _loadingScene = value; }
 		}
 		#endregion
 		
