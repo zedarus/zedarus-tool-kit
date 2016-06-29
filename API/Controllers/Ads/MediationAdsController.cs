@@ -19,6 +19,7 @@ namespace Zedarus.ToolKit.API
 
 		#region Properties
 		private bool _cached = false;
+		private Action _interstitialClosedCallback = null;
 		#endregion
 
 		#region Initialization
@@ -79,64 +80,64 @@ namespace Zedarus.ToolKit.API
 				wrapper.HideBanner();
 		}
 
-		public void ShowIntersitital(string tag, bool useBetweenLevelCounter)
+		public void ShowBetweenLevelAd(string tag, Action callback)
 		{
 			IMediationAdsWrapperInterface wrapper = Wrapper;
+			bool adStarted = false;
+
 			if (Enabled && wrapper != null)
 			{
-				if (useBetweenLevelCounter)
+				APIManager.Instance.State.IncreaseInterstitialCounter();
+
+				if (CanDisplayBetweenLevelAd)
 				{
-					if (ShouldDisplayBetweenLevelAd())
-					{
-						Debug.Log("Display interstitial: " + tag);
-						APIManager.Instance.State.ResetInterstitialCounter();
-						EventManager.SendEvent(IDs.Events.DisableMusicDuringAd);
-						#if UNITY_EDITOR
-						OnInterstitialClosed();
-						#else
-						wrapper.ShowIntersitital(tag);
-						#endif
-					}
-				}
-				else
-				{
+					adStarted = true;
+					_interstitialClosedCallback = callback;
+					Debug.Log("Display interstitial: " + tag);
+					APIManager.Instance.State.ResetInterstitialCounter();
 					EventManager.SendEvent(IDs.Events.DisableMusicDuringAd);
 					#if UNITY_EDITOR
-					OnInterstitialClosed();
+					DelayedCall.Create(OnInterstitialClosed, 2f);
 					#else
 					wrapper.ShowIntersitital(tag);
 					#endif
 				}
 			}
+
+			if (!adStarted && callback != null)
+			{
+				callback();
+			}
+
+			callback = null;
 		}
 
-		public void ShowRewardedVideo(string tag, bool useBetweenLevelCounter)
+		public void ShowIntersitital(string tag)
+		{
+			IMediationAdsWrapperInterface wrapper = Wrapper;
+
+			if (Enabled && wrapper != null)
+			{
+				EventManager.SendEvent(IDs.Events.DisableMusicDuringAd);
+				#if UNITY_EDITOR
+				DelayedCall.Create(OnInterstitialClosed, 2f);
+				#else
+				wrapper.ShowIntersitital(tag);
+				#endif
+			}
+		}
+
+		public void ShowRewardedVideo(string tag)
 		{
 			IMediationAdsWrapperInterface wrapper = Wrapper;
 			if (wrapper != null)
 			{
-				if (useBetweenLevelCounter)
-				{
-					if (ShouldDisplayBetweenLevelAd())
-					{
-						EventManager.SendEvent(IDs.Events.DisableMusicDuringAd);
-						wrapper.ShowRewardedVideo(tag);
-						#if UNITY_EDITOR
-						OnInterstitialClosed();
-						#else
-						wrapper.ShowRewardedVideo(tag);
-						#endif
-					}
-				}
-				else
-				{
-					EventManager.SendEvent(IDs.Events.DisableMusicDuringAd);
-					#if UNITY_EDITOR
-					OnInterstitialClosed();
-					#else
-					wrapper.ShowRewardedVideo(tag);
-					#endif
-				}
+				EventManager.SendEvent(IDs.Events.DisableMusicDuringAd);
+				#if UNITY_EDITOR
+				DelayedCall.Create(OnInterstitialClosed, 2f);
+				#else
+				wrapper.ShowRewardedVideo(tag);
+				#endif
 			}
 		}
 
@@ -165,12 +166,15 @@ namespace Zedarus.ToolKit.API
 				return false;
 		}
 
-		private bool ShouldDisplayBetweenLevelAd()
+		private bool CanDisplayBetweenLevelAd
 		{
-			if (Enabled)
-				return APIManager.Instance.State.IntertitialCounter >= APIManager.Instance.Settings.IntertitialsDelay;
-			else
-				return false;
+			get
+			{
+				if (Enabled)
+					return APIManager.Instance.State.IntertitialCounter >= APIManager.Instance.Settings.IntertitialsDelay;
+				else
+					return false;
+			}
 		}
 		#endregion
 
@@ -217,6 +221,12 @@ namespace Zedarus.ToolKit.API
 			EventManager.SendEvent(IDs.Events.EnableMusicAfterAd);
 			if (InterstitialClosed != null)
 				InterstitialClosed();
+
+			if (_interstitialClosedCallback != null)
+			{
+				_interstitialClosedCallback();
+				_interstitialClosedCallback = null;
+			}
 		}
 
 		private void OnGrantReward()
