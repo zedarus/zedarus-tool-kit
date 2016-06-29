@@ -54,7 +54,7 @@ namespace Zedarus.ToolKit.API
 		public void CacheInterstitial(string tag)
 		{
 			#if API_ADS_HEYZAP
-			Debug.Log("CacheInterstitial: " + tag);
+//			Debug.Log("CacheInterstitial: " + tag);
 			HZInterstitialAd.fetch(tag);
 			#endif
 		}
@@ -87,8 +87,6 @@ namespace Zedarus.ToolKit.API
 
 		public void HideBanner()
 		{
-			//Debug.Log("hide Banner");
-
 			#if API_ADS_HEYZAP
 			HZBannerAd.hide();
 			HZBannerAd.destroy();
@@ -112,6 +110,13 @@ namespace Zedarus.ToolKit.API
 			#if API_ADS_HEYZAP
 			HZIncentivizedAd.show(tag);
 			HZIncentivizedAd.fetch(tag);
+			#endif
+		}
+
+		public void ShowTestUI()
+		{
+			#if API_ADS_HEYZAP
+			HeyzapAds.ShowMediationTestSuite();
 			#endif
 		}
 		#endregion

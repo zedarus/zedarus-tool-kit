@@ -24,6 +24,7 @@ namespace Zedarus.ToolKit.API
 		void HideBanner();
 		void ShowIntersitital(string tag);
 		void ShowRewardedVideo(string tag);
+		void ShowTestUI();
 		#endregion
 
 		#region Queries

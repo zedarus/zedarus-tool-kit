@@ -18,7 +18,8 @@ namespace Zedarus.ToolKit.API
 		#endregion
 
 		#region Properties
-		private bool _cached = false;
+		private bool _interstitialsCached = false;
+		private bool _rewardVideosCached = false;
 		private Action _interstitialClosedCallback = null;
 		#endregion
 
@@ -40,14 +41,40 @@ namespace Zedarus.ToolKit.API
 		#endregion
 
 		#region Controls - Caching
-		public void Cache()
+		public void CacheIntersitials(string tag, params string[] otherTags)
 		{
-			if (_cached)
+			if (_interstitialsCached)
 				return;
 
-			// TODO: cache here
+			IMediationAdsWrapperInterface wrapper = Wrapper;
+			if (Enabled && wrapper != null)
+			{
+				wrapper.CacheInterstitial(tag);
+				foreach (string otherTag in otherTags)
+				{
+					wrapper.CacheInterstitial(tag);
+				}
+			}
 
-			_cached = true;
+			_interstitialsCached = true;
+		}
+
+		public void CacheRewardVideos(string tag, params string[] otherTags)
+		{
+			if (_rewardVideosCached)
+				return;
+
+			IMediationAdsWrapperInterface wrapper = Wrapper;
+			if (Enabled && wrapper != null)
+			{
+				wrapper.CacheRewardedVideo(tag);
+				foreach (string otherTag in otherTags)
+				{
+					wrapper.CacheRewardedVideo(tag);
+				}
+			}
+
+			_rewardVideosCached = true;
 		}
 
 		public void CacheInterstitial(string tag)
@@ -138,6 +165,40 @@ namespace Zedarus.ToolKit.API
 				#else
 				wrapper.ShowRewardedVideo(tag);
 				#endif
+			}
+		}
+
+		private int _testUIClicks = 0;
+		private float _testUILastClickTime = 0f;
+
+		public void ShowTestUI(bool useClickCounter)
+		{
+			if (useClickCounter)
+			{
+				if (Time.realtimeSinceStartup - _testUILastClickTime <= 0.5f)
+				{
+					_testUIClicks++;
+				}
+				else
+				{
+					_testUIClicks = 0;
+				}
+
+				_testUILastClickTime = Time.realtimeSinceStartup;
+
+				if (_testUIClicks >= 5)
+				{
+					_testUIClicks = 0;
+					ShowTestUI(false);
+				}
+			}
+			else
+			{
+				IMediationAdsWrapperInterface wrapper = Wrapper;
+				if (wrapper != null)
+				{
+					wrapper.ShowTestUI();
+				}
 			}
 		}
 
