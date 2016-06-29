@@ -141,6 +141,8 @@ namespace Zedarus.ToolKit.UI
 		{
 			if (!IsOpen)
 			{
+				OnOpen();
+
 				if (_skipFirstOpenAnimation)
 				{
 					animationSpeedScale = 1000f;
@@ -168,6 +170,7 @@ namespace Zedarus.ToolKit.UI
 			}
 		}
 
+		virtual protected void OnOpen() {}
 		virtual protected void ProcessCustomData(IUIScreenData customData) {}
 		virtual public void Refresh() {}
 
