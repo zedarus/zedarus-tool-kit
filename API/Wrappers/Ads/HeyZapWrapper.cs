@@ -2,6 +2,9 @@
 using UnityEngine.Assertions;
 using System;
 using System.Collections;
+#if API_ADS_HEYZAP
+using Heyzap;
+#endif
 
 namespace Zedarus.ToolKit.API
 {
@@ -40,7 +43,11 @@ namespace Zedarus.ToolKit.API
 		protected override void Setup(APIWrapperSettings settings)
 		{
 			#if API_ADS_HEYZAP
-			HeyzapAds.start(settings.APIKey, HeyzapAds.FLAG_NO_OPTIONS)
+			HeyZapWrapperSettings heyzapSettings = settings as HeyZapWrapperSettings;
+			if (heyzapSettings != null)
+			{
+				HeyzapAds.Start(heyzapSettings.APIKey, HeyzapAds.FLAG_NO_OPTIONS);
+			}
 			#endif
 		}
 
@@ -55,7 +62,7 @@ namespace Zedarus.ToolKit.API
 		{
 			#if API_ADS_HEYZAP
 //			Debug.Log("CacheInterstitial: " + tag);
-			HZInterstitialAd.fetch(tag);
+			HZInterstitialAd.Fetch(tag);
 			#endif
 		}
 
@@ -63,7 +70,7 @@ namespace Zedarus.ToolKit.API
 		{
 			#if API_ADS_HEYZAP
 			//Debug.Log("CacheRewardedVideo: " + tag);
-			HZIncentivizedAd.fetch(tag);
+			HZIncentivizedAd.Fetch(tag);
 			#endif
 		}
 		#endregion
@@ -79,7 +86,11 @@ namespace Zedarus.ToolKit.API
 				BannerDisplayed();
 
 			#if API_ADS_HEYZAP
-			HZBannerAd.showWithTag(HZBannerAd.POSITION_TOP, tag);
+			HZBannerShowOptions options = new HZBannerShowOptions();
+			options.Tag = tag;
+			options.Position = HZBannerShowOptions.POSITION_TOP;
+
+			HZBannerAd.ShowWithOptions(options);
 			#endif
 
 			_bannerDisplayed = true;
@@ -88,8 +99,8 @@ namespace Zedarus.ToolKit.API
 		public void HideBanner()
 		{
 			#if API_ADS_HEYZAP
-			HZBannerAd.hide();
-			HZBannerAd.destroy();
+			HZBannerAd.Hide();
+			HZBannerAd.Destroy();
 			#endif
 
 			if (BannerRemoved != null)
@@ -100,16 +111,22 @@ namespace Zedarus.ToolKit.API
 		public void ShowIntersitital(string tag)
 		{
 			#if API_ADS_HEYZAP
-			HZInterstitialAd.show(tag);
-			HZInterstitialAd.fetch(tag);
+			HZShowOptions options = new HZShowOptions();
+			options.Tag = tag;
+
+			HZInterstitialAd.ShowWithOptions(options);
+			HZInterstitialAd.Fetch(tag);	// TODO: do we really need this?
 			#endif
 		}
 
 		public void ShowRewardedVideo(string tag)
 		{
 			#if API_ADS_HEYZAP
-			HZIncentivizedAd.show(tag);
-			HZIncentivizedAd.fetch(tag);
+			HZIncentivizedShowOptions options = new HZIncentivizedShowOptions();
+			options.Tag = tag;
+
+			HZIncentivizedAd.ShowWithOptions(options);
+			HZIncentivizedAd.Fetch(tag);
 			#endif
 		}
 
@@ -137,20 +154,20 @@ namespace Zedarus.ToolKit.API
 		protected override void CreateEventListeners()
 		{
 			#if API_ADS_HEYZAP
-			HZBannerAd.setDisplayListener(OnBannerStateUpdate);
-			HZInterstitialAd.setDisplayListener(OnInterstitialStateUpdate);
-			HZVideoAd.setDisplayListener(OnInterstitialStateUpdate);
-			HZIncentivizedAd.setDisplayListener(OnIncentivizedStateUpdate);
+			HZBannerAd.SetDisplayListener(OnBannerStateUpdate);
+			HZInterstitialAd.SetDisplayListener(OnInterstitialStateUpdate);
+			HZVideoAd.SetDisplayListener(OnInterstitialStateUpdate);
+			HZIncentivizedAd.SetDisplayListener(OnIncentivizedStateUpdate);
 			#endif
 		}
 
 		protected override void RemoveEventListeners()
 		{
 			#if API_ADS_HEYZAP
-			HZBannerAd.setDisplayListener(null);
-			HZInterstitialAd.setDisplayListener(null);
-			HZVideoAd.setDisplayListener(null);
-			HZIncentivizedAd.setDisplayListener(null);
+			HZBannerAd.SetDisplayListener(null);
+			HZInterstitialAd.SetDisplayListener(null);
+			HZVideoAd.SetDisplayListener(null);
+			HZIncentivizedAd.SetDisplayListener(null);
 			#endif
 		}
 		#endregion
