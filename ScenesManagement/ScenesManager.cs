@@ -6,6 +6,33 @@ using Zedarus.ToolKit;
 
 namespace Zedarus.ToolKit.ScenesManagement
 {
+	public class FadeScreenTracker : MonoBehaviour
+	{
+		public void Init(Animator animator, int stateHash, System.Action callback)
+		{
+			StartCoroutine(Track(animator, stateHash, callback));
+		}
+
+		private IEnumerator Track(Animator animator, int stateHash, System.Action callback)
+		{
+			float timer = 0;
+			bool state = false;
+
+			while (!state && timer <= 5f)
+			{
+				state = animator.GetCurrentAnimatorStateInfo(0).shortNameHash == stateHash;
+				timer += Time.unscaledDeltaTime;
+				yield return new WaitForEndOfFrame();
+			}
+
+			if (state && callback != null)
+			{
+				callback();		
+				callback = null;
+			}
+		}
+	}
+
 	public class ScenesManager : SimpleSingleton<ScenesManager>
 	{
 		#region Properties
@@ -15,49 +42,75 @@ namespace Zedarus.ToolKit.ScenesManagement
 		private string _loadingScene = null;
 		private string _previousScene = null;
 		private bool _useLoadingScene = false;
+		private Animator _fadeScreen = null;
+		private FadeScreenTracker _fadeScreenTracker = null;
+		private object[] _cachedData = null;
+
+		private readonly int FadeIn = Animator.StringToHash("FadeIn"); 
+		private readonly int FadeOut = Animator.StringToHash("FadeOut"); 
 		#endregion
 
 		private Dictionary<string, Dictionary<object, object>> _params = new Dictionary<string, Dictionary<object, object>>();
 		
 		#region General Scene Switch Methods
+		private void OnFadeOutFinished()
+		{
+			GameObject.Destroy(_fadeScreenTracker.gameObject);
+			_fadeScreen = null;
+			ShowScene(_nextScene, _cachedData);
+		}
+
 		public virtual void ShowScene(string sceneName, params object[] data) 
 		{
+			_cachedData = null;
 			_previousScene = _currentScene;
 			_currentScene = _nextScene = sceneName;
 
-			if (_params.ContainsKey(sceneName))
+			if (_fadeScreen != null)
 			{
-				_params[sceneName].Clear();
+				_cachedData = data;
+
+				GameObject go = new GameObject("Fade Screen Tracker");
+				_fadeScreenTracker = go.AddComponent<FadeScreenTracker>();
+				_fadeScreenTracker.Init(_fadeScreen, FadeOut, OnFadeOutFinished);
+
+				_fadeScreen.SetTrigger(FadeOut);
 			}
 			else
 			{
-				_params[sceneName] = new Dictionary<object, object>();
-			}
-
-			if (data != null && data.Length > 0)
-			{
-				if (data.Length % 2 == 0)
+				if (_params.ContainsKey(sceneName))
 				{
-					for (int i = 0; i < data.Length; i += 2)
-					{
-						_params[sceneName].Add(data[i], data[i + 1]);	
-					}
+					_params[sceneName].Clear();
 				}
 				else
 				{
-					throw new UnityException("Each scene parameter must have a name pair");
+					_params[sceneName] = new Dictionary<object, object>();
 				}
-			}
 
-			if (_useLoadingScene)
-			{
-//				Resources.UnloadUnusedAssets();
-				SceneManager.LoadScene(_loadingScene);
-			}
-			else
-			{
-				Resources.UnloadUnusedAssets();
-				SceneManager.LoadScene(_nextScene);
+				if (data != null && data.Length > 0)
+				{
+					if (data.Length % 2 == 0)
+					{
+						for (int i = 0; i < data.Length; i += 2)
+						{
+							_params[sceneName].Add(data[i], data[i + 1]);	
+						}
+					}
+					else
+					{
+						throw new UnityException("Each scene parameter must have a name pair");
+					}
+				}
+
+				if (_useLoadingScene)
+				{
+					SceneManager.LoadScene(_loadingScene);
+				}
+				else
+				{
+					Resources.UnloadUnusedAssets();
+					SceneManager.LoadScene(_nextScene);
+				}
 			}
 		}
 
@@ -93,6 +146,23 @@ namespace Zedarus.ToolKit.ScenesManagement
 			}
 		}
 		#endregion
+
+		/// <summary>
+		/// Call this at the beginning of the scene to fade in.
+		/// </summary>
+		/// <param name="fadeScreen">Fade screen.</param>
+		public void UseFadeScreen(Animator fadeScreen)
+		{
+			if (fadeScreen)
+			{
+				_fadeScreen = fadeScreen;
+				_fadeScreen.SetTrigger(FadeIn);
+			}
+			else
+			{
+				_fadeScreen = null;
+			}
+		}
 
 		public void UseLoadingScene(string loadingSceneName)
 		{
