@@ -99,18 +99,38 @@ namespace Zedarus.ToolKit.API
 
 		public void ShowBetweenLevelAd(string tag, Action callback)
 		{
+			ShowIntersitital(tag, callback, true);
+		}
+
+		public void ShowIntersitital(string tag, Action callback)
+		{
+			ShowIntersitital(tag, callback, false);
+		}
+
+		private void ShowIntersitital(string tag, Action callback, bool useBetweenLevelCounter)
+		{
 			IAdsWrapperInterface wrapper = Wrapper;
 			bool adStarted = false;
 
 			if (Enabled && wrapper != null)
 			{
-				APIManager.Instance.State.IncreaseInterstitialCounter();
+				if (useBetweenLevelCounter)
+				{
+					APIManager.Instance.State.IncreaseInterstitialCounter();
+				}
 
-				if (CanDisplayBetweenLevelAd)
+				bool allowed = true;
+
+				if (useBetweenLevelCounter)
+				{
+					allowed = CanDisplayBetweenLevelAd;
+					APIManager.Instance.State.ResetInterstitialCounter();
+				}
+
+				if (allowed)
 				{
 					adStarted = true;
 					_interstitialClosedCallback = callback;
-					APIManager.Instance.State.ResetInterstitialCounter();
 					EventManager.SendEvent(IDs.Events.DisableMusicDuringAd);
 					#if UNITY_EDITOR
 					DelayedCall.Create(OnInterstitialClosed, 2f);
@@ -118,31 +138,6 @@ namespace Zedarus.ToolKit.API
 					wrapper.ShowIntersitital(tag);
 					#endif
 				}
-			}
-
-			if (!adStarted && callback != null)
-			{
-				callback();
-			}
-
-			callback = null;
-		}
-
-		public void ShowIntersitital(string tag, Action callback)
-		{
-			IAdsWrapperInterface wrapper = Wrapper;
-			bool adStarted = false;
-
-			if (Enabled && wrapper != null)
-			{
-				adStarted = true;
-				_interstitialClosedCallback = callback;
-				EventManager.SendEvent(IDs.Events.DisableMusicDuringAd);
-				#if UNITY_EDITOR
-				DelayedCall.Create(OnInterstitialClosed, 2f);
-				#else
-				wrapper.ShowIntersitital(tag);
-				#endif
 			}
 
 			if (!adStarted && callback != null)
