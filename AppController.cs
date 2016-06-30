@@ -15,6 +15,7 @@ namespace Zedarus.ToolKit
 		static private bool initialized = false;
 		private DataManager<GameDataClass, PlayerDataClass> _data;
 		private bool _postInit = false;
+		private string _cachedRemoteData = null;
 		#endregion
 
 		#region Unity Methods
@@ -57,6 +58,17 @@ namespace Zedarus.ToolKit
 			{
 				Data.Player.PostInit();
 			}
+
+			if (Data.Game != null)
+			{
+				if (_cachedRemoteData != null)
+				{
+					Data.Game.ApplyRemoteData(_cachedRemoteData);
+					_cachedRemoteData = null;		
+				}
+			}
+
+			APIManager.Instance.RemoteData.RequestData();
 		}
 
 		protected virtual void InitEvents()
@@ -85,7 +97,21 @@ namespace Zedarus.ToolKit
 
 		protected virtual void InitAPI()
 		{
+			APIManager.Instance.RemoteData.DataReceived += OnRemoteDataReceived;
+		}
+		#endregion
 
+		#region Event Handlers
+		private void OnRemoteDataReceived(string data)
+		{
+			if (initialized && _postInit)
+			{
+				Data.Game.ApplyRemoteData(data);
+			}
+			else
+			{
+				_cachedRemoteData = data;
+			}
 		}
 		#endregion
 

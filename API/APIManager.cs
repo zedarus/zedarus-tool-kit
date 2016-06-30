@@ -42,6 +42,11 @@ namespace Zedarus.ToolKit.API
 			public const int GooglePlayGameServices = 2;
 		}
 
+		public struct RemoteData
+		{
+			public const int HeyZap = 1;
+		}
+
 		public const int None = 0;
 	}
 	
@@ -54,6 +59,8 @@ namespace Zedarus.ToolKit.API
 		private SyncController _syncController;
 		private AnalyticsController _analyticsController;
 		private AdsController _adsController;
+		private RemoteDataController _remoteDataController;
+
 		private APIState _stateModelRef = null;
 		private APISettingsData _settingsModelRef = null;
 		#endregion
@@ -67,6 +74,7 @@ namespace Zedarus.ToolKit.API
 			_syncController = new SyncController();
 			_analyticsController = new AnalyticsController();
 			_adsController = new AdsController();
+			_remoteDataController = new RemoteDataController();
 			
 			_storeController.Initialized += OnControllerInitialized;
 			_socialController.Initialized += OnControllerInitialized;
@@ -74,6 +82,7 @@ namespace Zedarus.ToolKit.API
 			_syncController.Initialized += OnControllerInitialized;
 			_analyticsController.Initialized += OnControllerInitialized;
 			_adsController.Initialized += OnControllerInitialized;
+			_remoteDataController.Initialized += OnControllerInitialized;
 		}
 		#endregion
 		
@@ -86,6 +95,7 @@ namespace Zedarus.ToolKit.API
 			_syncController.Init();
 			_analyticsController.Init();
 			_adsController.Init();
+			_remoteDataController.Init();
 		}
 
 		public void UseAPISettingsModel(APISettingsData settingsModel)
@@ -135,6 +145,11 @@ namespace Zedarus.ToolKit.API
 		public AdsController Ads
 		{
 			get { return _adsController; }
+		}
+
+		public RemoteDataController RemoteData
+		{
+			get { return _remoteDataController; }
 		}
 
 		internal APIState State
