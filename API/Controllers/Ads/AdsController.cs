@@ -8,7 +8,7 @@ using Zedarus.ToolKit.Events;
 
 namespace Zedarus.ToolKit.API
 {
-	public class MediationAdsController : APIController 
+	public class AdsController : APIController 
 	{	
 		#region Events
 		public event Action InterstitialClosed;
@@ -50,7 +50,7 @@ namespace Zedarus.ToolKit.API
 			if (_interstitialsCached)
 				return;
 
-			IMediationAdsWrapperInterface wrapper = Wrapper;
+			IAdsWrapperInterface wrapper = Wrapper;
 			if (Enabled && wrapper != null)
 			{
 				wrapper.CacheInterstitial(tag);
@@ -68,7 +68,7 @@ namespace Zedarus.ToolKit.API
 			if (_rewardVideosCached)
 				return;
 
-			IMediationAdsWrapperInterface wrapper = Wrapper;
+			IAdsWrapperInterface wrapper = Wrapper;
 			if (Enabled && wrapper != null)
 			{
 				wrapper.CacheRewardedVideo(tag);
@@ -85,21 +85,21 @@ namespace Zedarus.ToolKit.API
 		#region Controls
 		public void ShowBanner(string tag)
 		{
-			IMediationAdsWrapperInterface wrapper = Wrapper;
+			IAdsWrapperInterface wrapper = Wrapper;
 			if (Enabled && wrapper != null)
 				wrapper.ShowBanner(tag);
 		}
 
 		public void HideBanner()
 		{
-			IMediationAdsWrapperInterface wrapper = Wrapper;
+			IAdsWrapperInterface wrapper = Wrapper;
 			if (wrapper != null)
 				wrapper.HideBanner();
 		}
 
 		public void ShowBetweenLevelAd(string tag, Action callback)
 		{
-			IMediationAdsWrapperInterface wrapper = Wrapper;
+			IAdsWrapperInterface wrapper = Wrapper;
 			bool adStarted = false;
 
 			if (Enabled && wrapper != null)
@@ -130,7 +130,7 @@ namespace Zedarus.ToolKit.API
 
 		public void ShowIntersitital(string tag, Action callback)
 		{
-			IMediationAdsWrapperInterface wrapper = Wrapper;
+			IAdsWrapperInterface wrapper = Wrapper;
 			bool adStarted = false;
 
 			if (Enabled && wrapper != null)
@@ -155,7 +155,7 @@ namespace Zedarus.ToolKit.API
 
 		public void ShowRewardedVideo(string tag, Action callback, Action<int> rewardCallback, int productID)
 		{
-			IMediationAdsWrapperInterface wrapper = Wrapper;
+			IAdsWrapperInterface wrapper = Wrapper;
 			bool adStarted = false;
 
 			if (wrapper != null)
@@ -204,7 +204,7 @@ namespace Zedarus.ToolKit.API
 			}
 			else
 			{
-				IMediationAdsWrapperInterface wrapper = Wrapper;
+				IAdsWrapperInterface wrapper = Wrapper;
 				if (wrapper != null)
 				{
 					wrapper.ShowTestUI();
@@ -221,7 +221,7 @@ namespace Zedarus.ToolKit.API
 		#region Queries
 		public float GetBannerHeight()
 		{
-			IMediationAdsWrapperInterface wrapper = Wrapper;
+			IAdsWrapperInterface wrapper = Wrapper;
 			if (Enabled && wrapper != null)
 				return wrapper.GetBannerHeight();
 			else
@@ -230,7 +230,7 @@ namespace Zedarus.ToolKit.API
 
 		public bool IsBannerVisible()
 		{
-			IMediationAdsWrapperInterface wrapper = Wrapper;
+			IAdsWrapperInterface wrapper = Wrapper;
 			if (Enabled && wrapper != null)
 				return wrapper.IsBannerVisible();
 			else
@@ -256,7 +256,7 @@ namespace Zedarus.ToolKit.API
 
 			EventManager.AddListener(IDs.Events.DisableAds, OnDisableAds);
 
-			foreach (IMediationAdsWrapperInterface wrapper in Wrappers)
+			foreach (IAdsWrapperInterface wrapper in Wrappers)
 			{
 				wrapper.InterstitialClosed += OnInterstitialClosed;
 				wrapper.GrantReward += OnGrantReward;
@@ -271,7 +271,7 @@ namespace Zedarus.ToolKit.API
 
 			EventManager.RemoveListener(IDs.Events.DisableAds, OnDisableAds);
 
-			foreach (IMediationAdsWrapperInterface wrapper in Wrappers)
+			foreach (IAdsWrapperInterface wrapper in Wrappers)
 			{
 				wrapper.InterstitialClosed -= OnInterstitialClosed;
 				wrapper.GrantReward -= OnGrantReward;
@@ -328,9 +328,9 @@ namespace Zedarus.ToolKit.API
 		#endregion
 
 		#region Getters
-		protected IMediationAdsWrapperInterface Wrapper
+		protected IAdsWrapperInterface Wrapper
 		{
-			get { return (IMediationAdsWrapperInterface)CurrentWrapperBase; }
+			get { return (IAdsWrapperInterface)CurrentWrapperBase; }
 		}
 		#endregion
 

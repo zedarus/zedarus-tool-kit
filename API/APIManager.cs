@@ -53,7 +53,7 @@ namespace Zedarus.ToolKit.API
 		private ScoreController _scoreController;
 		private SyncController _syncController;
 		private AnalyticsController _analyticsController;
-		private MediationAdsController _mediationAdsController;
+		private AdsController _mediationAdsController;
 		private APIState _stateModelRef = null;
 		private APISettingsData _settingsModelRef = null;
 		#endregion
@@ -66,7 +66,7 @@ namespace Zedarus.ToolKit.API
 			_scoreController = new ScoreController();
 			_syncController = new SyncController();
 			_analyticsController = new AnalyticsController();
-			_mediationAdsController = new MediationAdsController();
+			_mediationAdsController = new AdsController();
 			
 			_storeController.Initialized += OnControllerInitialized;
 			_socialController.Initialized += OnControllerInitialized;
@@ -132,7 +132,7 @@ namespace Zedarus.ToolKit.API
 			get { return _analyticsController; }
 		}
 
-		public MediationAdsController Ads
+		public AdsController Ads
 		{
 			get { return _mediationAdsController; }
 		}

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Zedarus.ToolKit.API
 {
-	public interface IMediationAdsWrapperInterface
+	public interface IAdsWrapperInterface
 	{
 		#region Events
 		event Action InterstitialClosed;

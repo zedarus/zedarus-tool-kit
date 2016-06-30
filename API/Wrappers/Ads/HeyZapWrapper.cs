@@ -26,7 +26,7 @@ namespace Zedarus.ToolKit.API
 		}
 	}
 
-	public class HeyZapWrapper : APIWrapper<HeyZapWrapper>, IMediationAdsWrapperInterface
+	public class HeyZapWrapper : APIWrapper<HeyZapWrapper>, IAdsWrapperInterface
 	{
 		#region Events
 		public event Action InterstitialClosed;
