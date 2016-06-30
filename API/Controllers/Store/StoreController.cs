@@ -27,12 +27,6 @@ namespace Zedarus.ToolKit.API
 			_queuedPurchases = new Queue<string>();
 			_queuedPurchasesCallbacks = new Queue<Action<string, bool>>();
 			_callbacks = new Dictionary<string, Action<string, bool>>();
-
-			// TODO: move this to settings class
-//			_items.Add(new StoreItem("CoinsPackSmall", "KubikoCoinsPackSmall", "com.zedarus.kubiko.coins_pack_small", true));
-//			_items.Add(new StoreItem("CoinsPackMedium", "KubikoCoinsPackMedium", "com.zedarus.kubiko.coins_pack_medium", true));
-//			_items.Add(new StoreItem("CoinsPackBig", "KubikoCoinsPackBig", "com.zedarus.kubiko.coins_pack_big", true));
-//			_items.Add(new StoreItem("RemoveAds", "KubikoRemoveAds", "com.zedarus.kubiko.remove_ads", false));
 		}
 		
 		protected override void CompleteInitialization()
@@ -44,20 +38,15 @@ namespace Zedarus.ToolKit.API
 		public void RegisterProducts(StoreProduct[] products)
 		{
 			_products = products;
-		}
-		#endregion
-		
-		#region Wrappers Initialization
-		protected override void InitWrappers() 
-		{
-			base.InitWrappers();
 
 			foreach (IStoreWrapperInterface wrapper in Wrappers)
 			{
 				wrapper.GetProductsListFromServer(_products);
 			}
 		}
+		#endregion
 		
+		#region Wrappers Initialization
 		protected override IAPIWrapperInterface GetWrapperForAPI(int wrapperAPI)
 		{
 			switch (wrapperAPI)
