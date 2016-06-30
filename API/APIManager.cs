@@ -53,7 +53,7 @@ namespace Zedarus.ToolKit.API
 		private ScoreController _scoreController;
 		private SyncController _syncController;
 		private AnalyticsController _analyticsController;
-		private AdsController _mediationAdsController;
+		private AdsController _adsController;
 		private APIState _stateModelRef = null;
 		private APISettingsData _settingsModelRef = null;
 		#endregion
@@ -66,14 +66,14 @@ namespace Zedarus.ToolKit.API
 			_scoreController = new ScoreController();
 			_syncController = new SyncController();
 			_analyticsController = new AnalyticsController();
-			_mediationAdsController = new AdsController();
+			_adsController = new AdsController();
 			
 			_storeController.Initialized += OnControllerInitialized;
 			_socialController.Initialized += OnControllerInitialized;
 			_scoreController.Initialized += OnControllerInitialized;
 			_syncController.Initialized += OnControllerInitialized;
 			_analyticsController.Initialized += OnControllerInitialized;
-			_mediationAdsController.Initialized += OnControllerInitialized;
+			_adsController.Initialized += OnControllerInitialized;
 		}
 		#endregion
 		
@@ -85,7 +85,7 @@ namespace Zedarus.ToolKit.API
 			_scoreController.Init();
 			_syncController.Init();
 			_analyticsController.Init();
-			_mediationAdsController.Init();
+			_adsController.Init();
 		}
 
 		public void UseAPISettingsModel(APISettingsData settingsModel)
@@ -134,7 +134,7 @@ namespace Zedarus.ToolKit.API
 
 		public AdsController Ads
 		{
-			get { return _mediationAdsController; }
+			get { return _adsController; }
 		}
 
 		internal APIState State
