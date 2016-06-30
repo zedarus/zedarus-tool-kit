@@ -21,6 +21,10 @@ namespace Zedarus.ToolKit.API
 		private bool _interstitialsCached = false;
 		private bool _rewardVideosCached = false;
 		private Action _interstitialClosedCallback = null;
+		private Action<int> _rewardCallback = null;
+		private int _rewardProductID = 0;
+		private int _testUIClicks = 0;
+		private float _testUILastClickTime = 0f;
 		#endregion
 
 		#region Initialization
@@ -76,20 +80,6 @@ namespace Zedarus.ToolKit.API
 
 			_rewardVideosCached = true;
 		}
-
-		public void CacheInterstitial(string tag)
-		{
-			IMediationAdsWrapperInterface wrapper = Wrapper;
-			if (Enabled && wrapper != null)
-				wrapper.CacheInterstitial(tag);
-		}
-
-		public void CacheRewardedVideo(string tag)
-		{
-			IMediationAdsWrapperInterface wrapper = Wrapper;
-			if (Enabled && wrapper != null)
-				wrapper.CacheRewardedVideo(tag);
-		}
 		#endregion
 
 		#region Controls
@@ -120,7 +110,6 @@ namespace Zedarus.ToolKit.API
 				{
 					adStarted = true;
 					_interstitialClosedCallback = callback;
-					Debug.Log("Display interstitial: " + tag);
 					APIManager.Instance.State.ResetInterstitialCounter();
 					EventManager.SendEvent(IDs.Events.DisableMusicDuringAd);
 					#if UNITY_EDITOR
@@ -139,12 +128,15 @@ namespace Zedarus.ToolKit.API
 			callback = null;
 		}
 
-		public void ShowIntersitital(string tag)
+		public void ShowIntersitital(string tag, Action callback)
 		{
 			IMediationAdsWrapperInterface wrapper = Wrapper;
+			bool adStarted = false;
 
 			if (Enabled && wrapper != null)
 			{
+				adStarted = true;
+				_interstitialClosedCallback = callback;
 				EventManager.SendEvent(IDs.Events.DisableMusicDuringAd);
 				#if UNITY_EDITOR
 				DelayedCall.Create(OnInterstitialClosed, 2f);
@@ -152,13 +144,26 @@ namespace Zedarus.ToolKit.API
 				wrapper.ShowIntersitital(tag);
 				#endif
 			}
+
+			if (!adStarted && callback != null)
+			{
+				callback();
+			}
+
+			callback = null;
 		}
 
-		public void ShowRewardedVideo(string tag)
+		public void ShowRewardedVideo(string tag, Action callback, Action<int> rewardCallback, int productID)
 		{
 			IMediationAdsWrapperInterface wrapper = Wrapper;
+			bool adStarted = false;
+
 			if (wrapper != null)
 			{
+				adStarted = true;
+				_interstitialClosedCallback = callback;
+				_rewardCallback = rewardCallback;
+				_rewardProductID = productID;
 				EventManager.SendEvent(IDs.Events.DisableMusicDuringAd);
 				#if UNITY_EDITOR
 				DelayedCall.Create(OnInterstitialClosed, 2f);
@@ -166,10 +171,15 @@ namespace Zedarus.ToolKit.API
 				wrapper.ShowRewardedVideo(tag);
 				#endif
 			}
-		}
 
-		private int _testUIClicks = 0;
-		private float _testUILastClickTime = 0f;
+			if (!adStarted && callback != null)
+			{
+				callback();
+			}
+
+			callback = null;
+			rewardCallback = null;
+		}
 
 		public void ShowTestUI(bool useClickCounter)
 		{
@@ -295,6 +305,13 @@ namespace Zedarus.ToolKit.API
 			EventManager.SendEvent(IDs.Events.EnableMusicAfterAd);
 			if (GrantReward != null)
 				GrantReward();
+
+			if (_rewardCallback != null)
+			{
+				_rewardCallback(_rewardProductID);
+				_rewardProductID = 0;
+				_rewardCallback = null;
+			}
 		}
 
 		private void OnBannerDisplayed()
