@@ -2,20 +2,10 @@ using UnityEngine;
 using System.Collections;
 
 namespace Zedarus.ToolKit.API
-{
-	public enum StoreItemType
-	{
-		CoinsPackSmall = 1,
-		CoinsPackMedium = 2,
-		CoinsPackBig = 3,
-		RemoveAds = 4,
-		None = 5,
-	}
-	
-	public class StoreItem
+{	
+	public class StoreProduct
 	{
 		#region Parameters
-		private StoreItemType _type;
 		private string _id;
 		private string _appStoreID;
 		private string _googlePlayID;
@@ -24,27 +14,25 @@ namespace Zedarus.ToolKit.API
 		private decimal _price;
 		private bool _consumable = true;
 		#endregion
-		
+
 		#region Initialization
-		public StoreItem()
+		public StoreProduct()
 		{
-			_type = StoreItemType.None;
-			_id = string.Empty;
+			_id = null;
 			_formattedPrice = "--";
 			_price = 0.0m;
 			_currency = "USD";
 		}
 		
-		public StoreItem(StoreItemType type, string id, string appStoreID, string googlePlayID)
+		public StoreProduct(string id, string appStoreID, string googlePlayID, bool consumable)
 		{
-			_type = type;
 			_id = id;
 			_appStoreID = appStoreID;
 			_googlePlayID = googlePlayID;
 			_formattedPrice = "--";
 			_price = 0.0m;
 			_currency = "USD";
-			_consumable = type != StoreItemType.RemoveAds;
+			_consumable = consumable;
 		}
 		#endregion
 		
@@ -56,13 +44,8 @@ namespace Zedarus.ToolKit.API
 			_currency = currency;
 		}
 		#endregion
-		
+
 		#region Getters
-		public StoreItemType Type
-		{
-			get { return _type; }
-		}
-		
 		public string ID
 		{
 			get { return _id; }

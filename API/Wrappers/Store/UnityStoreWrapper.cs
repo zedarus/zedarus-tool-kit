@@ -48,13 +48,13 @@ namespace Zedarus.ToolKit.API
 		#endregion
 
 		#region Controls
-		public void PurchaseItem(StoreItem item)
+		public void Purchase(StoreProduct product)
 		{
 			if (PurchaseProcessStarted != null)
-				PurchaseProcessStarted(item.ID);
+				PurchaseProcessStarted(product.ID);
 
 			#if API_IAP_UNITY
-			_controller.InitiatePurchase(item.ID);
+			_controller.InitiatePurchase(product.ID);
 			#endif
 		}
 
@@ -72,13 +72,13 @@ namespace Zedarus.ToolKit.API
 			#endif
 		}
 
-		public void GetProductsListFromServer(List<StoreItem> products)
+		public void GetProductsListFromServer(StoreProduct[] products)
 		{
 			#if API_IAP_UNITY
 			var builder = ConfigurationBuilder.Instance(StandardPurchasingModule.Instance());
 
 			ProductType productType;
-			foreach (StoreItem product in products)
+			foreach (StoreProduct product in products)
 			{
 				productType = product.Consumable ? ProductType.Consumable : ProductType.NonConsumable;
 
@@ -93,7 +93,7 @@ namespace Zedarus.ToolKit.API
 			#endif
 		}
 
-		public string GetLocalisedPriceForItemWithID(string id)
+		public string GetLocalisedPriceForProductWithID(string id)
 		{
 			if (_pricesReceived)
 			{
@@ -105,7 +105,7 @@ namespace Zedarus.ToolKit.API
 				return "--";
 		}
 
-		public string GetCurrencyIDForItemWithID(string id)
+		public string GetCurrencyIDForProductWithID(string id)
 		{
 			if (_pricesReceived)
 			{
@@ -117,7 +117,7 @@ namespace Zedarus.ToolKit.API
 				return "USD";
 		}
 
-		public decimal GetDecimalPriceForItemWithID(string id)
+		public decimal GetDecimalPriceForProductWithID(string id)
 		{
 			if (_pricesReceived)
 			{

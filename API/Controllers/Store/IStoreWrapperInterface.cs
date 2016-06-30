@@ -14,12 +14,12 @@ namespace Zedarus.ToolKit.API
 		#endregion
 		
 		#region Controls
-		void PurchaseItem(StoreItem item);
+		void Purchase(StoreProduct product);
 		void RestorePurchases();
-		void GetProductsListFromServer(List<StoreItem> products);
-		string GetLocalisedPriceForItemWithID(string id);
-		string GetCurrencyIDForItemWithID(string id);
-		decimal GetDecimalPriceForItemWithID(string id);
+		void GetProductsListFromServer(StoreProduct[] products);
+		string GetLocalisedPriceForProductWithID(string id);
+		string GetCurrencyIDForProductWithID(string id);
+		decimal GetDecimalPriceForProductWithID(string id);
 		#endregion
 	}
 }

@@ -69,6 +69,7 @@ namespace Zedarus.ToolKit
 			}
 
 			APIManager.Instance.RemoteData.RequestData();
+			APIManager.Instance.Store.RegisterProducts(ProductList);
 		}
 
 		protected virtual void InitEvents()
@@ -98,6 +99,11 @@ namespace Zedarus.ToolKit
 		protected virtual void InitAPI()
 		{
 			APIManager.Instance.RemoteData.DataReceived += OnRemoteDataReceived;
+		}
+
+		protected virtual StoreProduct[] ProductList
+		{
+			get { return null; }
 		}
 		#endregion
 
