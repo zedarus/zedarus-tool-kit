@@ -39,6 +39,11 @@ namespace Zedarus.ToolKit.Data.Player
 		{
 			_intertitialCounter = 0;
 		}
+
+		public void DisableAds()
+		{
+			_adsEnabled = false;
+		}
 		#endregion
 
 		#region Getters

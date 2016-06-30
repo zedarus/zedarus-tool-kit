@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using Zedarus.ToolKit.Data;
 using Zedarus.ToolKit.Data.Player;
 using Zedarus.ToolKit.Data.Game;
@@ -100,11 +101,17 @@ namespace Zedarus.ToolKit
 		protected virtual void InitAPI()
 		{
 			API.RemoteData.DataReceived += OnRemoteDataReceived;
+			API.Store.ProductPurchaseFinished += OnProductPurchaseFinished;
 		}
+		#endregion
 
-		protected virtual StoreProduct[] ProductList
+		#region Controls
+		public void PurchaseAdsRemoval()
 		{
-			get { return null; }
+			if (Data.Game.APISettings.AdsEnabled)
+			{
+				API.Store.Purchase(Data.Game.APISettings.RemoveAdsIAPID, null);
+			}
 		}
 		#endregion
 
@@ -118,6 +125,15 @@ namespace Zedarus.ToolKit
 			else
 			{
 				_cachedRemoteData = data;
+			}
+		}
+
+		protected virtual void OnProductPurchaseFinished(string productID, bool success)
+		{
+			if (Data.Game.APISettings.AdsEnabled && productID.Equals(Data.Game.APISettings.RemoveAdsIAPID) && success)
+			{
+				API.Ads.DisableAds();
+				Data.Save();
 			}
 		}
 		#endregion
@@ -138,6 +154,23 @@ namespace Zedarus.ToolKit
 				}
 
 				return _api; 
+			}
+		}
+
+		protected virtual StoreProduct[] ProductList
+		{
+			get 
+			{ 
+				if (Data.Game.APISettings.AdsEnabled)
+				{
+					return new StoreProduct[] { new StoreProduct(
+						Data.Game.APISettings.RemoveAdsIAPID, 
+						Data.Game.APISettings.RemoveAdsIAPAppleID, 
+						Data.Game.APISettings.RemoveAdsIAPGoogleID, false)
+					};
+				}
+				else
+					return null; 
 			}
 		}
 		#endregion

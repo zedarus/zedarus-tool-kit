@@ -15,6 +15,19 @@ namespace Zedarus.ToolKit.Data.Game
 		[DataField("Interstitials Delay")]
 		[DataValidateMin(0)]
 		private int _intertitialsDelay = 3;
+
+		[DataGroup("Remove Ads IAP")]
+		[SerializeField]
+		[DataField("Remove Ads IAP ID")]
+		private string _removeAdsIAPID = "";
+
+		[SerializeField]
+		[DataField("Remove Ads IAP App Store ID")]
+		private string _removeAdsIAPAppleID = "";
+
+		[SerializeField]
+		[DataField("Remove Ads IAP Google Play ID")]
+		private string _removeAdsIAPGooglePlayID = "";
 		#endregion
 
 		#region Initalization
@@ -31,6 +44,21 @@ namespace Zedarus.ToolKit.Data.Game
 		public int IntertitialsDelay
 		{
 			get { return _intertitialsDelay; }
+		}
+
+		public string RemoveAdsIAPID
+		{
+			get { return _removeAdsIAPID; }
+		}
+
+		public string RemoveAdsIAPAppleID
+		{
+			get { return _removeAdsIAPAppleID; }
+		}
+
+		public string RemoveAdsIAPGoogleID
+		{
+			get { return _removeAdsIAPGooglePlayID; }
 		}
 		#endregion
 

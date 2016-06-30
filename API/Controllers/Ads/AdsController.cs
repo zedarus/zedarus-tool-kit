@@ -208,9 +208,11 @@ namespace Zedarus.ToolKit.API
 			}
 		}
 
-		private void DisableAds()
+		public void DisableAds()
 		{
 			HideBanner();
+			Manager.State.DisableAds();
+			EventManager.SendEvent(IDs.Events.AdsDisabled);
 		}
 		#endregion
 
@@ -250,8 +252,6 @@ namespace Zedarus.ToolKit.API
 		{
 			base.CreateEventListeners();
 
-			EventManager.AddListener(IDs.Events.DisableAds, OnDisableAds);
-
 			foreach (IAdsWrapperInterface wrapper in Wrappers)
 			{
 				wrapper.InterstitialClosed += OnInterstitialClosed;
@@ -265,8 +265,6 @@ namespace Zedarus.ToolKit.API
 		{
 			base.RemoveEventListeners();
 
-			EventManager.RemoveListener(IDs.Events.DisableAds, OnDisableAds);
-
 			foreach (IAdsWrapperInterface wrapper in Wrappers)
 			{
 				wrapper.InterstitialClosed -= OnInterstitialClosed;
@@ -278,11 +276,6 @@ namespace Zedarus.ToolKit.API
 		#endregion
 
 		#region Event Handlers
-		private void OnDisableAds()
-		{
-			DisableAds();
-		}
-
 		private void OnInterstitialClosed()
 		{
 			EventManager.SendEvent(IDs.Events.EnableMusicAfterAd);
@@ -331,7 +324,7 @@ namespace Zedarus.ToolKit.API
 		#endregion
 
 		#region Helpers
-		private bool Enabled
+		public bool Enabled
 		{
 			get 
 			{

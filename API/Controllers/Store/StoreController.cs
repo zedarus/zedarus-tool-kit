@@ -10,6 +10,10 @@ namespace Zedarus.ToolKit.API
 {
 	public class StoreController : APIController
 	{
+		#region Events
+		public event Action<string, bool> ProductPurchaseFinished;
+		#endregion
+
 		#region Parameters
 		private StoreProduct[] _products;
 		private Queue<string> _queuedPurchases;
@@ -104,17 +108,6 @@ namespace Zedarus.ToolKit.API
 			else
 				return "--";
 		}
-
-		private void SimulateRemoveAdsPurchase()
-		{
-			// TODO: PlayerDataManager.Instance.DisableAds();
-			EventManager.SendEvent(IDs.Events.DisableAds);
-
-			//APIManager.Instance.Ads.DisableAds();
-			//APIManager.Instance.BannerAds.DisableAds();
-//			if (OnDisableAds != null)
-//				OnDisableAds();
-		}
 		#endregion
 		
 		#region Event Listeners
@@ -153,8 +146,17 @@ namespace Zedarus.ToolKit.API
 		{
 			if (_callbacks.ContainsKey(productID))
 			{
-				_callbacks[productID](productID, success);
+				if (_callbacks[productID] != null)
+				{
+					_callbacks[productID](productID, success);
+				}
+
 				_callbacks.Remove(productID);
+			}
+
+			if (ProductPurchaseFinished != null)
+			{
+				ProductPurchaseFinished(productID, success);
 			}
 			
 			CheckQueue();
