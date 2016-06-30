@@ -125,7 +125,11 @@ namespace Zedarus.ToolKit.API
 				if (useBetweenLevelCounter)
 				{
 					allowed = CanDisplayBetweenLevelAd;
-					Manager.State.ResetInterstitialCounter();
+
+					if (allowed)
+					{
+						Manager.State.ResetInterstitialCounter();
+					}
 				}
 
 				if (allowed)

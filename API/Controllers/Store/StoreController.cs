@@ -21,10 +21,6 @@ namespace Zedarus.ToolKit.API
 		private Dictionary<string, Action<string, bool>> _callbacks;
 		#endregion
 		
-		#region Events
-//		public event Action OnDisableAds;
-		#endregion
-		
 		#region Initialization
 		protected override void Setup() 
 		{
