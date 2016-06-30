@@ -55,6 +55,7 @@ namespace Zedarus.ToolKit.Data
 
 		public void Save()
 		{
+			Debug.Log("Save data");
 			Player.UpdateVersionAndTimestamp(Game.Settings.Version, Game.Settings.Build);
 			PlayerData.Save<PD>(Player, _playerDataFilename);
 		}
