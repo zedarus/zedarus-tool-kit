@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Zedarus.ToolKit;
 using Zedarus.ToolKit.Data;
 using Zedarus.ToolKit.Settings;
 using Zedarus.ToolKit.Events;
@@ -116,7 +117,7 @@ namespace Zedarus.ToolKit.API
 			{
 				if (useBetweenLevelCounter)
 				{
-					APIManager.Instance.State.IncreaseInterstitialCounter();
+					Manager.State.IncreaseInterstitialCounter();
 				}
 
 				bool allowed = true;
@@ -124,7 +125,7 @@ namespace Zedarus.ToolKit.API
 				if (useBetweenLevelCounter)
 				{
 					allowed = CanDisplayBetweenLevelAd;
-					APIManager.Instance.State.ResetInterstitialCounter();
+					Manager.State.ResetInterstitialCounter();
 				}
 
 				if (allowed)
@@ -237,7 +238,7 @@ namespace Zedarus.ToolKit.API
 			get
 			{
 				if (Enabled)
-					return APIManager.Instance.State.IntertitialCounter >= APIManager.Instance.Settings.IntertitialsDelay;
+					return Manager.State.IntertitialCounter >= Manager.Settings.IntertitialsDelay;
 				else
 					return false;
 			}
@@ -334,7 +335,7 @@ namespace Zedarus.ToolKit.API
 		{
 			get 
 			{
-				return APIManager.Instance.State.AdsEnabled && APIManager.Instance.Settings.AdsEnabled;
+				return Manager.State.AdsEnabled && Manager.Settings.AdsEnabled;
 			}
 		}
 		#endregion

@@ -14,6 +14,7 @@ namespace Zedarus.ToolKit
 		#region Properties
 		static private bool initialized = false;
 		private DataManager<GameDataClass, PlayerDataClass> _data;
+		private APIManager _api;
 		private bool _postInit = false;
 		private string _cachedRemoteData = null;
 		#endregion
@@ -38,7 +39,7 @@ namespace Zedarus.ToolKit
 			// - they rely on some data values heavily
 			// - remote game data is loaded through APIs, so we need to make sure to load local data first
 			InitAPI();
-			APIManager.Instance.Init();
+			API.Init();
 			
 			initialized = true;
 		}
@@ -68,8 +69,8 @@ namespace Zedarus.ToolKit
 				}
 			}
 
-			APIManager.Instance.RemoteData.RequestData();
-			APIManager.Instance.Store.RegisterProducts(ProductList);
+			API.RemoteData.RequestData();
+			API.Store.RegisterProducts(ProductList);
 		}
 
 		protected virtual void InitEvents()
@@ -81,7 +82,7 @@ namespace Zedarus.ToolKit
 		{
 			_data = new DataManager<GameDataClass, PlayerDataClass>();
 			_data.LoadGameData();
-			APIManager.Instance.UseAPISettingsModel(_data.Game.APISettings);
+			API.UseAPISettingsModel(_data.Game.APISettings);
 		}
 
 		protected virtual void InitPlayerData(string filename)
@@ -92,13 +93,13 @@ namespace Zedarus.ToolKit
 			APIState state = _data.Player.GetModel<APIState>();
 			if (state != null)
 			{
-				APIManager.Instance.UseAPIStateModel(state);
+				API.UseAPIStateModel(state);
 			}
 		}
 
 		protected virtual void InitAPI()
 		{
-			APIManager.Instance.RemoteData.DataReceived += OnRemoteDataReceived;
+			API.RemoteData.DataReceived += OnRemoteDataReceived;
 		}
 
 		protected virtual StoreProduct[] ProductList
@@ -125,6 +126,19 @@ namespace Zedarus.ToolKit
 		public DataManager<GameDataClass, PlayerDataClass> Data
 		{
 			get { return _data; }
+		}
+
+		public APIManager API
+		{
+			get 
+			{ 
+				if (_api == null)
+				{
+					_api = new APIManager();
+				}
+
+				return _api; 
+			}
 		}
 		#endregion
 	}

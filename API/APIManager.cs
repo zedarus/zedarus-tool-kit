@@ -50,7 +50,7 @@ namespace Zedarus.ToolKit.API
 		public const int None = 0;
 	}
 	
-	public class APIManager : SimpleSingleton<APIManager>
+	public class APIManager
 	{
 		#region Properties
 		private StoreController _storeController;
@@ -66,7 +66,7 @@ namespace Zedarus.ToolKit.API
 		#endregion
 		
 		#region Initalization
-		private APIManager()
+		public APIManager()
 		{
 			_storeController = new StoreController();
 			_socialController = new SocialController();
@@ -89,13 +89,13 @@ namespace Zedarus.ToolKit.API
 		#region Controls
 		public void Init()
 		{
-			_storeController.Init();
-			_socialController.Init();
-			_scoreController.Init();
-			_syncController.Init();
-			_analyticsController.Init();
-			_adsController.Init();
-			_remoteDataController.Init();
+			_storeController.Init(this);
+			_socialController.Init(this);
+			_scoreController.Init(this);
+			_syncController.Init(this);
+			_analyticsController.Init(this);
+			_adsController.Init(this);
+			_remoteDataController.Init(this);
 		}
 
 		public void UseAPISettingsModel(APISettingsData settingsModel)

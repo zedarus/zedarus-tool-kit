@@ -14,6 +14,7 @@ namespace Zedarus.ToolKit.API
 		protected List<IAPIWrapperInterface> _wrappers;
 		private object[] _wrapperParameters = null;
 		private int _numberOfWrappersInitialized = 0;
+		private APIManager _managerRef = null;
 		#endregion
 		
 		#region Events
@@ -28,10 +29,11 @@ namespace Zedarus.ToolKit.API
 			_wrapperParameters = parameters;
 		}
 		
-		public void Init()
+		public void Init(APIManager manager)
 		{
 			if (!_initialized && !_initializationStarted)
 			{
+				_managerRef = manager;
 				_wrappers = new List<IAPIWrapperInterface>();
 				
 				Setup();
@@ -119,6 +121,11 @@ namespace Zedarus.ToolKit.API
 		#endregion
 		
 		#region Getters
+		protected APIManager Manager
+		{
+			get { return _managerRef; }
+		}
+
 		public bool IsInitialized
 		{
 			get { return _initialized; }
