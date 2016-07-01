@@ -57,11 +57,6 @@ namespace Zedarus.ToolKit.API
 			if (Wrapper != null) Wrapper.RestoreAchievement(achievementID);
 		}
 		
-		public void SubmitTotalScore(int score)
-		{
-			throw new NotImplementedException();
-		}
-		
 		public void SubmitScore(int score, string leaderboardID) 
 		{
 			if (Wrapper != null) Wrapper.SubmitScore(score, leaderboardID);

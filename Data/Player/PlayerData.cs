@@ -49,7 +49,6 @@ namespace Zedarus.ToolKit.Data.Player
 					{
 						if (model.Value != null && _models.ContainsKey(model.Key))
 						{
-							Debug.Log("merge data: " + model.Key);
 							_models[model.Key].Merge(model.Value);
 						}
 					}

@@ -19,6 +19,14 @@ namespace Zedarus.ToolKit.Data.Game
 		[SerializeField]
 		[DataTable(1002, "API Settings", typeof(APISettingsData))]
 		private APISettingsData _apiSettings;
+
+		[SerializeField]
+		[DataTable(1003, "Achievements", typeof(AchievementData))]
+		private List<AchievementData> _achievements;
+
+		[SerializeField]
+		[DataTable(1004, "Leaderboards", typeof(LeaderboardData))]
+		private List<LeaderboardData> _leaderboards;
 		#endregion
 
 		#region Settings
@@ -142,6 +150,42 @@ namespace Zedarus.ToolKit.Data.Game
 		public SettingsData Settings
 		{
 			get { return _settings; }
+		}
+
+		public List<AchievementData> Achievements
+		{
+			get { return _achievements; }
+		}
+
+		public List<LeaderboardData> Leaderboards
+		{
+			get { return _leaderboards; }
+		}
+
+		public LeaderboardData DefaultLeaderboard
+		{
+			get 
+			{ 
+				foreach (LeaderboardData leaderboard in Leaderboards)
+				{
+					if (leaderboard.Default)
+					{
+						return leaderboard;
+					}
+				}
+
+				return null; 
+			}
+		}
+
+		public AchievementData GetAchievement(int id)
+		{
+			return GetDataTableEntry<AchievementData>(id, Achievements);
+		}
+
+		public LeaderboardData GetLeaderboard(int id)
+		{
+			return GetDataTableEntry<LeaderboardData>(id, Leaderboards);
 		}
 
 		protected T GetDataTableEntry<T>(int id, List<T> table) where T : IGameDataModel
