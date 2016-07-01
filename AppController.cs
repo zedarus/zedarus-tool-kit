@@ -6,6 +6,7 @@ using Zedarus.ToolKit.Data.Player;
 using Zedarus.ToolKit.Data.Game;
 using Zedarus.ToolKit.API;
 using Zedarus.ToolKit.Settings;
+using Zedarus.ToolKit.Events;
 
 namespace Zedarus.ToolKit
 {
@@ -17,7 +18,6 @@ namespace Zedarus.ToolKit
 		private DataManager<GameDataClass, PlayerDataClass> _data;
 		private APIManager _api;
 		private bool _postInit = false;
-		private string _cachedRemoteData = null;
 		#endregion
 
 		#region Unity Methods
@@ -59,15 +59,6 @@ namespace Zedarus.ToolKit
 			if (Data.Player != null)
 			{
 				Data.Player.PostInit();
-			}
-
-			if (Data.Game != null)
-			{
-				if (_cachedRemoteData != null)
-				{
-					Data.Game.ApplyRemoteData(_cachedRemoteData);
-					_cachedRemoteData = null;		
-				}
 			}
 
 			API.RemoteData.RequestData();
@@ -116,16 +107,9 @@ namespace Zedarus.ToolKit
 		#endregion
 
 		#region Event Handlers
-		private void OnRemoteDataReceived(string data)
+		protected void OnRemoteDataReceived(string data)
 		{
-			if (initialized && _postInit)
-			{
-				Data.Game.ApplyRemoteData(data);
-			}
-			else
-			{
-				_cachedRemoteData = data;
-			}
+			EventManager.SendEvent<string>(IDs.Events.RemoteDataReceived, data);
 		}
 
 		protected virtual void OnProductPurchaseFinished(string productID, bool success)

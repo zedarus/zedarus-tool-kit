@@ -79,7 +79,7 @@ namespace Zedarus.ToolKit.Data.Player
 			_timestamp = DateTime.UtcNow;
 		}
 
-		public void OnGameDataChange()
+		public virtual void OnGameDataChange()
 		{
 			PostInit();
 		}

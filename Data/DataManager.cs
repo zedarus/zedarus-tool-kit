@@ -43,6 +43,8 @@ namespace Zedarus.ToolKit.Data
 			if (Game != null && _queuedRemoteData != null)
 			{
 				Game.ApplyRemoteData(_queuedRemoteData);
+				if (Player != null)
+					Player.OnGameDataChange();
 				_queuedRemoteData = null;
 			}
 		}
