@@ -4,6 +4,9 @@ using System.Collections;
 using System.Collections.Generic;
 using Zedarus.ToolKit.Localisation;
 using Zedarus.ToolKit;
+#if UNITY_IPHONE && API_SCORE_GAMECENTER
+using Prime31;
+#endif
 
 namespace Zedarus.ToolKit.API
 {
@@ -12,7 +15,7 @@ namespace Zedarus.ToolKit.API
 		#region Setup
 		protected override void Setup(APIWrapperSettings settings) 
 		{
-//			Login();
+			Login();
 		}
 
 		protected override APIWrapperSettings ParseSettings(object[] settings)
@@ -22,17 +25,6 @@ namespace Zedarus.ToolKit.API
 		#endregion
 		
 		#region Controls
-		public void RequestAuthorisation()
-		{
-			#if UNITY_IPHONE && API_SCORE_GAMECENTER
-			if (!PlayerDataManager.Instance.GameCenterLoginRequested)
-			{
-				PopupManager.Instance.ShowUseGameCenterPopup(OnGameCenterUseConfirm, null);
-				PlayerDataManager.Instance.RequestGameCenterLogin();
-			}
-			#endif
-		}
-		
 		public void Login()
 		{
 			#if UNITY_IPHONE && API_SCORE_GAMECENTER
@@ -44,42 +36,43 @@ namespace Zedarus.ToolKit.API
 			#endif
 		}
 		
-		public void UnlockAchievement(int achievementID) 
+		public void UnlockAchievement(string achievementID) 
 		{
 			#if UNITY_IPHONE && API_SCORE_GAMECENTER
 			if (!Enabled)
 				return;
 			
-			string achievement = GetAchivementID(achievementID);
-			if (achievement != null)
+			if (achievementID != null)
 			{
-				GameCenterBinding.reportAchievement(achievement, 100f);	
+				GameCenterBinding.reportAchievement(achievementID, 100f);	
 				GameCenterBinding.showCompletionBannerForAchievements();
 			}
 			#endif
 		}
-		
-		public void RestoreAchievement(int achievementID)
+
+		public void RestoreAchievement(string achievementID)
 		{
 			#if UNITY_IPHONE && API_SCORE_GAMECENTER
 			if (!Enabled)
 				return;
 			
-			string achievement = GetAchivementID(achievementID);
-			if (achievement != null)
-				GameCenterBinding.reportAchievement(achievement, 100f);
+			if (achievementID != null)
+			{
+				GameCenterBinding.reportAchievement(achievementID, 100f);
+			}
 			#endif
 		}
 		
-		public void SubmitScore(int score, int leaderboardID) 
+		public void SubmitScore(int score, string leaderboardID) 
 		{
 			#if UNITY_IPHONE && API_SCORE_GAMECENTER
 			if (!Enabled)
 				return;
 			
-			string leaderboard = GetLeaderboardID(leaderboardID);
-			if (leaderboard != null)
-				GameCenterBinding.reportScore(score, leaderboard);
+			if (leaderboardID != null)
+			{
+				GameCenterBinding.reportScore(score, leaderboardID);
+			}
 			#endif
 		}
 		
@@ -137,26 +130,6 @@ namespace Zedarus.ToolKit.API
 				return false;
 				#endif
 			}
-		}
-		
-		private string GetAchivementID(int achievementID)
-		{
-			#if UNITY_IPHONE && API_SCORE_GAMECENTER
-			AchievementData achievement = GameDataManager.Instance.GetAchievementWithID(achievementID);
-			if (achievement != null)
-				return achievement.GameCenterIosID;
-			#endif
-			return null;
-		}
-		
-		private string GetLeaderboardID(int leaderboardID)
-		{
-			#if UNITY_IPHONE && API_SCORE_GAMECENTER
-			LeaderboardData leaderboard = GameDataManager.Instance.GetLeaderboardWithID(leaderboardID);	
-			if (leaderboard != null)
-				return leaderboard.GameCenterIosID;
-			#endif
-			return null;
 		}
 		#endregion
 		

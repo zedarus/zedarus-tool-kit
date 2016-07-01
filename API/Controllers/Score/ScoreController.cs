@@ -8,7 +8,7 @@ namespace Zedarus.ToolKit.API
 	public class ScoreController : APIController 
 	{
 		#region Events
-		public event Action<int> DisplayAchievementUnlockedNotification;
+		public event Action<string> DisplayAchievementUnlockedNotification;
 		#endregion
 		
 		#region Initialization
@@ -36,17 +36,12 @@ namespace Zedarus.ToolKit.API
 		#endregion
 		
 		#region Controls
-		public void RequestAuthorisation()
-		{
-			if (Wrapper != null) Wrapper.RequestAuthorisation();	
-		}
-		
 		public void Login()
 		{
 			if (Wrapper != null) Wrapper.Login();
 		}
 		
-		public void UnlockAchievement(int achievementID) 
+		public void UnlockAchievement(string achievementID) 
 		{
 			if (Wrapper != null)
 			{
@@ -57,7 +52,7 @@ namespace Zedarus.ToolKit.API
 			}
 		}
 		
-		public void RestoreAchievement(int achievementID) 
+		public void RestoreAchievement(string achievementID) 
 		{
 			if (Wrapper != null) Wrapper.RestoreAchievement(achievementID);
 		}
@@ -67,7 +62,7 @@ namespace Zedarus.ToolKit.API
 			throw new NotImplementedException();
 		}
 		
-		public void SubmitScore(int score, int leaderboardID) 
+		public void SubmitScore(int score, string leaderboardID) 
 		{
 			if (Wrapper != null) Wrapper.SubmitScore(score, leaderboardID);
 		}

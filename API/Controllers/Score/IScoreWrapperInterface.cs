@@ -11,11 +11,10 @@ namespace Zedarus.ToolKit.API
 		#endregion
 		
 		#region Controls
-		void RequestAuthorisation();
 		void Login();
-		void UnlockAchievement(int achievementID);
-		void SubmitScore(int score, int leaderboardID);
-		void RestoreAchievement(int achievementID);
+		void UnlockAchievement(string achievementID);
+		void SubmitScore(int score, string leaderboardID);
+		void RestoreAchievement(string achievementID);
 		void DisplayAchievementsList();
 		void DisplayLeaderboardsList();
 		void DisplayDefaultView();

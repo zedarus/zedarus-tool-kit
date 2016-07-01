@@ -32,8 +32,6 @@ namespace Zedarus.ToolKit.API
 		#endregion
 		
 		#region Controls
-		public void RequestAuthorisation() {}
-		
 		public void Login()
 		{
 			#if UNITY_ANDROID
@@ -45,7 +43,7 @@ namespace Zedarus.ToolKit.API
 			#endif
 		}
 		
-		public void UnlockAchievement(int achievementID)
+		public void UnlockAchievement(string achievementID)
 		{
 			#if UNITY_ANDROID
 			if (!Enabled)
@@ -57,7 +55,7 @@ namespace Zedarus.ToolKit.API
 			#endif
 		}
 		
-		public void RestoreAchievement(int achievementID)
+		public void RestoreAchievement(string achievementID)
 		{
 			#if UNITY_ANDROID
 			if (!Enabled)
@@ -69,7 +67,7 @@ namespace Zedarus.ToolKit.API
 			#endif
 		}
 		
-		public void SubmitScore(int score, int leaderboardID)
+		public void SubmitScore(int score, string leaderboardID)
 		{
 			#if UNITY_ANDROID
 			if (!Enabled)
