@@ -59,7 +59,7 @@ namespace Zedarus.ToolKit.Data
 			_playerData = PlayerData.Load<PD>(_playerDataFilename);
 		}
 
-		public void Save(bool sync)
+		public void Save(bool sync = true)
 		{
 			Debug.Log("Save data");
 			Player.UpdateVersionAndTimestamp(Game.Settings.Version, Game.Settings.Build);
