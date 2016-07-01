@@ -21,9 +21,7 @@ namespace Zedarus.ToolKit.API
 
 		public struct Sharing
 		{
-			public const int Facebook = 1;
-			public const int Twitter = 2;
-			public const int Email = 3;
+			public const int Native = 1;
 		}
 
 		public struct Analytics
@@ -54,7 +52,7 @@ namespace Zedarus.ToolKit.API
 	{
 		#region Properties
 		private StoreController _storeController;
-		private SocialController _socialController;
+		private ShareController _shareController;
 		private ScoreController _scoreController;
 		private SyncController _syncController;
 		private AnalyticsController _analyticsController;
@@ -69,7 +67,7 @@ namespace Zedarus.ToolKit.API
 		public APIManager()
 		{
 			_storeController = new StoreController();
-			_socialController = new SocialController();
+			_shareController = new ShareController();
 			_scoreController = new ScoreController();
 			_syncController = new SyncController();
 			_analyticsController = new AnalyticsController();
@@ -77,7 +75,7 @@ namespace Zedarus.ToolKit.API
 			_remoteDataController = new RemoteDataController();
 			
 			_storeController.Initialized += OnControllerInitialized;
-			_socialController.Initialized += OnControllerInitialized;
+			_shareController.Initialized += OnControllerInitialized;
 			_scoreController.Initialized += OnControllerInitialized;
 			_syncController.Initialized += OnControllerInitialized;
 			_analyticsController.Initialized += OnControllerInitialized;
@@ -90,7 +88,7 @@ namespace Zedarus.ToolKit.API
 		public void Init()
 		{
 			_storeController.Init(this);
-			_socialController.Init(this);
+			_shareController.Init(this);
 			_scoreController.Init(this);
 			_syncController.Init(this);
 			_analyticsController.Init(this);
@@ -122,9 +120,9 @@ namespace Zedarus.ToolKit.API
 			get { return _storeController; }
 		}
 		
-		public SocialController Social
+		public ShareController Share
 		{
-			get { return _socialController; }
+			get { return _shareController; }
 		}
 		
 		public ScoreController Score

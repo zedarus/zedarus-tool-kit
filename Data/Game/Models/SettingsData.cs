@@ -11,9 +11,26 @@ namespace Zedarus.ToolKit.Data.Game
 		[SerializeField]
 		[DataField("Version")]
 		private string _version = "0.0.0";
+
 		[SerializeField]
 		[DataField("Build")]
 		private int _build = 0;
+
+		[SerializeField]
+		[DataField("AppStore link")]
+		private string _appstoreLink = "";
+
+		[SerializeField]
+		[DataField("Google Play link")]
+		private string _googlePlayLink = "";
+
+		[SerializeField]
+		[DataField("AppStore link (short)")]
+		private string _appstoreLinkShort = "";
+
+		[SerializeField]
+		[DataField("Google Play link (short)")]
+		private string _googlePlayLinkShort = "";
 		#endregion
 
 		#region Initalization
@@ -46,6 +63,33 @@ namespace Zedarus.ToolKit.Data.Game
 		public int Build
 		{
 			get { return _build; }
+		}
+
+		public string GetCurrentPlatformStoreLink(bool shortVersion)
+		{
+			#if UNITY_IPHONE
+			return GetAppStoreLink(shortVersion);
+			#elif UNITY_ANDROID
+			return GetGooglePlayLink(shortVersion);
+			#else
+			return null;
+			#endif
+		}
+
+		public string GetAppStoreLink(bool shortVersion)
+		{
+			if (shortVersion)
+				return _appstoreLinkShort;
+			else
+				return _appstoreLink;
+		}
+
+		public string GetGooglePlayLink(bool shortVersion)
+		{
+			if (shortVersion)
+				return _googlePlayLinkShort;
+			else
+			return _googlePlayLink;
 		}
 		#endregion
 
