@@ -31,7 +31,7 @@ namespace Zedarus.ToolKit.API
 			if (!GameCenterBinding.isPlayerAuthenticated())
 			{
 				ZedLogger.Log("trying to authenticate local player");
-				GameCenterBinding.authenticateLocalPlayer();
+				GameCenterBinding.authenticateLocalPlayer(false);
 			}
 			#endif
 		}
