@@ -60,7 +60,19 @@ namespace Zedarus.ToolKit.Data.Player
 
 		#region Controls
 		public void Reset() { }
-		public bool Merge(IPlayerDataModel data) { return true; }
+		public bool Merge(IPlayerDataModel data) 
+		{ 
+			APIState other = (APIState)data;
+			if (other != null)
+			{
+				_adsEnabled = other.AdsEnabled;
+				return true;
+			}
+			else
+			{
+				return true; 
+			}
+		}
 		#endregion
 	}
 }

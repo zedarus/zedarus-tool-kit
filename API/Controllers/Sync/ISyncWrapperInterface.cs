@@ -7,7 +7,7 @@ namespace Zedarus.ToolKit.API
 	public interface ISyncWrapperInterface
 	{
 		#region Events
-		event Action SyncFinished;
+		event Action<byte[]> SyncFinished;
 		#endregion
 		
 		#region Controls

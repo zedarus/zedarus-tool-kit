@@ -8,7 +8,7 @@ namespace Zedarus.ToolKit.API
 	public class SyncController : APIController 
 	{
 		#region Events
-		public event Action SyncFinished;
+		public event Action<byte[]> SyncFinished;
 		#endregion
 		
 		#region Initialization
@@ -90,10 +90,10 @@ namespace Zedarus.ToolKit.API
 		#endregion
 		
 		#region Event Handlers
-		private void OnSyncFinished()
+		private void OnSyncFinished(byte[] data)
 		{
 			if (SyncFinished != null)
-				SyncFinished();
+				SyncFinished(data);
 		}
 		#endregion
 	}

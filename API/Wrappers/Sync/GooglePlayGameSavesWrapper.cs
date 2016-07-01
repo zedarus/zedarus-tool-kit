@@ -6,7 +6,7 @@ namespace Zedarus.ToolKit.API
 	public class GooglePlayGameSavesWrapper : APIWrapper<GooglePlayGameSavesWrapper>, ISyncWrapperInterface 
 	{
 		#region Events
-		public event Action SyncFinished;
+		public event Action<byte[]> SyncFinished;
 		#endregion
 
 		#region Properties

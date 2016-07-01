@@ -1,11 +1,33 @@
 ﻿using UnityEngine;
+using UnityEngine.Assertions;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using Zedarus.ToolKit;
+#if UNITY_IPHONE && API_SYNC_ICLOUD
+using Prime31;
+#endif
 
 namespace Zedarus.ToolKit.API
 {
+	public class ICloudWrapperSettings : APIWrapperSettings
+	{
+		private string _filename = "";
+
+		public ICloudWrapperSettings(object[] settings) : base(settings)
+		{
+			Assert.IsTrue(settings.Length > 0, "Incorrect number of parameters for ICloud wrapper");
+			Assert.IsTrue(settings[0].GetType() == typeof(string), "First parameter must be string");
+
+			_filename = settings[0].ToString();
+		}
+
+		public string Filename
+		{
+			get { return _filename; }
+		}
+	}
+
 	public class ICloudWrapper : APIWrapper<ICloudWrapper>, ISyncWrapperInterface 
 	{
 		#region Parameters
@@ -13,25 +35,31 @@ namespace Zedarus.ToolKit.API
 		#endregion
 		
 		#region Events
-		public event Action SyncFinished;
+		public event Action<byte[]> SyncFinished;
 		#endregion
 		
-		#region Parameters
+		#region Properties
+		private string _filename = "sync.dat";
 		#endregion
 		
 		#region Setup
 		protected override void Setup(APIWrapperSettings settings) 
 		{
 			#if UNITY_IPHONE && API_SYNC_ICLOUD
+			ICloudWrapperSettings icloudSettings = settings as ICloudWrapperSettings;
+			if (icloudSettings != null)
+			{
+				_filename = icloudSettings.Filename;
+			}
+
 			_lastSync = new DateTime(1986, 1, 1);
 			iCloudBinding.getUbiquityIdentityToken();
-			Sync();
 			#endif
 		}
 
 		protected override APIWrapperSettings ParseSettings(object[] settings)
 		{
-			return null;
+			return new ICloudWrapperSettings(settings);
 		}
 		#endregion
 		
@@ -52,15 +80,16 @@ namespace Zedarus.ToolKit.API
 				ZedLogger.Log("Documetns store is not available", LoggerContext.iCloud);
 				return false;
 			}
+
+//			PlayerData remoteData = GetPlayerData();
+//			if (remoteData != null)
+//				data.Merge(remoteData);
 			
-			PlayerData remoteData = GetPlayerData();
-			if (remoteData != null)
-				data.Merge(remoteData);
-			
-			byte[] bytes = UnitySerializer.Serialize(data);
-			bool result = P31CloudFile.writeAllBytes(GlobalSettings.Instance.API.iCloudFilename, bytes);
+//			byte[] bytes = UnitySerializer.Serialize(data);
+			bool result = P31CloudFile.writeAllBytes(Filename, data);
 			
 			ZedLogger.Log("File written in the cloud: " + result, LoggerContext.iCloud);
+
 			return result;
 			#else
 			return false;
@@ -70,11 +99,11 @@ namespace Zedarus.ToolKit.API
 		public byte[] GetData()
 		{
 			#if UNITY_IPHONE && API_SYNC_ICLOUD
-			if (P31CloudFile.exists(GlobalSettings.Instance.API.iCloudFilename))
+			if (P31CloudFile.exists(Filename))
 			{
-				byte[] bytes = P31CloudFile.readAllBytes(GlobalSettings.Instance.API.iCloudFilename);
-				PlayerData data = UnitySerializer.Deserialize<PlayerData>(bytes);
-				return data;
+				return P31CloudFile.readAllBytes(Filename);
+//				PlayerData data = UnitySerializer.Deserialize<PlayerData>(bytes);
+//				return bytes;
 			}
 			
 			ZedLogger.Log("Could not restore player data from cloud", LoggerContext.iCloud);
@@ -138,7 +167,7 @@ namespace Zedarus.ToolKit.API
 			{
 				ZedLogger.Log(doc, LoggerContext.iCloud);
 				
-				if (doc.filename.Equals(GlobalSettings.Instance.API.iCloudFilename))
+				if (doc.filename.Equals(Filename))
 				{
 					if (doc.isDownloaded)
 					{
@@ -167,7 +196,14 @@ namespace Zedarus.ToolKit.API
 		{
 			ZedLogger.Log("Sending sync finished event", LoggerContext.iCloud);
 			if (SyncFinished != null)
-				SyncFinished();
+				SyncFinished(GetData());
+		}
+		#endregion
+
+		#region Getters
+		private string Filename
+		{
+			get { return _filename; }
 		}
 		#endregion
 	}

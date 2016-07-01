@@ -39,7 +39,7 @@ namespace Zedarus.ToolKit.Data.Player
 		#endregion
 
 		#region Merging
-		private void MergeData(PlayerData dataToMerge)
+		public void MergeData(PlayerData dataToMerge)
 		{
 			if (dataToMerge != null)
 			{
@@ -49,6 +49,7 @@ namespace Zedarus.ToolKit.Data.Player
 					{
 						if (model.Value != null && _models.ContainsKey(model.Key))
 						{
+							Debug.Log("merge data: " + model.Key);
 							_models[model.Key].Merge(model.Value);
 						}
 					}
@@ -107,6 +108,37 @@ namespace Zedarus.ToolKit.Data.Player
 		#endregion
 
 		#region Loading & Saving Data
+		public static byte[] Serialize<PlayerDataClass>(PlayerDataClass data) where PlayerDataClass : PlayerData
+		{
+			try
+			{
+				using (MemoryStream stream = new MemoryStream())
+				{
+					new BinaryFormatter().Serialize(stream, data);
+					return stream.ToArray();
+				}
+			}
+			catch (Exception)
+			{
+				return null;
+			}
+		}
+
+		public static PlayerDataClass Deserialize<PlayerDataClass>(byte[] data) where PlayerDataClass : PlayerData
+		{
+			try
+			{
+				using (MemoryStream stream = new MemoryStream(data))
+				{
+					return new BinaryFormatter().Deserialize(stream) as PlayerDataClass;
+				}
+			}
+			catch (Exception)
+			{
+				return null;
+			}
+		}
+
 		public static PlayerDataClass Load<PlayerDataClass>(string filename) where PlayerDataClass : PlayerData
 		{
 			PlayerDataClass data = null;

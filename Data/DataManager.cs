@@ -25,6 +25,10 @@ namespace Zedarus.ToolKit.Data
 		private string _queuedRemoteData = null;
 		#endregion
 
+		#region Events
+		public event Action<bool> PlayerDataSaved;
+		#endregion
+
 		#region Init
 		public DataManager() 
 		{
@@ -55,11 +59,16 @@ namespace Zedarus.ToolKit.Data
 			_playerData = PlayerData.Load<PD>(_playerDataFilename);
 		}
 
-		public void Save()
+		public void Save(bool sync)
 		{
 			Debug.Log("Save data");
 			Player.UpdateVersionAndTimestamp(Game.Settings.Version, Game.Settings.Build);
 			PlayerData.Save<PD>(Player, _playerDataFilename);
+
+			if (PlayerDataSaved != null)
+			{
+				PlayerDataSaved(sync);
+			}
 		}
 		#endregion
 

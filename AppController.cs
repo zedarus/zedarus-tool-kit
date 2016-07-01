@@ -63,6 +63,7 @@ namespace Zedarus.ToolKit
 
 			API.RemoteData.RequestData();
 			API.Store.RegisterProducts(ProductList);
+			API.Sync.Sync();
 		}
 
 		protected virtual void InitEvents()
@@ -91,8 +92,10 @@ namespace Zedarus.ToolKit
 
 		protected virtual void InitAPI()
 		{
+			Data.PlayerDataSaved += OnPlayerDataSaved;
 			API.RemoteData.DataReceived += OnRemoteDataReceived;
 			API.Store.ProductPurchaseFinished += OnProductPurchaseFinished;
+			API.Sync.SyncFinished += OnSyncFinished;
 		}
 		#endregion
 
@@ -117,8 +120,22 @@ namespace Zedarus.ToolKit
 			if (Data.Game.APISettings.AdsEnabled && productID.Equals(Data.Game.APISettings.RemoveAdsIAPID) && success)
 			{
 				API.Ads.DisableAds();
-				Data.Save();
+				Data.Save(true);
 			}
+		}
+
+		private void OnPlayerDataSaved(bool sync)
+		{
+			if (sync)
+			{
+				API.Sync.SaveData(PlayerData.Serialize<PlayerDataClass>(Data.Player));
+			}
+		}
+
+		private void OnSyncFinished(byte[] data)
+		{
+			Data.Player.MergeData(PlayerData.Deserialize<PlayerDataClass>(data));
+			Data.Save(false);
 		}
 		#endregion
 
