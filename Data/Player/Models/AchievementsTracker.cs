@@ -88,6 +88,53 @@ namespace Zedarus.ToolKit.Data.Player
 			}
 		}
 
+		public void Reset() { }
+		public bool Merge(IPlayerDataModel data) 
+		{
+			AchievementsTracker other = (AchievementsTracker)data;
+
+			if (other != null)
+			{
+				foreach (KeyValuePair<int, int> param in other._parametersInt)
+				{
+					if (_parametersInt.ContainsKey(param.Key))
+					{
+						if (_parametersInt[param.Key] < param.Value)
+						{
+							_parametersInt[param.Key] = param.Value;
+						}
+					}
+					else
+					{
+						_parametersInt.Add(param.Key, param.Value);
+					}
+				}
+
+				foreach (KeyValuePair<int, float> param in other._parametersFloat)
+				{
+					if (_parametersFloat.ContainsKey(param.Key))
+					{
+						if (_parametersFloat[param.Key] < param.Value)
+						{
+							_parametersFloat[param.Key] = param.Value;
+						}
+					}
+					else
+					{
+						_parametersFloat.Add(param.Key, param.Value);
+					}
+				}
+
+				return true; 
+			}
+			else
+			{
+				return false;
+			}
+		}
+		#endregion
+
+		#region Helpers
 		private object Sum(object a, object b)
 		{
 			object c = a;
@@ -101,30 +148,6 @@ namespace Zedarus.ToolKit.Data.Player
 			}
 			return c;
 		}
-
-		public void Reset() { }
-		public bool Merge(IPlayerDataModel data) 
-		{
-			AchievementsTracker other = (AchievementsTracker)data;
-
-			if (other != null)
-			{
-
-
-				return true; 
-			}
-			else
-			{
-				return false;
-			}
-		}
 		#endregion
-
-//		#region Helpers
-//		private void CheckAchievementsForCondition(AchievementConditionData condition)
-//		{
-//
-//		}
-//		#endregion
 	}
 }
