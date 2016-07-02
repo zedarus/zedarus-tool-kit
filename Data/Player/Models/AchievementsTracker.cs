@@ -17,6 +17,8 @@ namespace Zedarus.ToolKit.Data.Player
 		private Dictionary<int, int> _parametersInt;
 		[SerializeField]
 		private Dictionary<int, float> _parametersFloat;
+		[SerializeField]
+		private List<int> _unlockedAchievements;
 
 		[NonSerialized]
 		private GameData _gameDataRef = null;
@@ -33,6 +35,7 @@ namespace Zedarus.ToolKit.Data.Player
 		{
 			_parametersInt = new Dictionary<int, int>();
 			_parametersFloat = new Dictionary<int, float>();
+			_unlockedAchievements = new List<int>();
 		}
 		#endregion
 
@@ -61,6 +64,9 @@ namespace Zedarus.ToolKit.Data.Player
 						break;
 					case AchievementConditionData.ParameterType.Float:
 						parameters = _parametersFloat;
+						break;
+					case AchievementConditionData.ParameterType.CustomCondition:
+						// TODO: call custom external handler
 						break;
 				}
 
@@ -95,43 +101,50 @@ namespace Zedarus.ToolKit.Data.Player
 			{
 				if (achievement.Enabled && achievement.ConditionID.Equals(condition.ID))
 				{
-					// TODO: check if achievement was already unlocked first
-
-					switch (condition.ParamType)
+					if (!IsAchievementUnlocked(achievement.ID))
 					{
-						case AchievementConditionData.ParameterType.Int:
-							int paramCurrent = 0;
-							int paramTarget = 0;
-							if (int.TryParse(parameterValue.ToString(), out paramCurrent) && int.TryParse(achievement.ConditionParameter, out paramTarget))
-							{
-								if (paramCurrent >= paramTarget)
+						switch (condition.ParamType)
+						{
+							case AchievementConditionData.ParameterType.Int:
+								int paramCurrent = 0;
+								int paramTarget = 0;
+								if (int.TryParse(parameterValue.ToString(), out paramCurrent) && int.TryParse(achievement.ConditionParameter, out paramTarget))
 								{
-									UnlockAchievement(achievement);
+									if (paramCurrent >= paramTarget)
+									{
+										UnlockAchievement(achievement);
+									}
 								}
-							}
-							break;
-						case AchievementConditionData.ParameterType.Float:
-							float paramCurrentFloat = 0;
-							float paramTargetFloat = 0;
-							if (float.TryParse(parameterValue.ToString(), out paramCurrentFloat) && float.TryParse(achievement.ConditionParameter, out paramTargetFloat))
-							{
-								if (paramCurrentFloat >= paramTargetFloat)
+								break;
+							case AchievementConditionData.ParameterType.Float:
+								float paramCurrentFloat = 0;
+								float paramTargetFloat = 0;
+								if (float.TryParse(parameterValue.ToString(), out paramCurrentFloat) && float.TryParse(achievement.ConditionParameter, out paramTargetFloat))
 								{
-									UnlockAchievement(achievement);
+									if (paramCurrentFloat >= paramTargetFloat)
+									{
+										UnlockAchievement(achievement);
+									}
 								}
-							}
-							break;
-						case AchievementConditionData.ParameterType.CustomCondition:
-							// TODO: call custom external handler
-							break;
+								break;
+						}
 					}
 				}
 			}
 		}
 
+		private bool IsAchievementUnlocked(int achievementID)
+		{
+			return _unlockedAchievements.Contains(achievementID);
+		}
+
 		private void UnlockAchievement(AchievementData achievement)
 		{
-			Debug.Log("Unlock achievement: " + achievement.Name);
+			if (!_unlockedAchievements.Contains(achievement.ID))
+			{
+				Debug.Log("Unlock achievement: " + achievement.Name);
+				_unlockedAchievements.Add(achievement.ID);
+			}
 		}
 
 		public void Reset() { }
@@ -141,6 +154,14 @@ namespace Zedarus.ToolKit.Data.Player
 
 			if (other != null)
 			{
+				foreach (int achivementID in other._unlockedAchievements)
+				{
+					if (!_unlockedAchievements.Contains(achivementID))
+					{
+						_unlockedAchievements.Add(achivementID);
+					}
+				}
+
 				foreach (KeyValuePair<int, int> param in other._parametersInt)
 				{
 					if (_parametersInt.ContainsKey(param.Key))
