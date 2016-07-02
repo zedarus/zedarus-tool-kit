@@ -12,6 +12,7 @@ using Zedarus.ToolKit.Data;
 using Zedarus.ToolKit.Data.Player;
 using Zedarus.ToolKit.Events;
 using Zedarus.ToolKit.Settings;
+using Zedarus.ToolKit.Data.Game;
 
 namespace Zedarus.ToolKit.Data.Player
 {
@@ -35,6 +36,16 @@ namespace Zedarus.ToolKit.Data.Player
 
 		protected virtual void SetupModelsList()
 		{
+			AddModel<APIState>();
+			AddModel<AchievementsTracker>();
+		}
+
+		internal void SetGameDataReference(GameData gameData)
+		{
+			if (AchievementsTracker != null)
+			{
+				AchievementsTracker.SetGameDataReference(gameData);
+			}
 		}
 		#endregion
 
@@ -93,6 +104,11 @@ namespace Zedarus.ToolKit.Data.Player
 				return (T) _models[key];
 			else
 				return default(T);
+		}
+
+		public AchievementsTracker AchievementsTracker
+		{
+			get { return GetModel<AchievementsTracker>(); }
 		}
 
 		public int Build

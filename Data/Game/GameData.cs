@@ -21,11 +21,15 @@ namespace Zedarus.ToolKit.Data.Game
 		private APISettingsData _apiSettings;
 
 		[SerializeField]
-		[DataTable(1003, "Achievements", typeof(AchievementData))]
+		[DataTable(1003, "Achievement Conditions", typeof(AchievementConditionData))]
+		private List<AchievementConditionData> _achievementConditions;
+
+		[SerializeField]
+		[DataTable(1004, "Achievements", typeof(AchievementData))]
 		private List<AchievementData> _achievements;
 
 		[SerializeField]
-		[DataTable(1004, "Leaderboards", typeof(LeaderboardData))]
+		[DataTable(1005, "Leaderboards", typeof(LeaderboardData))]
 		private List<LeaderboardData> _leaderboards;
 		#endregion
 
@@ -152,6 +156,11 @@ namespace Zedarus.ToolKit.Data.Game
 			get { return _settings; }
 		}
 
+		public List<AchievementConditionData> AchivementConditions
+		{
+			get { return _achievementConditions; }
+		}
+
 		public List<AchievementData> Achievements
 		{
 			get { return _achievements; }
@@ -176,6 +185,11 @@ namespace Zedarus.ToolKit.Data.Game
 
 				return null; 
 			}
+		}
+
+		public AchievementConditionData GetAchievementCondition(int id)
+		{
+			return GetDataTableEntry<AchievementConditionData>(id, AchivementConditions);
 		}
 
 		public AchievementData GetAchievement(int id)

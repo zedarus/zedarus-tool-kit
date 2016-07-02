@@ -57,6 +57,11 @@ namespace Zedarus.ToolKit.Data
 		{
 			_playerDataFilename = dataFilename;
 			_playerData = PlayerData.Load<PD>(_playerDataFilename);
+
+			if (_playerData != null)
+			{
+				_playerData.SetGameDataReference(Game);
+			}
 		}
 
 		public void Save(bool sync = true)

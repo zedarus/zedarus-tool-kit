@@ -13,6 +13,14 @@ namespace Zedarus.ToolKit.Data.Game
 		private string _name = "Achievement";
 
 		[SerializeField]
+		[DataField("Condition", foreignKeyForTable=typeof(AchievementConditionData))]
+		private int _conditionID;
+
+		[SerializeField]
+		[DataField("Condition Parameters")]
+		private string _conditionParameter = string.Empty;
+
+		[SerializeField]
 		[DataField("Apple ID")]
 		private string _appleID = "";
 
