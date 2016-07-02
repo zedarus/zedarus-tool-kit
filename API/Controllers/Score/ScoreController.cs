@@ -2,6 +2,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Zedarus.ToolKit.Settings;
+using Zedarus.ToolKit.Events;
 
 namespace Zedarus.ToolKit.API
 {
@@ -93,6 +95,34 @@ namespace Zedarus.ToolKit.API
 				else
 					return false;
 			}
+		}
+		#endregion
+
+		#region Event Listeners
+		protected override void CreateEventListeners()
+		{
+			base.CreateEventListeners();
+			EventManager.AddListener<string>(IDs.Events.AchievementUnlocked, OnAchievementUnlocked);
+			EventManager.AddListener<string>(IDs.Events.AchievementRestored, OnAchievementRestored);
+		}
+
+		protected override void RemoveEventListeners()
+		{
+			base.RemoveEventListeners();
+			EventManager.RemoveListener<string>(IDs.Events.AchievementUnlocked, OnAchievementUnlocked);
+			EventManager.RemoveListener<string>(IDs.Events.AchievementRestored, OnAchievementRestored);
+		}
+		#endregion
+
+		#region Event Handlers
+		private void OnAchievementUnlocked(string achievementID)
+		{
+			UnlockAchievement(achievementID);
+		}
+
+		private void OnAchievementRestored(string achievementID)
+		{
+			RestoreAchievement(achievementID);
 		}
 		#endregion
 		

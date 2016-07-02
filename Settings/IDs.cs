@@ -13,6 +13,8 @@ namespace Zedarus.ToolKit.Settings
 			public const int EnableMusicAfterAd = EVENT_OFFSET + 2;
 			public const int AdsDisabled = EVENT_OFFSET + 3;
 			public const int RemoteDataReceived = EVENT_OFFSET + 4;
+			public const int AchievementUnlocked = EVENT_OFFSET + 5;
+			public const int AchievementRestored = EVENT_OFFSET + 6;
 		}
 
 		private static bool _initialized = false;
@@ -24,6 +26,8 @@ namespace Zedarus.ToolKit.Settings
 				EventManager.RegisterEvent(Events.EnableMusicAfterAd);
 				EventManager.RegisterEvent(Events.AdsDisabled);
 				EventManager.RegisterEvent(Events.RemoteDataReceived);
+				EventManager.RegisterEvent(Events.AchievementUnlocked);
+				EventManager.RegisterEvent(Events.AchievementRestored);
 				_initialized = true;
 			}
 		}

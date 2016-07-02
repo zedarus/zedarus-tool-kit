@@ -5,6 +5,8 @@ using System.Collections;
 using System.Collections.Generic;
 using Zedarus.ToolKit.Data.Game;
 using Zedarus.ToolKit.Data.Player;
+using Zedarus.ToolKit.Events;
+using Zedarus.ToolKit.Settings;
 using Zedarus.ToolKit;
 
 namespace Zedarus.ToolKit.Data.Player
@@ -26,10 +28,6 @@ namespace Zedarus.ToolKit.Data.Player
 		private Func<int, object, bool> _customConditionDelegate = null;
 		#endregion
 
-		#region Events
-		public event Action<AchievementData> AchievementUnlocked;
-		#endregion
-
 		#region Init
 		public AchievementsTracker() 
 		{
@@ -45,11 +43,19 @@ namespace Zedarus.ToolKit.Data.Player
 		}
 		#endregion
 
-		#region Getters
-
-		#endregion
-
 		#region Controls
+		internal void RestoreAchievements()
+		{
+			foreach (int achievementID in _unlockedAchievements)
+			{
+				AchievementData achievement = _gameDataRef.GetAchievement(achievementID);
+				if (achievement != null && achievement.Enabled)
+				{
+					EventManager.SendEvent<string>(IDs.Events.AchievementRestored, achievement.CurrentPlatformID);
+				}
+			}
+		}
+
 		internal void SetGameDataReference(GameData data)
 		{
 			_gameDataRef = data;
@@ -163,10 +169,7 @@ namespace Zedarus.ToolKit.Data.Player
 			{
 				_unlockedAchievements.Add(achievement.ID);
 
-				if (AchievementUnlocked != null)
-				{
-					AchievementUnlocked(achievement);
-				}
+				EventManager.SendEvent<string>(IDs.Events.AchievementUnlocked, achievement.CurrentPlatformID);
 			}
 		}
 

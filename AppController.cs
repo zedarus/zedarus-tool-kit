@@ -64,6 +64,11 @@ namespace Zedarus.ToolKit
 			API.RemoteData.RequestData();
 			API.Store.RegisterProducts(ProductList);
 			API.Sync.Sync();
+
+			if (Data.Player != null && Data.Player.AchievementsTracker != null)
+			{
+				Data.Player.AchievementsTracker.RestoreAchievements();
+			}
 		}
 
 		protected virtual void InitEvents()
@@ -88,7 +93,6 @@ namespace Zedarus.ToolKit
 				API.UseAPIStateModel(state);
 			}
 
-			_data.Player.AchievementsTracker.AchievementUnlocked += OnAchievementUnlocked;
 			_data.Player.AchievementsTracker.SetCustomConditionDelegate(OnCheckCustomAchievementCondition);
 		}
 
@@ -143,11 +147,6 @@ namespace Zedarus.ToolKit
 		protected virtual bool OnCheckCustomAchievementCondition(int achievement, object parameterValue)
 		{
 			return false;
-		}
-
-		private void OnAchievementUnlocked(AchievementData achievement)
-		{
-			API.Score.UnlockAchievement(achievement.CurrentPlatformID);
 		}
 		#endregion
 
