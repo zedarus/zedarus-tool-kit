@@ -83,9 +83,55 @@ namespace Zedarus.ToolKit.Data.Player
 						parameters.Add(conditionID, parameterValue);
 					}
 
-					Debug.Log(string.Format("Condition {0} has new parameter value {1}", condition.Name, parameters[conditionID]));
+					CheckAchivementsForCondition<T>(condition, (T)parameters[conditionID]);
+//					Debug.Log(string.Format("Condition {0} has new parameter value {1}", condition.Name, parameters[conditionID]));
 				}
 			}
+		}
+
+		private void CheckAchivementsForCondition<T>(AchievementConditionData condition, T parameterValue)
+		{
+			foreach (AchievementData achievement in _gameDataRef.Achievements)
+			{
+				if (achievement.Enabled && achievement.ConditionID.Equals(condition.ID))
+				{
+					// TODO: check if achievement was already unlocked first
+
+					switch (condition.ParamType)
+					{
+						case AchievementConditionData.ParameterType.Int:
+							int paramCurrent = 0;
+							int paramTarget = 0;
+							if (int.TryParse(parameterValue.ToString(), out paramCurrent) && int.TryParse(achievement.ConditionParameter, out paramTarget))
+							{
+								if (paramCurrent >= paramTarget)
+								{
+									UnlockAchievement(achievement);
+								}
+							}
+							break;
+						case AchievementConditionData.ParameterType.Float:
+							float paramCurrentFloat = 0;
+							float paramTargetFloat = 0;
+							if (float.TryParse(parameterValue.ToString(), out paramCurrentFloat) && float.TryParse(achievement.ConditionParameter, out paramTargetFloat))
+							{
+								if (paramCurrentFloat >= paramTargetFloat)
+								{
+									UnlockAchievement(achievement);
+								}
+							}
+							break;
+						case AchievementConditionData.ParameterType.CustomCondition:
+							// TODO: call custom external handler
+							break;
+					}
+				}
+			}
+		}
+
+		private void UnlockAchievement(AchievementData achievement)
+		{
+			Debug.Log("Unlock achievement: " + achievement.Name);
 		}
 
 		public void Reset() { }

@@ -13,6 +13,10 @@ namespace Zedarus.ToolKit.Data.Game
 		private string _name = "Achievement";
 
 		[SerializeField]
+		[DataField("Enabled")]
+		private bool _enabled = true;
+
+		[SerializeField]
 		[DataField("Condition", foreignKeyForTable=typeof(AchievementConditionData))]
 		private int _conditionID;
 
@@ -38,6 +42,21 @@ namespace Zedarus.ToolKit.Data.Game
 		public string Name
 		{
 			get { return _name; }
+		}
+
+		public bool Enabled
+		{
+			get { return _enabled; }
+		}
+
+		public int ConditionID
+		{
+			get { return _conditionID; }
+		}
+
+		public string ConditionParameter
+		{
+			get { return _conditionParameter; }
 		}
 
 		public string AppleID
