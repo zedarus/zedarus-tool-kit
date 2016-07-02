@@ -67,46 +67,6 @@ namespace Zedarus.ToolKit.API
 				TraceEvent(eventName, parameters);
 			}*/
 		}
-
-		public void LogPurchase(string product, decimal price, string currency)
-		{
-			//Analytics.Transaction(product, price, currency, null, null);
-			//TraceEvent("Log Purcahse", "product", product, "price", price.ToString(), "currency", currency);
-		}
-		#endregion
-
-		#region Helpers
-		private void TraceEvent(string eventName, params string[] parameters)
-		{
-			#if DEV_BUILD
-			string trace = "Report UnityAnalytics event: \"" + eventName + "\"";
-			if (parameters != null && parameters.Length % 2 == 0)
-			{
-				trace += "\nParameters:\n";
-				for (int i = 0; i < parameters.Length; i += 2)
-				{
-					trace += "\t" + parameters[i] + ": " + parameters[i+1] + "\n";
-				}
-			}
-			if (GlobalSettings.Instance.DevelopmentBuild) Debug.Log(trace);
-			#endif
-		}
-
-		private void TraceEvent(string eventName, Dictionary<string, object> parameters)
-		{
-			#if DEV_BUILD
-			string trace = "Report Flurry event: \"" + eventName + "\"";
-			if (parameters != null)
-			{
-				trace += "\nParameters:\n";
-				foreach(KeyValuePair<string, object> item in parameters)
-				{
-					trace += "\t" + item.Key + ": " + item.Value.ToString() + "\n";
-				}
-			}
-			if (GlobalSettings.Instance.DevelopmentBuild) Debug.Log(trace);
-			#endif
-		}
 		#endregion
 
 		#region Event Listeners
