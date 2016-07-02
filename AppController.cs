@@ -88,6 +88,7 @@ namespace Zedarus.ToolKit
 				API.UseAPIStateModel(state);
 			}
 
+			_data.Player.AchievementsTracker.AchievementUnlocked += OnAchievementUnlocked;
 			_data.Player.AchievementsTracker.SetCustomConditionDelegate(OnCheckCustomAchievementCondition);
 		}
 
@@ -142,6 +143,11 @@ namespace Zedarus.ToolKit
 		protected virtual bool OnCheckCustomAchievementCondition(int achievement, object parameterValue)
 		{
 			return false;
+		}
+
+		private void OnAchievementUnlocked(AchievementData achievement)
+		{
+			API.Score.UnlockAchievement(achievement.CurrentPlatformID);
 		}
 		#endregion
 

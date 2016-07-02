@@ -26,6 +26,10 @@ namespace Zedarus.ToolKit.Data.Player
 		private Func<int, object, bool> _customConditionDelegate = null;
 		#endregion
 
+		#region Events
+		public event Action<AchievementData> AchievementUnlocked;
+		#endregion
+
 		#region Init
 		public AchievementsTracker() 
 		{
@@ -97,7 +101,6 @@ namespace Zedarus.ToolKit.Data.Player
 					}
 
 					CheckAchivementsForCondition<T>(condition, (T)parameters[conditionID]);
-//					Debug.Log(string.Format("Condition {0} has new parameter value {1}", condition.Name, parameters[conditionID]));
 				}
 			}
 		}
@@ -158,8 +161,12 @@ namespace Zedarus.ToolKit.Data.Player
 		{
 			if (!_unlockedAchievements.Contains(achievement.ID))
 			{
-				Debug.Log("Unlock achievement: " + achievement.Name);
 				_unlockedAchievements.Add(achievement.ID);
+
+				if (AchievementUnlocked != null)
+				{
+					AchievementUnlocked(achievement);
+				}
 			}
 		}
 
