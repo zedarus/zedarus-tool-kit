@@ -22,6 +22,8 @@ namespace Zedarus.ToolKit.Data.Player
 
 		[NonSerialized]
 		private GameData _gameDataRef = null;
+		[NonSerialized]
+		private Func<int, object, bool> _customConditionDelegate = null;
 		#endregion
 
 		#region Init
@@ -49,6 +51,11 @@ namespace Zedarus.ToolKit.Data.Player
 			_gameDataRef = data;
 		}
 
+		public void SetCustomConditionDelegate(Func<int, object, bool> customConditionDelegate)
+		{
+			_customConditionDelegate = customConditionDelegate;
+		}
+
 		public void UpdateConditionParameter<T>(int conditionID, T parameterValue)
 		{
 			AchievementConditionData condition = _gameDataRef.GetAchievementCondition(conditionID);
@@ -66,7 +73,7 @@ namespace Zedarus.ToolKit.Data.Player
 						parameters = _parametersFloat;
 						break;
 					case AchievementConditionData.ParameterType.CustomCondition:
-						// TODO: call custom external handler
+						CheckAchivementsForCondition<T>(condition, parameterValue);
 						break;
 				}
 
@@ -122,6 +129,15 @@ namespace Zedarus.ToolKit.Data.Player
 								if (float.TryParse(parameterValue.ToString(), out paramCurrentFloat) && float.TryParse(achievement.ConditionParameter, out paramTargetFloat))
 								{
 									if (paramCurrentFloat >= paramTargetFloat)
+									{
+										UnlockAchievement(achievement);
+									}
+								}
+								break;
+							case AchievementConditionData.ParameterType.CustomCondition:
+								if (_customConditionDelegate != null)
+								{
+									if (_customConditionDelegate(achievement.ID, parameterValue))
 									{
 										UnlockAchievement(achievement);
 									}

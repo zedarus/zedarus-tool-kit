@@ -87,6 +87,8 @@ namespace Zedarus.ToolKit
 			{
 				API.UseAPIStateModel(state);
 			}
+
+			_data.Player.AchievementsTracker.SetCustomConditionDelegate(OnCheckCustomAchievementCondition);
 		}
 
 		protected virtual void InitAPI()
@@ -135,6 +137,11 @@ namespace Zedarus.ToolKit
 		{
 			Data.Player.MergeData(PlayerData.Deserialize<PlayerDataClass>(data));
 			Data.Save(false);
+		}
+
+		protected virtual bool OnCheckCustomAchievementCondition(int achievement, object parameterValue)
+		{
+			return false;
 		}
 		#endregion
 
