@@ -155,6 +155,8 @@ namespace Zedarus.ToolKit.Data.Game
 				RenderCustomEditorForField(field, attribute);
 			else if (field.FieldType == typeof(string))
 				RenderStringField(field, attribute);
+			else if (field.FieldType == typeof(Color))
+				RenderColorField(field, attribute);
 			else if (field.FieldType == typeof(int))
 				RenderIntField(field, attribute);
 			else if (field.FieldType == typeof(float))
@@ -324,6 +326,10 @@ namespace Zedarus.ToolKit.Data.Game
 				{
 					list[i] = EditorGUILayout.TextField(label, list[i] as string);
 				}
+				else if (arrayElementType == typeof(Color))
+				{
+					list[i] = EditorGUILayout.ColorField(label, (Color)list[i]);
+				}
 				else if (arrayElementType == typeof(int))
 				{
 					if (options != null && values != null)
@@ -463,6 +469,11 @@ namespace Zedarus.ToolKit.Data.Game
 				currentValue = value.ToString();
 			
 			field.SetValue(this, EditorGUILayout.TextField(attribute.EditorLabel, currentValue));
+		}
+
+		protected void RenderColorField(FieldInfo field, DataField attribute)
+		{
+			field.SetValue(this, EditorGUILayout.ColorField(attribute.EditorLabel, (Color)field.GetValue(this)));
 		}
 
 		protected void RenderIntField(FieldInfo field, DataField attribute)
