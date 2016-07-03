@@ -46,8 +46,8 @@ namespace Zedarus.ToolKit.ScenesManagement
 		private FadeScreenTracker _fadeScreenTracker = null;
 		private object[] _cachedData = null;
 
-		private readonly int FadeIn = Animator.StringToHash("FadeIn"); 
-		private readonly int FadeOut = Animator.StringToHash("FadeOut"); 
+		private int FadeInTrigger;
+		private int FadeOutTrigger;
 		#endregion
 
 		private Dictionary<string, Dictionary<object, object>> _params = new Dictionary<string, Dictionary<object, object>>();
@@ -72,9 +72,11 @@ namespace Zedarus.ToolKit.ScenesManagement
 
 				GameObject go = new GameObject("Fade Screen Tracker");
 				_fadeScreenTracker = go.AddComponent<FadeScreenTracker>();
-				_fadeScreenTracker.Init(_fadeScreen, FadeOut, OnFadeOutFinished);
+				_fadeScreenTracker.Init(_fadeScreen, FadeOutTrigger, OnFadeOutFinished);
 
-				_fadeScreen.SetTrigger(FadeOut);
+				_fadeScreen.ResetTrigger(FadeInTrigger);
+				_fadeScreen.ResetTrigger(FadeOutTrigger);
+				_fadeScreen.SetTrigger(FadeOutTrigger);
 			}
 			else
 			{
@@ -151,16 +153,52 @@ namespace Zedarus.ToolKit.ScenesManagement
 		/// Call this at the beginning of the scene to fade in.
 		/// </summary>
 		/// <param name="fadeScreen">Fade screen.</param>
-		public void UseFadeScreen(Animator fadeScreen)
+		public void UseFadeScreen(Animator fadeScreen, float delay = 0f, string fadeInTrigger = null, string fadeOutTrigger = null)
 		{
 			if (fadeScreen)
 			{
+				if (fadeInTrigger != null)
+				{
+					FadeInTrigger = Animator.StringToHash(fadeInTrigger); 
+				}
+				else
+				{
+					FadeInTrigger = Animator.StringToHash("FadeIn"); 
+				}
+
+				if (fadeOutTrigger != null)
+				{
+					FadeOutTrigger = Animator.StringToHash(fadeOutTrigger); 
+				}
+				else
+				{
+					FadeOutTrigger = Animator.StringToHash("FadeOut"); 
+				}
+
 				_fadeScreen = fadeScreen;
-				_fadeScreen.SetTrigger(FadeIn);
+
+				if (delay > 0)
+				{
+					DelayedCall.Create(UseFadeScreen, delay, false);
+				}
+				else
+				{
+					UseFadeScreen();
+				}
 			}
 			else
 			{
 				_fadeScreen = null;
+			}
+		}
+
+		private void UseFadeScreen()
+		{
+			if (_fadeScreen != null)
+			{
+				_fadeScreen.ResetTrigger(FadeInTrigger);
+				_fadeScreen.ResetTrigger(FadeOutTrigger);
+				_fadeScreen.SetTrigger(FadeInTrigger);
 			}
 		}
 
