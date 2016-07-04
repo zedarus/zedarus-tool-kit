@@ -38,6 +38,14 @@ namespace Zedarus.ToolKit.API
 				wrapper.LogEvent(eventName, parameters); 
 			}
 		}
+
+		public void LogRateApp(bool accepted)
+		{
+			LogEvent("Rate App", new System.Collections.Generic.Dictionary<string, object>
+			{
+				{ "accepted", accepted }
+			});
+		}
 		#endregion
 
 		#region Audio

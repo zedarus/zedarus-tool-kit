@@ -2,6 +2,7 @@
 using System;
 using System.Runtime.Serialization;
 using System.Collections;
+using Zedarus.ToolKit.UI;
 
 namespace Zedarus.ToolKit.Data.Player
 {
@@ -60,6 +61,26 @@ namespace Zedarus.ToolKit.Data.Player
 			}
 
 			return false;
+		}
+		#endregion
+
+		#region Helpers
+		public void StartPopupsSequence(UIManager uiManager, string genericPopupID, 
+			bool rewardFirst, string rewardMessage, string rewardButton,
+			string rateMessage, string rateAcceptButton, string rateDeclineButton, System.Action rateAcceptCallback, System.Action rateDeclinedCallback)
+		{
+			if (rewardFirst)
+			{
+				uiManager.OpenPopup(genericPopupID, new UIGenericPopupData(
+					null, rewardMessage, new UIGenericPopupButtonData(rewardButton, null)
+				));
+			}
+
+			uiManager.OpenPopup(genericPopupID, new UIGenericPopupData(
+				null, rateMessage, 
+				new UIGenericPopupButtonData(rateAcceptButton, rateAcceptCallback),
+				new UIGenericPopupButtonData(rateDeclineButton, rateDeclinedCallback)
+			));
 		}
 		#endregion
 
