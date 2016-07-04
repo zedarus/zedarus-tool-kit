@@ -66,20 +66,20 @@ namespace Zedarus.ToolKit.Data.Player
 
 		#region Helpers
 		public void StartPopupsSequence(UIManager uiManager, string genericPopupID, 
-			bool rewardFirst, string rewardMessage, string rewardButton,
-			string rateMessage, string rateAcceptButton, string rateDeclineButton, System.Action rateAcceptCallback, System.Action rateDeclinedCallback)
+			bool rewardFirst, string rewardMessage, string rewardButton, int rewardButtonColor,
+			string rateMessage, string rateAcceptButton, int rateAcceptButtonColor, string rateDeclineButton, int rateDeclineButtonColor, System.Action rateAcceptCallback, System.Action rateDeclinedCallback)
 		{
 			if (rewardFirst)
 			{
 				uiManager.OpenPopup(genericPopupID, new UIGenericPopupData(
-					null, rewardMessage, new UIGenericPopupButtonData(rewardButton, null)
+					null, rewardMessage, new UIGenericPopupButtonData(rewardButton, null, rewardButtonColor)
 				));
 			}
 
 			uiManager.OpenPopup(genericPopupID, new UIGenericPopupData(
 				null, rateMessage, 
-				new UIGenericPopupButtonData(rateAcceptButton, rateAcceptCallback),
-				new UIGenericPopupButtonData(rateDeclineButton, rateDeclinedCallback)
+				new UIGenericPopupButtonData(rateAcceptButton, rateAcceptCallback, rateAcceptButtonColor),
+				new UIGenericPopupButtonData(rateDeclineButton, rateDeclinedCallback, rateDeclineButtonColor)
 			));
 		}
 		#endregion

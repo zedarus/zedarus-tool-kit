@@ -78,12 +78,9 @@ namespace Zedarus.ToolKit.UI
 	{
 		#region Properties
 		private string _label;
-		private Color? _color;
 		private System.Action _callback;
 		private bool _closePopupOnPress;
-		private float _hue;
-		private float _saturation;
-		private float _value;
+		private int _colorID;
 		#endregion
 
 		#region Init
@@ -91,37 +88,27 @@ namespace Zedarus.ToolKit.UI
 		{
 			_label = label;
 			_callback = null;
-			_color = null;
+			_colorID = 0;
 			_closePopupOnPress = true;
-			_hue = 0f;
-			_saturation = 1f;
-			_value = 1f;
 		}
 
 		public UIGenericPopupButtonData(string label, System.Action callback, bool closePopupOnPress = true) : this(label)
 		{
 			_callback = callback;
-			_color = null;
+			_colorID = 0;
 			_closePopupOnPress = closePopupOnPress;
 		}
 
-		public UIGenericPopupButtonData(string label, System.Action callback, Color color, bool closePopupOnPress = true) : this(label, callback, closePopupOnPress)
+		public UIGenericPopupButtonData(string label, System.Action callback, int colorID, bool closePopupOnPress = true) : this(label, callback, closePopupOnPress)
 		{
-			_color = color;
-		}
-
-		public UIGenericPopupButtonData(string label, System.Action callback, float hueShift, float saturation = 1f, float value = 1f, bool closePopupOnPress = true) : this(label, callback, closePopupOnPress)
-		{
-			_hue = hueShift;
-			_saturation = saturation;
-			_value = value;
+			_colorID = colorID;
 		}
 
 		public void Clear()
 		{
 			_label = null;
 			_callback = null;
-			_color = null;
+			_colorID = 0;
 		}
 		#endregion
 
@@ -136,29 +123,14 @@ namespace Zedarus.ToolKit.UI
 			get { return _callback; }
 		}
 
-		public Color? Color
+		public int ColorID
 		{
-			get { return _color; }
+			get { return _colorID; }
 		}
 
 		public bool ClosePopupOnPress
 		{
 			get { return _closePopupOnPress; }
-		}
-
-		public float HueShift
-		{
-			get { return _hue; }
-		}
-
-		public float Saturation
-		{
-			get { return _saturation; }
-		}
-
-		public float Value
-		{
-			get { return _value; }
 		}
 		#endregion
 	}
