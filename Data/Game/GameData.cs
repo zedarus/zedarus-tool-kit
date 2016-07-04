@@ -31,6 +31,10 @@ namespace Zedarus.ToolKit.Data.Game
 		[SerializeField]
 		[DataTable(1005, "Leaderboards", typeof(LeaderboardData))]
 		private List<LeaderboardData> _leaderboards;
+
+		[SerializeField]
+		[DataTable(1006, "Rate Me Popup", typeof(RateMePopupData))]
+		private RateMePopupData _rateMePopup;
 		#endregion
 
 		#region Settings
@@ -154,6 +158,11 @@ namespace Zedarus.ToolKit.Data.Game
 		public SettingsData Settings
 		{
 			get { return _settings; }
+		}
+
+		public RateMePopupData RateMePopup
+		{
+			get { return _rateMePopup; }
 		}
 
 		public List<AchievementConditionData> AchivementConditions
