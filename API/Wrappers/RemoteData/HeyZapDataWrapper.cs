@@ -62,6 +62,7 @@ namespace Zedarus.ToolKit.API
 		#endregion
 
 		#region Event Handlers
+		#if API_ADS_HEYZAP
 		private void NetworkCallbackListener(string network, string callback)
 		{
 			if ((network.Equals(Heyzap.HeyzapAds.Network.HEYZAP_EXCHANGE) || network.Equals(Heyzap.HeyzapAds.Network.HEYZAP)) && callback.Equals(Heyzap.HeyzapAds.NetworkCallback.INITIALIZED))
@@ -74,6 +75,7 @@ namespace Zedarus.ToolKit.API
 				}
 			}
 		}
+		#endif
 		#endregion
 	}
 }
