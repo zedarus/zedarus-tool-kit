@@ -26,6 +26,7 @@ namespace Zedarus.ToolKit.API
 		private int _rewardProductID = 0;
 		private int _testUIClicks = 0;
 		private float _testUILastClickTime = 0f;
+		private GameObject _adBlockObject = null;
 		#endregion
 
 		#region Initialization
@@ -98,17 +99,17 @@ namespace Zedarus.ToolKit.API
 				wrapper.HideBanner();
 		}
 
-		public void ShowBetweenLevelAd(string tag, Action callback)
+		public void ShowBetweenLevelAd(string tag, Action callback, GameObject adBlockObject = null)
 		{
-			ShowIntersitital(tag, callback, true);
+			ShowIntersitital(tag, callback, true, adBlockObject);
 		}
 
-		public void ShowIntersitital(string tag, Action callback)
+		public void ShowIntersitital(string tag, Action callback, GameObject adBlockObject = null)
 		{
-			ShowIntersitital(tag, callback, false);
+			ShowIntersitital(tag, callback, false, adBlockObject);
 		}
 
-		private void ShowIntersitital(string tag, Action callback, bool useBetweenLevelCounter)
+		private void ShowIntersitital(string tag, Action callback, bool useBetweenLevelCounter, GameObject adBlockObject)
 		{
 			IAdsWrapperInterface wrapper = Wrapper;
 			bool adStarted = false;
@@ -134,6 +135,12 @@ namespace Zedarus.ToolKit.API
 
 				if (allowed)
 				{
+					if (adBlockObject != null)
+					{
+						_adBlockObject = adBlockObject;
+						_adBlockObject.SetActive(true);
+					}
+
 					adStarted = true;
 					_interstitialClosedCallback = callback;
 					EventManager.SendEvent(IDs.Events.DisableMusicDuringAd);
@@ -283,6 +290,13 @@ namespace Zedarus.ToolKit.API
 		private void OnInterstitialClosed()
 		{
 			EventManager.SendEvent(IDs.Events.EnableMusicAfterAd);
+
+			if (_adBlockObject != null)
+			{
+				_adBlockObject.SetActive(false);
+				_adBlockObject = null;
+			}
+
 			if (InterstitialClosed != null)
 				InterstitialClosed();
 
