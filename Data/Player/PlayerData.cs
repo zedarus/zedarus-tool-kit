@@ -39,6 +39,7 @@ namespace Zedarus.ToolKit.Data.Player
 			AddModel<APIState>();
 			AddModel<AchievementsTracker>();
 			AddModel<RateMePopup>();
+			AddModel<AudioState>();
 		}
 
 		internal void SetGameDataReference(GameData gameData)
@@ -115,6 +116,11 @@ namespace Zedarus.ToolKit.Data.Player
 		public RateMePopup RateMePopup
 		{
 			get { return GetModel<RateMePopup>(); }
+		}
+
+		public AudioState AudioState
+		{
+			get { return GetModel<AudioState>(); }
 		}
 
 		public int Build

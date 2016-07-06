@@ -15,6 +15,7 @@ namespace Zedarus.ToolKit.Settings
 			public const int RemoteDataReceived = EVENT_OFFSET + 4;
 			public const int AchievementUnlocked = EVENT_OFFSET + 5;
 			public const int AchievementRestored = EVENT_OFFSET + 6;
+			public const int AudioStateUpdated = EVENT_OFFSET + 7;
 		}
 
 		private static bool _initialized = false;
@@ -28,6 +29,7 @@ namespace Zedarus.ToolKit.Settings
 				EventManager.RegisterEvent(Events.RemoteDataReceived);
 				EventManager.RegisterEvent(Events.AchievementUnlocked);
 				EventManager.RegisterEvent(Events.AchievementRestored);
+				EventManager.RegisterEvent(Events.AudioStateUpdated);
 				_initialized = true;
 			}
 		}

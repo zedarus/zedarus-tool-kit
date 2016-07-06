@@ -20,6 +20,7 @@ namespace Zedarus.ToolKit
 		static private bool initialized = false;
 		private DataManager<GameDataClass, PlayerDataClass> _data;
 		private APIManager _api;
+		private AudioController _audio;
 		private bool _postInit = false;
 		#endregion
 
@@ -73,6 +74,8 @@ namespace Zedarus.ToolKit
 			{
 				Data.Player.AchievementsTracker.RestoreAchievements();
 			}
+
+			Audio.Init(Data.Player);
 		}
 
 		protected virtual void InitCrashReporting()
@@ -177,6 +180,19 @@ namespace Zedarus.ToolKit
 				}
 
 				return _api; 
+			}
+		}
+
+		public AudioController Audio
+		{
+			get 
+			{
+				if (_audio == null)
+				{
+					_audio = new AudioController();
+				}
+
+				return _audio;
 			}
 		}
 
