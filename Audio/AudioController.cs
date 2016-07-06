@@ -10,7 +10,7 @@ using Zedarus.ToolKit.Data.Player;
 using DarkTonic.MasterAudio;
 #endif
 
-namespace Zedarus.ToolKit
+namespace Zedarus.ToolKit.Audio
 {
 	public class AudioController
 	{

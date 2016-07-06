@@ -10,6 +10,7 @@ using Zedarus.ToolKit.Data.Game;
 using Zedarus.ToolKit.API;
 using Zedarus.ToolKit.Settings;
 using Zedarus.ToolKit.Events;
+using Zedarus.ToolKit.Audio;
 
 namespace Zedarus.ToolKit
 {
