@@ -31,6 +31,14 @@ namespace Zedarus.ToolKit.Data.Game
 		[SerializeField]
 		[DataField("Google Play link (short)")]
 		private string _googlePlayLinkShort = "";
+
+		[SerializeField]
+		[DataField("Contact Email")]
+		private string _contactEmail = "contact@zedarus.com";
+
+		[SerializeField]
+		[DataField("Contact Email Subject")]
+		private string _contactEmailSubject = "Game Title";
 		#endregion
 
 		#region Initalization
@@ -52,6 +60,16 @@ namespace Zedarus.ToolKit.Data.Game
 			_build = build;
 		}
 		#endif
+
+		public void SendContactEmail()
+		{
+			Application.OpenURL("mailto:" + ContactEmail + "?subject=" + EscapeURL(ContactEmailSubject));
+		}
+
+		private string EscapeURL(string url)
+		{
+			return WWW.EscapeURL(url).Replace("+","%20");
+		}
 		#endregion
 
 		#region Getters
@@ -63,6 +81,16 @@ namespace Zedarus.ToolKit.Data.Game
 		public int Build
 		{
 			get { return _build; }
+		}
+
+		public string ContactEmail
+		{
+			get { return _contactEmail; }
+		}
+
+		public string ContactEmailSubject
+		{
+			get { return _contactEmailSubject; }
 		}
 
 		public string GetCurrentPlatformStoreLink(bool shortVersion)
