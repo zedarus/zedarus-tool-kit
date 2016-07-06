@@ -32,6 +32,7 @@ namespace Zedarus.ToolKit.API
 			{
 				ZedLogger.Log("trying to authenticate local player");
 				GameCenterBinding.authenticateLocalPlayer(false);
+				GameCenterBinding.showCompletionBannerForAchievements();
 			}
 			#endif
 		}
