@@ -27,8 +27,8 @@ namespace Zedarus.ToolKit.Localisation
 
 		public override void OnInspectorGUI()
 		{
-			if (!LocalisationManager.Instance.HasData)
-				LocalisationManager.Instance.UpdateData();
+			if (!LocalisationManager.HasData)
+				LocalisationManager.UpdateData();
 
 			_target.Update();
 
@@ -39,7 +39,7 @@ namespace Zedarus.ToolKit.Localisation
 			string error = "";
 
 			// Page:
-			string[] sheets = LocalisationManager.Instance.Sheets;
+			string[] sheets = LocalisationManager.Sheets;
 			string newValue = _page.stringValue;
 			if (sheets != null && sheets.Length > 0)
 			{
@@ -58,7 +58,7 @@ namespace Zedarus.ToolKit.Localisation
 			_page.stringValue = newValue;
 
 			// Phrase:
-			string[] phrases = LocalisationManager.Instance.GetPhrasesForSheet(_page.stringValue);
+			string[] phrases = LocalisationManager.GetPhrasesForSheet(_page.stringValue);
 			newValue = _phrase.stringValue;
 			if (phrases != null && phrases.Length > 0)
 			{
@@ -87,7 +87,7 @@ namespace Zedarus.ToolKit.Localisation
 
 			if (GUILayout.Button("Refresh Data"))
 			{
-				LocalisationManager.Instance.UpdateData();
+				LocalisationManager.UpdateData();
 			}
 
 			//if (changed)

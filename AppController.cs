@@ -23,6 +23,7 @@ namespace Zedarus.ToolKit
 		private DataManager<GameDataClass, PlayerDataClass> _data;
 		private APIManager _api;
 		private AudioController _audio;
+		private LocalisationManager _localisation;
 		private bool _postInit = false;
 		#endregion
 
@@ -80,7 +81,7 @@ namespace Zedarus.ToolKit
 			Audio.Init(Data.Player);
 
 			// TODO: pass language saved in player data here
-			LocalisationManager.Instance.Init();
+			Localisation.Init();
 		}
 
 		protected virtual void InitCrashReporting()
@@ -198,6 +199,19 @@ namespace Zedarus.ToolKit
 				}
 
 				return _audio;
+			}
+		}
+
+		public LocalisationManager Localisation
+		{
+			get 
+			{
+				if (_localisation == null)
+				{
+					_localisation = new LocalisationManager();
+				}
+
+				return _localisation;
 			}
 		}
 

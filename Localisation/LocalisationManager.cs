@@ -9,7 +9,7 @@ using Zedarus.ToolKit.Settings;
 
 namespace Zedarus.ToolKit.Localisation
 {
-	public class LocalisationManager : SimpleSingleton<LocalisationManager>
+	public class LocalisationManager
 	{
 		#region Properties
 		private string _firstPage = null;
@@ -17,6 +17,8 @@ namespace Zedarus.ToolKit.Localisation
 		#endregion
 
 		#region Controls
+		public LocalisationManager() {}
+
 		public void Init()
 		{
 			if (!_ready)
@@ -120,14 +122,14 @@ namespace Zedarus.ToolKit.Localisation
 		#endregion
 
 		#if UNITY_EDITOR
-		private Dictionary<string, List<string>> _data = new Dictionary<string, List<string>>();
+		private static Dictionary<string, List<string>> _data = new Dictionary<string, List<string>>();
 
-		public bool HasData
+		public static bool HasData
 		{
 			get { return _data.Count > 0; }
 		}
 
-		public void UpdateData()
+		public static void UpdateData()
 		{
 			_data.Clear();
 
@@ -150,7 +152,7 @@ namespace Zedarus.ToolKit.Localisation
 			#endif
 		}
 
-		public string[] Sheets
+		public static string[] Sheets
 		{
 			get
 			{
@@ -160,7 +162,7 @@ namespace Zedarus.ToolKit.Localisation
 			}
 		}
 
-		public string[] GetPhrasesForSheet(string sheet)
+		public static string[] GetPhrasesForSheet(string sheet)
 		{
 			if (_data.ContainsKey(sheet))
 				return _data[sheet].ToArray();

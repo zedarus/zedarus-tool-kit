@@ -7,7 +7,7 @@ using Zedarus.ToolKit.Events;
 
 namespace Zedarus.ToolKit.Localisation
 {
-	public class LocaliseText : MonoBehaviour
+	public abstract class LocaliseText : MonoBehaviour
 	{
 		#region Properties
 		[SerializeField] private Text _textLabel;
@@ -37,7 +37,7 @@ namespace Zedarus.ToolKit.Localisation
 		{
 			if (_textLabel != null && _page != null && _phrase != null)
 			{
-				_localisedString = LocalisationManager.Instance.Localise(_phrase, _page);
+				_localisedString = LocManagerRef.Localise(_phrase, _page);
 				_textLabel.text = _localisedString;
 
 				if (_cachedArgs != null)
@@ -62,7 +62,7 @@ namespace Zedarus.ToolKit.Localisation
 		{
 			for (int i = 0; i < 100; i++)
 			{
-				if (LocalisationManager.Instance.Ready)
+				if (LocManagerRef.Ready)
 				{
 					Localise();
 				}
@@ -72,6 +72,10 @@ namespace Zedarus.ToolKit.Localisation
 				}
 			}
 		}
+		#endregion
+
+		#region Getters
+		protected abstract LocalisationManager LocManagerRef { get; }
 		#endregion
 	}
 }

@@ -122,7 +122,6 @@ namespace Zedarus.ToolKit.Audio
 			#if AUDIO_MASTER_AUDIO
 			if (MasterAudio.SafeInstance != null && PlayerDataRef != null)
 			{
-				Debug.Log("OnAudioStateUpdate");
 				if (PlayerDataRef.AudioState.MusicEnabled)
 				{
 					MasterAudio.UnmuteAllPlaylists();
