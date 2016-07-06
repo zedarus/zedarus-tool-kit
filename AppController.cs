@@ -1,4 +1,7 @@
 ﻿using UnityEngine;
+#if API_CRASH_UNITY
+using UnityEngine.CrashLog;
+#endif
 using System.Collections;
 using System.Collections.Generic;
 using Zedarus.ToolKit.Data;
@@ -31,6 +34,7 @@ namespace Zedarus.ToolKit
 		#region Init
 		private void Init()
 		{
+			InitCrashReporting();
 			InitEvents();
 
 			InitGameData();
@@ -69,6 +73,13 @@ namespace Zedarus.ToolKit
 			{
 				Data.Player.AchievementsTracker.RestoreAchievements();
 			}
+		}
+
+		protected virtual void InitCrashReporting()
+		{
+			#if API_CRASH_UNITY
+			CrashReporting.Init(Application.cloudProjectId);
+			#endif
 		}
 
 		protected virtual void InitEvents()
