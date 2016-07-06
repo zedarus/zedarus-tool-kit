@@ -3,6 +3,8 @@ using System;
 using System.Text.RegularExpressions;
 using System.Collections;
 using System.Collections.Generic;
+using Zedarus.ToolKit.Events;
+using Zedarus.ToolKit.Settings;
 
 namespace Zedarus.ToolKit.API
 {
@@ -80,32 +82,6 @@ namespace Zedarus.ToolKit.API
 		}
 		#endregion
 		
-		#region Localisation
-		public void LogSystemLanguage(string languageCode) 
-		{
-			if (Wrappers == null || Wrappers.Count < 1)
-				return;
-			
-			Dictionary<string, object> parameters = new Dictionary<string, object>();
-			parameters.Add("code", languageCode.ToLower());
-
-			foreach (IAnalyticsWrapperInterface wrapper in Wrappers)
-				wrapper.LogEvent("Localisation - System Language", parameters);
-		}
-		
-		public void LogLanguageChange(string languageCode) 
-		{
-			if (Wrappers == null || Wrappers.Count < 1)
-				return;
-			
-			Dictionary<string, object> parameters = new Dictionary<string, object>();
-			parameters.Add("code", languageCode.ToLower());
-
-			foreach (IAnalyticsWrapperInterface wrapper in Wrappers)
-				wrapper.LogEvent("Localisation - Change Language", parameters);
-		}
-		#endregion
-		
 		#region Gameplay
 		public void LogUnlockAchievement(string achievement) 
 		{
@@ -119,6 +95,31 @@ namespace Zedarus.ToolKit.API
 					{ "achievement", achievement }					
 				});
 			}
+		}
+		#endregion
+
+		#region Event Listeners
+		protected override void CreateEventListeners()
+		{
+			base.CreateEventListeners();
+			EventManager.AddListener<string>(IDs.Events.ChangeLanguage, OnChangeLanguage);
+		}
+
+		protected override void RemoveEventListeners()
+		{
+			base.RemoveEventListeners();
+			EventManager.RemoveListener<string>(IDs.Events.ChangeLanguage, OnChangeLanguage);
+		}
+		#endregion
+
+		#region Event Handlers
+		private void OnChangeLanguage(string language)
+		{
+			Debug.Log("On change language: " + language);
+			LogEvent("Usage - Language", new System.Collections.Generic.Dictionary<string, object>
+			{
+				{ "language", language }
+			});
 		}
 		#endregion
 	}

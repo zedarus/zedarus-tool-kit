@@ -16,6 +16,7 @@ namespace Zedarus.ToolKit.Settings
 			public const int AchievementUnlocked = EVENT_OFFSET + 5;
 			public const int AchievementRestored = EVENT_OFFSET + 6;
 			public const int AudioStateUpdated = EVENT_OFFSET + 7;
+			public const int ChangeLanguage = EVENT_OFFSET + 8;
 		}
 
 		private static bool _initialized = false;
@@ -30,6 +31,7 @@ namespace Zedarus.ToolKit.Settings
 				EventManager.RegisterEvent(Events.AchievementUnlocked);
 				EventManager.RegisterEvent(Events.AchievementRestored);
 				EventManager.RegisterEvent(Events.AudioStateUpdated);
+				EventManager.RegisterEvent(Events.ChangeLanguage);
 				_initialized = true;
 			}
 		}
