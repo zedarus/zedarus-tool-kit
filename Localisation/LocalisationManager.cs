@@ -1,108 +1,158 @@
-using UnityEngine;
+﻿using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 using System.Collections;
 using System.Collections.Generic;
+using Zedarus.ToolKit.Events;
+using Zedarus.ToolKit.Settings;
 
 namespace Zedarus.ToolKit.Localisation
 {
 	public class LocalisationManager : SimpleSingleton<LocalisationManager>
 	{
-		#region Settings
-		private const string DefaultPageName = "General";
-		#endregion
-
 		#region Properties
-		private Dictionary<int, string> _pages;
+		private string _firstPage = null;
+		private bool _ready = false;
 		#endregion
 
-		#region Init
-		public LocalisationManager()
+		#region Controls
+		public void Init()
 		{
-			_pages = new Dictionary<int, string>();
-			#if ZTK_LOC_M2H
-			LanguageCode localLang = Language.LanguageNameToCode(Application.systemLanguage);
-			APIManager.Instance.Analytics.LogSystemLanguage(localLang.ToString());
-			#endif
-		}
-		#endregion
-
-		#region Setup
-		public void AddPage(int id, string name)
-		{
-			_pages.Add(id, name);
-		}
-		#endregion
-		
-		#region Localizing
-		public void Localize() 
-		{
-			LocaliseObject[] localizeObjects = GameObject.FindObjectsOfType<LocaliseObject>();
-			foreach (LocaliseObject o in localizeObjects)
-				o.Localise(this);
-
-			//#if NGUI
-			//UIRoot.Broadcast("Localize", this);
-			//#endif
+			if (!_ready)
+			{
+				EventManager.SendEvent<string>(IDs.Events.SetLanguage, Language.CurrentLanguage().ToString());
+				_ready = true;
+			}
 		}
 
-		public void LocalizeGameObject(GameObject gameObject) 
+		public void ChangeLanguage(LanguageCode language, bool notifyAllObjects)
 		{
-			gameObject.BroadcastMessage("Localize", this, SendMessageOptions.DontRequireReceiver);
+			Language.SwitchLanguage(language);
+			EventManager.SendEvent<string>(IDs.Events.SetLanguage, language.ToString());
+
+			if (notifyAllObjects)
+			{
+				LocaliseText[] localiseComponents = GameObject.FindObjectsOfType<LocaliseText>();
+				foreach (LocaliseText localiseComponent in localiseComponents)
+				{
+					localiseComponent.Localise();
+				}
+			}
 		}
 
-		public string Get(string word, int page) 
+		public string Localise(string key)
 		{
-			#if ZTK_LOC_M2H
-			return Language.Get(word, ConvertPageIDToStringValue(page));
-			#else
-			return "no localisation plugin";
-			#endif
+			return Localise(key, FirstPage);
 		}
 
-		public string Get(string word) 
+		public string Localise(string key, string page)
 		{
-			#if ZTK_LOC_M2H
-			return Language.Get(word);
-			#else
-			return "no localisation plugin";
-			#endif
+			return Language.Get(key, page);
 		}
 
-		#if ZTK_LOC_M2H
-		public string GetForLanguage(string word, int page, LanguageCode language)
+		public string Localise(string key, object enumerablePage)
 		{
-			LanguageCode currentLanguage = Language.CurrentLanguage();
-			ChangeLanguage(language);
-			string s = Get(word, page);
-			ChangeLanguage(currentLanguage);
-			return s;
-		}
-		#endif
-		#endregion
-		
-		#region Helpers
-		private string ConvertPageIDToStringValue(int page) 
-		{
-			if (_pages.ContainsKey(page))
-				return _pages [page];
+			if (enumerablePage is System.Enum)
+			{
+				System.Type type = enumerablePage.GetType();
+				if (type != null)
+				{
+					return Localise(key, type.Name);
+				}
+				else
+					return null;
+			}
 			else
-				return DefaultPageName;
+				return null;
 		}
 
-		public void ChangeLanguage(string languageCode) 
+		public string Localise(object enumerable)
 		{
-			#if ZTK_LOC_M2H
-			Language.SwitchLanguage(languageCode);
-			APIManager.Instance.Analytics.LogLanguageChange(languageCode.ToLower());
-			#endif
+			if (enumerable is System.Enum)
+			{
+				System.Type type = enumerable.GetType();
+				if (type != null)
+				{
+					return Localise(System.Enum.GetName(type, enumerable), type.Name);
+				}
+				else
+					return null;
+			}
+			else
+				return null;
+		}
+		#endregion
+
+		#region Helpers
+		private string FirstPage
+		{
+			get 
+			{
+				if (_firstPage == null)
+				{
+					List<string> list = new List<string>(Language.Sheets.Keys);
+					_firstPage = list[list.Count - 1];
+					list.Clear();
+					list = null;
+				}
+
+				return _firstPage;
+			}
 		}
 
-		#if ZTK_LOC_M2H
-		public void ChangeLanguage(LanguageCode languageCode) 
+		public bool Ready
 		{
-			Language.SwitchLanguage(languageCode);
-			APIManager.Instance.Analytics.LogLanguageChange(languageCode.ToString().ToLower());
+			get { return _ready; }
+		}
+		#endregion
+
+		#if UNITY_EDITOR
+		private Dictionary<string, List<string>> _data = new Dictionary<string, List<string>>();
+
+		public bool HasData
+		{
+			get { return _data.Count > 0; }
+		}
+
+		public void UpdateData()
+		{
+			_data.Clear();
+
+			Language.LoadAvailableLanguages();
+			Language.SwitchLanguage(LanguageCode.EN);
+
+			// TODO: this should be modular for different libs
+			foreach (KeyValuePair<string, Dictionary<string, string>> sheet in Language.Sheets)
+			{
+				List<string> phrases = new List<string>();
+
+				foreach (KeyValuePair<string, string> phrase in sheet.Value)
+				{
+					phrases.Add(phrase.Key);
+				}
+
+				_data.Add(sheet.Key, phrases);
+			}
+		}
+
+		public string[] Sheets
+		{
+			get
+			{
+				List<string> list = new List<string>(_data.Keys);
+				list.Reverse();
+				return list.ToArray();
+			}
+		}
+
+		public string[] GetPhrasesForSheet(string sheet)
+		{
+			if (_data.ContainsKey(sheet))
+				return _data[sheet].ToArray();
+			else
+				return null;
 		}
 		#endif
-		#endregion
 	}
 }

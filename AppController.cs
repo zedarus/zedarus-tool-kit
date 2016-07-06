@@ -11,6 +11,7 @@ using Zedarus.ToolKit.API;
 using Zedarus.ToolKit.Settings;
 using Zedarus.ToolKit.Events;
 using Zedarus.ToolKit.Audio;
+using Zedarus.ToolKit.Localisation;
 
 namespace Zedarus.ToolKit
 {
@@ -77,6 +78,9 @@ namespace Zedarus.ToolKit
 			}
 
 			Audio.Init(Data.Player);
+
+			// TODO: pass language saved in player data here
+			LocalisationManager.Instance.Init();
 		}
 
 		protected virtual void InitCrashReporting()

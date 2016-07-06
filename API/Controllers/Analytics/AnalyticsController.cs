@@ -102,13 +102,13 @@ namespace Zedarus.ToolKit.API
 		protected override void CreateEventListeners()
 		{
 			base.CreateEventListeners();
-			EventManager.AddListener<string>(IDs.Events.ChangeLanguage, OnChangeLanguage);
+			EventManager.AddListener<string>(IDs.Events.SetLanguage, OnChangeLanguage);
 		}
 
 		protected override void RemoveEventListeners()
 		{
 			base.RemoveEventListeners();
-			EventManager.RemoveListener<string>(IDs.Events.ChangeLanguage, OnChangeLanguage);
+			EventManager.RemoveListener<string>(IDs.Events.SetLanguage, OnChangeLanguage);
 		}
 		#endregion
 
