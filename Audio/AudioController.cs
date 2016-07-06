@@ -23,6 +23,8 @@ namespace Zedarus.ToolKit
 		{
 			_playerDataRef = playerDataRef;
 			EventManager.AddListener(IDs.Events.AudioStateUpdated, OnAudioStateUpdate);
+			EventManager.AddListener(IDs.Events.DisableMusicDuringAd, OnAdStarted);
+			EventManager.AddListener(IDs.Events.EnableMusicAfterAd, OnAdFinished);
 			OnAudioStateUpdate();
 		}
 		#endregion
@@ -65,6 +67,13 @@ namespace Zedarus.ToolKit
 				#endif
 			}
 		}
+		#endregion
+
+		#region Getters
+		private PlayerData PlayerDataRef
+		{
+			get { return _playerDataRef; }
+		}
 
 		private bool MusicMuted
 		{
@@ -91,14 +100,23 @@ namespace Zedarus.ToolKit
 		}
 		#endregion
 
-		#region Getters
-		private PlayerData PlayerDataRef
-		{
-			get { return _playerDataRef; }
-		}
-		#endregion
-
 		#region Event Handlers
+		private void OnAdStarted()
+		{
+			if (!MusicMuted && MasterAudio.SafeInstance != null)
+			{
+				MasterAudio.MuteAllPlaylists();
+			}
+		}
+
+		private void OnAdFinished()
+		{
+			if (MasterAudio.SafeInstance != null && PlayerDataRef != null && PlayerDataRef.AudioState.MusicEnabled)
+			{
+				MasterAudio.UnmuteAllPlaylists();
+			}
+		}
+
 		private void OnAudioStateUpdate()
 		{
 			#if AUDIO_MASTER_AUDIO
@@ -107,11 +125,11 @@ namespace Zedarus.ToolKit
 				Debug.Log("OnAudioStateUpdate");
 				if (PlayerDataRef.AudioState.MusicEnabled)
 				{
-					MasterAudio.UnmutePlaylist();
+					MasterAudio.UnmuteAllPlaylists();
 				}
 				else
 				{
-					MasterAudio.MutePlaylist();
+					MasterAudio.MuteAllPlaylists();
 				}
 
 				if (PlayerDataRef.AudioState.SoundEnabled)
