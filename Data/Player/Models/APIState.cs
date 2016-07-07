@@ -13,6 +13,8 @@ namespace Zedarus.ToolKit.Data.Player
 		private bool _adsEnabled;
 		[SerializeField]
 		private int _intertitialCounter;
+		[SerializeField]
+		private DateTime _promoDisplayDate;
 		#endregion
 
 		#region Init
@@ -26,6 +28,7 @@ namespace Zedarus.ToolKit.Data.Player
 		{
 			_adsEnabled = true;
 			_intertitialCounter = 0;
+			_promoDisplayDate = new DateTime(1986, 7, 21);
 		}
 		#endregion
 
@@ -44,6 +47,11 @@ namespace Zedarus.ToolKit.Data.Player
 		{
 			_adsEnabled = false;
 		}
+
+		public void RegisterPromoDisplay()
+		{
+			_promoDisplayDate = DateTime.UtcNow;
+		}
 		#endregion
 
 		#region Getters
@@ -55,6 +63,11 @@ namespace Zedarus.ToolKit.Data.Player
 		public int IntertitialCounter
 		{
 			get { return _intertitialCounter; }
+		}
+
+		public DateTime LastPromoDisplayDate
+		{
+			get { return _promoDisplayDate; }
 		}
 		#endregion
 

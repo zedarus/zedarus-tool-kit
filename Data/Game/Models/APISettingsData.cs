@@ -28,6 +28,14 @@ namespace Zedarus.ToolKit.Data.Game
 		[SerializeField]
 		[DataField("Remove Ads IAP Google Play ID")]
 		private string _removeAdsIAPGooglePlayID = "";
+
+		[SerializeField]
+		[DataField("Promo Ads Enabled")]
+		private bool _promoAdsEnabled = false;
+
+		[SerializeField]
+		[DataField("Promo Ads Delay (min)")]
+		private int _promoAdsDelayMins = 60;
 		#endregion
 
 		#region Initalization
@@ -59,6 +67,16 @@ namespace Zedarus.ToolKit.Data.Game
 		public string RemoveAdsIAPGoogleID
 		{
 			get { return _removeAdsIAPGooglePlayID; }
+		}
+
+		public bool PromoAdsEnabled
+		{
+			get { return _promoAdsEnabled; }
+		}
+
+		public int PromoAdsDelayMins
+		{
+			get { return _promoAdsDelayMins; }
 		}
 		#endregion
 

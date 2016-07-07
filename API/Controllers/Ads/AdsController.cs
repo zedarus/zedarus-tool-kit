@@ -101,15 +101,20 @@ namespace Zedarus.ToolKit.API
 
 		public void ShowBetweenLevelAd(string tag, Action callback, GameObject adBlockObject = null)
 		{
-			ShowIntersitital(tag, callback, true, adBlockObject);
+			ShowIntersitital(tag, callback, true, false, adBlockObject);
 		}
 
 		public void ShowIntersitital(string tag, Action callback, GameObject adBlockObject = null)
 		{
-			ShowIntersitital(tag, callback, false, adBlockObject);
+			ShowIntersitital(tag, callback, false, false, adBlockObject);
 		}
 
-		private void ShowIntersitital(string tag, Action callback, bool useBetweenLevelCounter, GameObject adBlockObject)
+		public void ShowPromo(string tag, Action callback, GameObject adBlockObject = null)
+		{
+			ShowIntersitital(tag, callback, false, true, adBlockObject);
+		}
+
+		private void ShowIntersitital(string tag, Action callback, bool useBetweenLevelCounter, bool usePromoCounter, GameObject adBlockObject)
 		{
 			IAdsWrapperInterface wrapper = Wrapper;
 			bool adStarted = false;
@@ -130,6 +135,16 @@ namespace Zedarus.ToolKit.API
 					if (allowed)
 					{
 						Manager.State.ResetInterstitialCounter();
+					}
+				}
+
+				if (usePromoCounter)
+				{
+					allowed = CanDisplayPromo;
+
+					if (allowed)
+					{
+						Manager.State.RegisterPromoDisplay();
 					}
 				}
 
@@ -252,6 +267,27 @@ namespace Zedarus.ToolKit.API
 			{
 				if (Enabled)
 					return Manager.State.IntertitialCounter >= Manager.Settings.IntertitialsDelay;
+				else
+					return false;
+			}
+		}
+
+		private bool CanDisplayPromo
+		{
+			get 
+			{
+				if (Enabled)
+				{
+					if (Manager.Settings.PromoAdsEnabled)
+					{
+						int minutes = Convert.ToInt32((DateTime.UtcNow - Manager.State.LastPromoDisplayDate).TotalMinutes);
+						return minutes >= Manager.Settings.PromoAdsDelayMins;
+					}
+					else
+					{
+						return false;
+					}
+				}
 				else
 					return false;
 			}
