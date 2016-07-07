@@ -35,7 +35,13 @@ namespace Zedarus.ToolKit.API
 		#endregion
 
 		#region Controls
-
+		public void RequestNotificationsPermission()
+		{
+			if (Wrapper != null)
+			{
+				Wrapper.RequestNotificationsPermission();
+			}
+		}
 		#endregion
 
 		#region Queries

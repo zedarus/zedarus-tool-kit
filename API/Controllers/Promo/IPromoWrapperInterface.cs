@@ -11,6 +11,7 @@ namespace Zedarus.ToolKit.API
 		#endregion
 
 		#region Controls
+		void RequestNotificationsPermission();
 		#endregion
 
 		#region Queries

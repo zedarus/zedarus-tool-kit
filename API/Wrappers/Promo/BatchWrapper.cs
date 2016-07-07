@@ -4,6 +4,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Zedarus.ToolKit;
+#if UNITY_IOS
+using UnityEngine.iOS;
+#endif
 #if API_PROMO_BATCH
 using Batch;
 #endif
@@ -51,7 +54,6 @@ namespace Zedarus.ToolKit.API
 			BatchWrapperSettings batchSettings = settings as BatchWrapperSettings;
 			if (batchSettings != null)
 			{
-				Debug.Log("HELLO 2");
 				GameObject batchGO = new GameObject("Batch");
 				GameObject.DontDestroyOnLoad(batchGO);
 
@@ -100,7 +102,18 @@ namespace Zedarus.ToolKit.API
 		#endregion
 
 		#region Controls
+		public void RequestNotificationsPermission()
+		{
+			#if API_PROMO_BATCH
+			// TODO: check if this will also work for local notifications
+			_plugin.Push.RegisterForRemoteNotifications();
 
+			#if UNITY_IOS
+			UnityEngine.iOS.NotificationServices.RegisterForNotifications(NotificationType.Alert | NotificationType.Badge | NotificationType.Sound);
+			#endif
+
+			#endif
+		}
 		#endregion
 
 		#region Event Listeners
