@@ -125,9 +125,9 @@ namespace Zedarus.ToolKit
 			API.Sync.RequestSyncEnable += OnRequestSyncEnable;
 		}
 
-		protected virtual void DisplaySyncConfirmUI(System.Action syncConfirmedHandler, System.Action syncDeniedHandler)
+		protected virtual bool DisplaySyncConfirmUI(System.Action syncConfirmedHandler, System.Action syncDeniedHandler)
 		{
-			
+			return true;
 		}
 		#endregion
 
@@ -172,7 +172,10 @@ namespace Zedarus.ToolKit
 
 		private void OnRequestSyncEnable()
 		{
-			DisplaySyncConfirmUI(null, null);
+			if (!DisplaySyncConfirmUI(OnSyncConfirmed, OnSyncDenied))
+			{
+				DelayedCall.Create(OnRequestSyncEnable, 0.5f, true, true, "Ask for sync delay");
+			}
 		}
 
 		private void OnSyncConfirmed()

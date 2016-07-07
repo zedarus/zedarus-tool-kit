@@ -5,8 +5,13 @@ namespace Zedarus.ToolKit
 {
 	public class DelayedCall : MonoBehaviour
 	{
-		public void Init(System.Action callback, float delay, bool useRealtime)
+		public void Init(System.Action callback, float delay, bool useRealtime, bool dontDestroyOnLoad)
 		{
+			if (dontDestroyOnLoad)
+			{
+				DontDestroyOnLoad(gameObject);
+			}
+
 			StartCoroutine(Delay(delay, callback, useRealtime));
 		}
 
@@ -30,11 +35,11 @@ namespace Zedarus.ToolKit
 			Destroy(gameObject);
 		}
 
-		public static DelayedCall Create(System.Action callback, float delay, bool useRealtime = true, string customName = null)
+		public static DelayedCall Create(System.Action callback, float delay, bool useRealtime = true, bool dontDestroyOnLoad = false, string customName = null)
 		{
 			GameObject go = new GameObject((customName == null) ? "Delayed Call" : customName);
 			DelayedCall call = go.AddComponent<DelayedCall>();
-			call.Init(callback, delay, useRealtime);
+			call.Init(callback, delay, useRealtime, dontDestroyOnLoad);
 			return call;
 		}
 	}
