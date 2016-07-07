@@ -8,6 +8,11 @@ namespace Zedarus.ToolKit
 	public class SimpleSingleton<T> where T : class
 	{
 		private static T _instance;
+
+		public static bool HasInstance
+		{
+			get { return _instance != null; }
+		}
 	
 		public static T Instance
 		{

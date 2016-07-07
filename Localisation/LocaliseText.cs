@@ -62,7 +62,7 @@ namespace Zedarus.ToolKit.Localisation
 		{
 			for (int i = 0; i < 100; i++)
 			{
-				if (LocManagerRef.Ready)
+				if (LocManagerRef != null && LocManagerRef.Ready)
 				{
 					Localise();
 				}
