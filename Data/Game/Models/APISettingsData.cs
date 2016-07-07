@@ -36,6 +36,10 @@ namespace Zedarus.ToolKit.Data.Game
 		[SerializeField]
 		[DataField("Promo Ads Delay (min)")]
 		private int _promoAdsDelayMins = 60;
+
+		[SerializeField]
+		[DataField("Local Notifications Enabled")]
+		private bool _localNotificationsEnabled = false;
 		#endregion
 
 		#region Initalization
@@ -77,6 +81,11 @@ namespace Zedarus.ToolKit.Data.Game
 		public int PromoAdsDelayMins
 		{
 			get { return _promoAdsDelayMins; }
+		}
+
+		public bool LocalNotificationsEnabled
+		{
+			get { return _localNotificationsEnabled; }
 		}
 		#endregion
 

@@ -35,6 +35,10 @@ namespace Zedarus.ToolKit.Data.Game
 		[SerializeField]
 		[DataTable(1006, "Rate Me Popup", typeof(RateMePopupData))]
 		private RateMePopupData _rateMePopup;
+
+		[SerializeField]
+		[DataTable(1007, "Promo - Local Notifications", typeof(PromoLocalNotifications))]
+		private List<PromoLocalNotifications> _localNotifications;
 		#endregion
 
 		#region Settings
@@ -180,6 +184,11 @@ namespace Zedarus.ToolKit.Data.Game
 			get { return _leaderboards; }
 		}
 
+		public List<PromoLocalNotifications> LocalNotifications
+		{
+			get { return _localNotifications; }
+		}
+
 		public LeaderboardData DefaultLeaderboard
 		{
 			get 
@@ -209,6 +218,11 @@ namespace Zedarus.ToolKit.Data.Game
 		public LeaderboardData GetLeaderboard(int id)
 		{
 			return GetDataTableEntry<LeaderboardData>(id, Leaderboards);
+		}
+
+		public PromoLocalNotifications GetLocalNotification(int id)
+		{
+			return GetDataTableEntry<PromoLocalNotifications>(id, LocalNotifications);
 		}
 
 		protected T GetDataTableEntry<T>(int id, List<T> table) where T : IGameDataModel

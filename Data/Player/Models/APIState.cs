@@ -19,6 +19,8 @@ namespace Zedarus.ToolKit.Data.Player
 		private bool _syncEnabled;
 		[SerializeField]
 		private bool _askedSyncPermission;
+		[SerializeField]
+		private bool _localNotificationsScheduled;
 		#endregion
 
 		#region Init
@@ -35,6 +37,7 @@ namespace Zedarus.ToolKit.Data.Player
 			_adsEnabled = true;
 			_intertitialCounter = 0;
 			_promoDisplayDate = new DateTime(1986, 7, 21);
+			_localNotificationsScheduled = false;
 		}
 		#endregion
 
@@ -68,6 +71,11 @@ namespace Zedarus.ToolKit.Data.Player
 		{
 			_askedSyncPermission = true;
 		}
+
+		public void ScheduleLocalNotifications()
+		{
+			_localNotificationsScheduled = true;		
+		}
 		#endregion
 
 		#region Getters
@@ -94,6 +102,11 @@ namespace Zedarus.ToolKit.Data.Player
 		public bool AskedSyncPermission
 		{
 			get { return _askedSyncPermission; }
+		}
+
+		public bool LocalNotificationsScheduled
+		{
+			get { return _localNotificationsScheduled; }
 		}
 		#endregion
 

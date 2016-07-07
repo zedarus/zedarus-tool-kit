@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Zedarus.ToolKit;
+using Zedarus.ToolKit.Data.Game;
 #if UNITY_IOS
 using UnityEngine.iOS;
 #endif
@@ -39,6 +40,7 @@ namespace Zedarus.ToolKit.API
 		#endregion
 
 		#region Events
+		public event Action<IDictionary> ProcessUserDataFromLocalNotification;
 		#endregion
 
 		#region Properties
@@ -112,6 +114,92 @@ namespace Zedarus.ToolKit.API
 			UnityEngine.iOS.NotificationServices.RegisterForNotifications(NotificationType.Alert | NotificationType.Badge | NotificationType.Sound);
 			#endif
 
+			#endif
+		}
+
+		public void ClearLocalNotifications()
+		{
+			#if UNITY_IOS
+			int attempts = 64;
+			while (UnityEngine.iOS.NotificationServices.localNotificationCount > 0 && attempts > 0) 
+			{
+				foreach (UnityEngine.iOS.LocalNotification notif in UnityEngine.iOS.NotificationServices.localNotifications)
+				{
+					if (notif.userInfo != null)
+					{
+						if (ProcessUserDataFromLocalNotification != null)
+						{
+							ProcessUserDataFromLocalNotification(notif.userInfo);
+						}
+					}
+				}
+
+				// TODO: process notification for userInfo and grant rewards
+				UnityEngine.iOS.NotificationServices.ClearLocalNotifications();
+				attempts--;
+			}
+			#endif
+		}
+
+		public void ScheduleLocalNotification(string text, string action, DateTime date, PromoLocalNotifications.RepeatInterval repeat, IDictionary userInfo)
+		{
+			#if UNITY_IOS
+			var notif = new UnityEngine.iOS.LocalNotification();
+
+			notif.alertBody = text;
+			notif.fireDate = date;
+
+			if (!string.IsNullOrEmpty(action.Trim()))
+			{
+				notif.alertAction = action;
+			}
+
+			switch (repeat)
+			{
+				case PromoLocalNotifications.RepeatInterval.Daily:
+					notif.repeatInterval = UnityEngine.iOS.CalendarUnit.Day;
+					break;
+				case PromoLocalNotifications.RepeatInterval.Weekly:
+					notif.repeatInterval = UnityEngine.iOS.CalendarUnit.Week;
+					break;
+				case PromoLocalNotifications.RepeatInterval.Monthly:
+					notif.repeatInterval = UnityEngine.iOS.CalendarUnit.Month;
+					break;
+			}
+
+			if (userInfo != null)
+			{
+				notif.userInfo = userInfo;
+			}
+
+			UnityEngine.iOS.NotificationServices.ScheduleLocalNotification(notif);
+			#endif
+		}
+
+		public void CancelAllScheduledLocalNotifications()
+		{
+			#if UNITY_IOS
+			UnityEngine.iOS.NotificationServices.CancelAllLocalNotifications();
+			#endif
+		}
+
+		public void CancelScheduledLocalNotification(string text)
+		{
+			#if UNITY_IOS
+			UnityEngine.iOS.LocalNotification notificationToCancel = null;
+			foreach (UnityEngine.iOS.LocalNotification notif in UnityEngine.iOS.NotificationServices.scheduledLocalNotifications)
+			{
+				if (notif.alertBody.Equals(text))
+				{
+					notificationToCancel = notif;
+					break;
+				}
+			}
+
+			if (notificationToCancel != null)
+			{
+				UnityEngine.iOS.NotificationServices.CancelLocalNotification(notificationToCancel);
+			}
 			#endif
 		}
 		#endregion

@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Zedarus.ToolKit;
 using Zedarus.ToolKit.Data;
+using Zedarus.ToolKit.Data.Game;
 using Zedarus.ToolKit.Settings;
 using Zedarus.ToolKit.Events;
 
@@ -12,6 +13,7 @@ namespace Zedarus.ToolKit.API
 	public class PromoController : APIController 
 	{	
 		#region Events
+		public event Action<IDictionary> ProcessUserDataFromLocalNotification;
 		#endregion
 
 		#region Properties
@@ -42,6 +44,37 @@ namespace Zedarus.ToolKit.API
 				Wrapper.RequestNotificationsPermission();
 			}
 		}
+
+		public void ClearLocalNotifications()
+		{
+			if (Wrapper != null)
+			{
+				Wrapper.ClearLocalNotifications();
+			}
+		}
+
+		public void ScheduleLocalNotification(string text, string action, DateTime date, PromoLocalNotifications.RepeatInterval repeat, IDictionary userInfo)
+		{
+			if (Wrapper != null)
+			{
+				if (Manager.Settings.LocalNotificationsEnabled)
+				{
+					Wrapper.ScheduleLocalNotification(text, action, date, repeat, userInfo);
+				}
+				else
+				{
+					Debug.Log("Local notification are disabled in API settings");
+				}
+			}
+		}
+
+		public void CancelAllScheduledLocalNotifications()
+		{
+			if (Wrapper != null)
+			{
+				Wrapper.CancelAllScheduledLocalNotifications();
+			}
+		}
 		#endregion
 
 		#region Queries
@@ -55,7 +88,7 @@ namespace Zedarus.ToolKit.API
 
 			foreach (IPromoWrapperInterface wrapper in Wrappers)
 			{
-				
+				wrapper.ProcessUserDataFromLocalNotification += OnProcessUserDataFromLocalNotification;
 			}
 		}
 
@@ -65,13 +98,19 @@ namespace Zedarus.ToolKit.API
 
 			foreach (IPromoWrapperInterface wrapper in Wrappers)
 			{
-				
+				wrapper.ProcessUserDataFromLocalNotification -= OnProcessUserDataFromLocalNotification;
 			}
 		}
 		#endregion
 
 		#region Event Handlers
-
+		private void OnProcessUserDataFromLocalNotification(IDictionary userInfo)
+		{
+			if (ProcessUserDataFromLocalNotification != null)
+			{
+				ProcessUserDataFromLocalNotification(userInfo);
+			}
+		}
 		#endregion
 
 		#region Getters

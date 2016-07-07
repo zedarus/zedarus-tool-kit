@@ -80,8 +80,27 @@ namespace Zedarus.ToolKit
 
 			Audio.Init(Data.Player);
 
-			// TODO: pass language saved in player data here
 			Localisation.Init();
+
+			if (Data.Player != null && Data.Game.APISettings.LocalNotificationsEnabled && !Data.Player.APIState.LocalNotificationsScheduled)
+			{
+				Debug.Log("Schedule local notifications");
+				foreach (PromoLocalNotifications notif in Data.Game.LocalNotifications)
+				{
+					if (notif.Enabled)
+					{
+						string text = notif.Text;
+						if (notif.UseLocalisation)
+						{
+							text = Localisation.Localise(notif.TextLocalisationID);
+						}
+						API.Promo.ScheduleLocalNotification(text, notif.Action, notif.Date, notif.Repeat, notif.UserInfo);
+					}
+				}
+
+				Data.Player.APIState.ScheduleLocalNotifications();
+				Data.Save(false);
+			}
 		}
 
 		protected virtual void InitCrashReporting()
@@ -123,6 +142,7 @@ namespace Zedarus.ToolKit
 			API.Store.ProductPurchaseFinished += OnProductPurchaseFinished;
 			API.Sync.SyncFinished += OnSyncFinished;
 			API.Sync.RequestSyncEnable += OnRequestSyncEnable;
+			API.Promo.ProcessUserDataFromLocalNotification += OnProcessUserDataFromLocalNotification;
 		}
 
 		protected virtual bool DisplaySyncConfirmUI(System.Action syncConfirmedHandler, System.Action syncDeniedHandler)
@@ -192,6 +212,11 @@ namespace Zedarus.ToolKit
 		protected virtual bool OnCheckCustomAchievementCondition(int achievement, object parameterValue)
 		{
 			return false;
+		}
+
+		protected virtual void OnProcessUserDataFromLocalNotification(IDictionary userData)
+		{
+		
 		}
 		#endregion
 
