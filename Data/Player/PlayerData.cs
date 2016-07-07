@@ -123,6 +123,11 @@ namespace Zedarus.ToolKit.Data.Player
 			get { return GetModel<AudioState>(); }
 		}
 
+		public APIState APIState
+		{
+			get { return GetModel<APIState>(); }
+		}
+
 		public int Build
 		{
 			get { return _buildNumber; }

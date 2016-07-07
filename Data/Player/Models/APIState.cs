@@ -15,6 +15,10 @@ namespace Zedarus.ToolKit.Data.Player
 		private int _intertitialCounter;
 		[SerializeField]
 		private DateTime _promoDisplayDate;
+		[SerializeField]
+		private bool _syncEnabled;
+		[SerializeField]
+		private bool _askedSyncPermission;
 		#endregion
 
 		#region Init
@@ -26,6 +30,8 @@ namespace Zedarus.ToolKit.Data.Player
 		[OnDeserializing]
 		private void SetDefaults(StreamingContext sc)
 		{
+			_syncEnabled = false;
+			_askedSyncPermission = false;
 			_adsEnabled = true;
 			_intertitialCounter = 0;
 			_promoDisplayDate = new DateTime(1986, 7, 21);
@@ -52,6 +58,16 @@ namespace Zedarus.ToolKit.Data.Player
 		{
 			_promoDisplayDate = DateTime.UtcNow;
 		}
+
+		public void ChangeSyncState(bool enabled)
+		{
+			_syncEnabled = enabled;
+		}
+
+		public void AskForSyncPermission()
+		{
+			_askedSyncPermission = true;
+		}
 		#endregion
 
 		#region Getters
@@ -68,6 +84,16 @@ namespace Zedarus.ToolKit.Data.Player
 		public DateTime LastPromoDisplayDate
 		{
 			get { return _promoDisplayDate; }
+		}
+
+		public bool SyncEnabled
+		{
+			get { return _syncEnabled; }
+		}
+
+		public bool AskedSyncPermission
+		{
+			get { return _askedSyncPermission; }
 		}
 		#endregion
 

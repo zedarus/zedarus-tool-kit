@@ -9,6 +9,7 @@ namespace Zedarus.ToolKit.API
 	{
 		#region Events
 		public event Action<byte[]> SyncFinished;
+		public event Action RequestSyncEnable;
 		#endregion
 		
 		#region Initialization
@@ -31,6 +32,12 @@ namespace Zedarus.ToolKit.API
 		#endregion
 		
 		#region Controls
+		public void AllowSync()
+		{
+			Manager.State.ChangeSyncState(true);
+			Sync();
+		}
+
 		public void Sync() 
 		{
 			if (Wrapper != null)
@@ -39,7 +46,7 @@ namespace Zedarus.ToolKit.API
 		
 		public bool SaveData(byte[] data) 
 		{
-			if (Wrapper != null)
+			if (Manager.State.SyncEnabled && Wrapper != null)
 				return Wrapper.SaveData(data);
 			else
 				return false;
@@ -92,8 +99,20 @@ namespace Zedarus.ToolKit.API
 		#region Event Handlers
 		private void OnSyncFinished(byte[] data)
 		{
-			if (SyncFinished != null)
-				SyncFinished(data);
+			if (Manager.State.SyncEnabled)
+			{
+				if (SyncFinished != null)
+					SyncFinished(data);
+			}
+			else
+			{
+				if (!Manager.State.AskedSyncPermission)
+				{
+					Manager.State.AskForSyncPermission();
+					if (RequestSyncEnable != null)
+						RequestSyncEnable();
+				}
+			}
 		}
 		#endregion
 	}

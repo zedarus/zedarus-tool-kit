@@ -122,6 +122,12 @@ namespace Zedarus.ToolKit
 			API.RemoteData.DataReceived += OnRemoteDataReceived;
 			API.Store.ProductPurchaseFinished += OnProductPurchaseFinished;
 			API.Sync.SyncFinished += OnSyncFinished;
+			API.Sync.RequestSyncEnable += OnRequestSyncEnable;
+		}
+
+		protected virtual void DisplaySyncConfirmUI(System.Action syncConfirmedHandler, System.Action syncDeniedHandler)
+		{
+			
 		}
 		#endregion
 
@@ -162,6 +168,21 @@ namespace Zedarus.ToolKit
 		{
 			Data.Player.MergeData(PlayerData.Deserialize<PlayerDataClass>(data));
 			Data.Save(false);
+		}
+
+		private void OnRequestSyncEnable()
+		{
+			DisplaySyncConfirmUI(null, null);
+		}
+
+		private void OnSyncConfirmed()
+		{
+			API.Sync.AllowSync();
+		}
+
+		private void OnSyncDenied()
+		{
+			
 		}
 
 		protected virtual bool OnCheckCustomAchievementCondition(int achievement, object parameterValue)
