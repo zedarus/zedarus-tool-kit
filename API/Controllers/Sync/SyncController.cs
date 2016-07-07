@@ -65,6 +65,15 @@ namespace Zedarus.ToolKit.API
 			if (Wrapper != null)
 				Wrapper.DisplayUI();
 		}
+
+		public void ApplyLoadedData()
+		{
+			byte[] data = GetPlayerData();
+			if (data != null)
+			{
+				OnSyncFinished(data);
+			}
+		}
 		#endregion
 		
 		#region Getters
