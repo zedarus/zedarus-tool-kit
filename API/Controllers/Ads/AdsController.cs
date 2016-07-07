@@ -173,7 +173,7 @@ namespace Zedarus.ToolKit.API
 				_rewardProductID = productID;
 				EventManager.SendEvent(IDs.Events.DisableMusicDuringAd);
 				#if UNITY_EDITOR
-				DelayedCall.Create(OnInterstitialClosed, 2f);
+				DelayedCall.Create(OnGrantReward, 2f);
 				#else
 				wrapper.ShowRewardedVideo(tag);
 				#endif

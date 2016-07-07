@@ -80,7 +80,14 @@ namespace Zedarus.ToolKit.Audio
 			get 
 			{ 
 				#if AUDIO_MASTER_AUDIO
-				return MasterAudio.PlaylistsMuted; 
+				if (MasterAudio.SafeInstance != null)
+				{
+					return MasterAudio.PlaylistsMuted; 
+				}
+				else
+				{
+					return false;
+				}
 				#else
 				return false;
 				#endif
@@ -92,7 +99,14 @@ namespace Zedarus.ToolKit.Audio
 			get 
 			{ 
 				#if AUDIO_MASTER_AUDIO
-				return MasterAudio.MixerMuted; 
+				if (MasterAudio.SafeInstance != null)
+				{
+					return MasterAudio.MixerMuted; 
+				}
+				else
+				{
+					return false;
+				}
 				#else
 				return false;
 				#endif
@@ -103,18 +117,22 @@ namespace Zedarus.ToolKit.Audio
 		#region Event Handlers
 		private void OnAdStarted()
 		{
-			if (!MusicMuted && MasterAudio.SafeInstance != null)
+			#if AUDIO_MASTER_AUDIO
+			if (MasterAudio.SafeInstance != null && !MusicMuted)
 			{
 				MasterAudio.MuteAllPlaylists();
 			}
+			#endif
 		}
 
 		private void OnAdFinished()
 		{
+			#if AUDIO_MASTER_AUDIO
 			if (MasterAudio.SafeInstance != null && PlayerDataRef != null && PlayerDataRef.AudioState.MusicEnabled)
 			{
 				MasterAudio.UnmuteAllPlaylists();
 			}
+			#endif
 		}
 
 		private void OnAudioStateUpdate()
