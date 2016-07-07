@@ -181,6 +181,7 @@ namespace Zedarus.ToolKit
 		private void OnSyncConfirmed()
 		{
 			API.Sync.AllowSync();
+			OnSyncFinished(API.Sync.GetPlayerData());
 		}
 
 		private void OnSyncDenied()
