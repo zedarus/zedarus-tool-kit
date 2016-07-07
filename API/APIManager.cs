@@ -45,6 +45,11 @@ namespace Zedarus.ToolKit.API
 			public const int HeyZap = 1;
 		}
 
+		public struct Promo
+		{
+			public const int Batch = 1;
+		}
+
 		public const int None = 0;
 	}
 	
@@ -58,6 +63,7 @@ namespace Zedarus.ToolKit.API
 		private AnalyticsController _analyticsController;
 		private AdsController _adsController;
 		private RemoteDataController _remoteDataController;
+		private PromoController _promoController;
 
 		private APIState _stateModelRef = null;
 		private APISettingsData _settingsModelRef = null;
@@ -73,6 +79,7 @@ namespace Zedarus.ToolKit.API
 			_analyticsController = new AnalyticsController();
 			_adsController = new AdsController();
 			_remoteDataController = new RemoteDataController();
+			_promoController = new PromoController();
 			
 			_storeController.Initialized += OnControllerInitialized;
 			_shareController.Initialized += OnControllerInitialized;
@@ -81,6 +88,7 @@ namespace Zedarus.ToolKit.API
 			_analyticsController.Initialized += OnControllerInitialized;
 			_adsController.Initialized += OnControllerInitialized;
 			_remoteDataController.Initialized += OnControllerInitialized;
+			_promoController.Initialized += OnControllerInitialized;
 		}
 		#endregion
 		
@@ -94,6 +102,7 @@ namespace Zedarus.ToolKit.API
 			_analyticsController.Init(this);
 			_adsController.Init(this);
 			_remoteDataController.Init(this);
+			_promoController.Init(this);
 		}
 
 		public void UseAPISettingsModel(APISettingsData settingsModel)
@@ -148,6 +157,11 @@ namespace Zedarus.ToolKit.API
 		public RemoteDataController RemoteData
 		{
 			get { return _remoteDataController; }
+		}
+
+		public PromoController Promo
+		{
+			get { return _promoController; }
 		}
 
 		internal APIState State
