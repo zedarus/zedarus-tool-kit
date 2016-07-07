@@ -47,7 +47,7 @@ namespace Zedarus.ToolKit.API
 		{
 			base.CreateEventListeners();
 
-			foreach (IAdsWrapperInterface wrapper in Wrappers)
+			foreach (IPromoWrapperInterface wrapper in Wrappers)
 			{
 				
 			}
@@ -57,7 +57,7 @@ namespace Zedarus.ToolKit.API
 		{
 			base.RemoveEventListeners();
 
-			foreach (IAdsWrapperInterface wrapper in Wrappers)
+			foreach (IPromoWrapperInterface wrapper in Wrappers)
 			{
 				
 			}
