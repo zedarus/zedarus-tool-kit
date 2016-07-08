@@ -70,29 +70,7 @@ namespace Zedarus.ToolKit.API
 
 				_plugin.StartPlugin(config);
 			}
-
 			#endif
-
-
-			// UNITY LOCAL NOTIFICATIONS
-			// TEMP
-//
-//			// TODO: this should be called several times on each launch to remove all pending notifications on app start
-//			if (UnityEngine.iOS.NotificationServices.localNotificationCount > 0) {
-//				Debug.Log(UnityEngine.iOS.NotificationServices.localNotifications[0].alertBody);
-//				UnityEngine.iOS.NotificationServices.ClearLocalNotifications();
-//			}
-//
-//			var notif = new UnityEngine.iOS.LocalNotification();
-//			notif.fireDate = System.DateTime.Now.AddSeconds(120);
-//			notif.alertAction = "Play";
-//			notif.alertBody = "Hello!";
-//			UnityEngine.iOS.NotificationServices.ScheduleLocalNotification(notif);
-//
-//			// TODO: Warning! this will display iOS standart request for notifications popup
-//			UnityEngine.iOS.NotificationServices.RegisterForNotifications(NotificationType.Alert | NotificationType.Badge | NotificationType.Sound);
-//
-			// TEMP
 
 			SendInitializedEvent();	// TODO: temp
 		}
@@ -113,7 +91,6 @@ namespace Zedarus.ToolKit.API
 			#if UNITY_IOS
 			UnityEngine.iOS.NotificationServices.RegisterForNotifications(NotificationType.Alert | NotificationType.Badge | NotificationType.Sound);
 			#endif
-
 			#endif
 		}
 
@@ -134,10 +111,11 @@ namespace Zedarus.ToolKit.API
 					}
 				}
 
-				// TODO: process notification for userInfo and grant rewards
 				UnityEngine.iOS.NotificationServices.ClearLocalNotifications();
 				attempts--;
 			}
+
+			UnityEngine.iOS.NotificationServices.CancelAllLocalNotifications();
 			#endif
 		}
 
@@ -156,6 +134,12 @@ namespace Zedarus.ToolKit.API
 
 			switch (repeat)
 			{
+				case PromoLocalNotifications.RepeatInterval.Minute:
+					notif.repeatInterval = UnityEngine.iOS.CalendarUnit.Minute;
+					break;
+				case PromoLocalNotifications.RepeatInterval.Hourly:
+					notif.repeatInterval = UnityEngine.iOS.CalendarUnit.Hour;
+					break;
 				case PromoLocalNotifications.RepeatInterval.Daily:
 					notif.repeatInterval = UnityEngine.iOS.CalendarUnit.Day;
 					break;
@@ -175,49 +159,14 @@ namespace Zedarus.ToolKit.API
 			UnityEngine.iOS.NotificationServices.ScheduleLocalNotification(notif);
 			#endif
 		}
-
-		public void CancelAllScheduledLocalNotifications()
-		{
-			#if UNITY_IOS
-			UnityEngine.iOS.NotificationServices.CancelAllLocalNotifications();
-			#endif
-		}
-
-		public void CancelScheduledLocalNotification(string text)
-		{
-			#if UNITY_IOS
-			UnityEngine.iOS.LocalNotification notificationToCancel = null;
-			foreach (UnityEngine.iOS.LocalNotification notif in UnityEngine.iOS.NotificationServices.scheduledLocalNotifications)
-			{
-				if (notif.alertBody.Equals(text))
-				{
-					notificationToCancel = notif;
-					break;
-				}
-			}
-
-			if (notificationToCancel != null)
-			{
-				UnityEngine.iOS.NotificationServices.CancelLocalNotification(notificationToCancel);
-			}
-			#endif
-		}
 		#endregion
 
 		#region Event Listeners
-		protected override void CreateEventListeners() 
-		{
-			
-		}
-
-		protected override void RemoveEventListeners() 
-		{
-			
-		}
+		protected override void CreateEventListeners() {}
+		protected override void RemoveEventListeners() {}
 		#endregion
 
 		#region Event Handlers
-
 		#endregion
 	}
 }

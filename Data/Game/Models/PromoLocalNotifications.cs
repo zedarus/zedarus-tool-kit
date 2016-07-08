@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace Zedarus.ToolKit.Data.Game
 {
@@ -14,7 +15,11 @@ namespace Zedarus.ToolKit.Data.Game
 			Daily = 1,
 			Weekly = 2,
 			Monthly = 3,
+			Minute = 5,
+			Hourly = 4,
 		}
+
+		public const string REWARD_ID = "reward_id";
 		#endregion
 
 		#region Properties
@@ -45,6 +50,10 @@ namespace Zedarus.ToolKit.Data.Game
 		[SerializeField]
 		[DataField("Repeat Interval")]
 		private RepeatInterval _repeat = RepeatInterval.None;
+
+		[SerializeField]
+		[DataField("Reward", foreignKeyForTable=typeof(PromoReward))]
+		private int _rewardID;
 		#endregion
 
 		#region Initalization
@@ -96,8 +105,7 @@ namespace Zedarus.ToolKit.Data.Game
 
 		public IDictionary UserInfo
 		{
-			// TODO: implement correct user info here for rewards, etc
-			get { return null; }		
+			get { return new Dictionary<string, int>() { { REWARD_ID, _rewardID } }; }		
 		}
 		#endregion
 

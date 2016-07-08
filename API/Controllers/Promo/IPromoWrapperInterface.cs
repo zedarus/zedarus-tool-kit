@@ -16,7 +16,6 @@ namespace Zedarus.ToolKit.API
 		void RequestNotificationsPermission();
 		void ClearLocalNotifications();
 		void ScheduleLocalNotification(string text, string action, DateTime date, PromoLocalNotifications.RepeatInterval repeat, IDictionary userInfo);
-		void CancelAllScheduledLocalNotifications();
 		#endregion
 
 		#region Queries

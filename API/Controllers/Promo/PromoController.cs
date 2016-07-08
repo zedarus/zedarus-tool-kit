@@ -13,7 +13,7 @@ namespace Zedarus.ToolKit.API
 	public class PromoController : APIController 
 	{	
 		#region Events
-		public event Action<IDictionary> ProcessUserDataFromLocalNotification;
+		public event Action<int> ProcessRewardFromLocalNotification;
 		#endregion
 
 		#region Properties
@@ -67,14 +67,6 @@ namespace Zedarus.ToolKit.API
 				}
 			}
 		}
-
-		public void CancelAllScheduledLocalNotifications()
-		{
-			if (Wrapper != null)
-			{
-				Wrapper.CancelAllScheduledLocalNotifications();
-			}
-		}
 		#endregion
 
 		#region Queries
@@ -106,9 +98,17 @@ namespace Zedarus.ToolKit.API
 		#region Event Handlers
 		private void OnProcessUserDataFromLocalNotification(IDictionary userInfo)
 		{
-			if (ProcessUserDataFromLocalNotification != null)
+			if (ProcessRewardFromLocalNotification != null)
 			{
-				ProcessUserDataFromLocalNotification(userInfo);
+				if (userInfo != null && userInfo.Contains(PromoLocalNotifications.REWARD_ID))
+				{
+					int rewardID = 0;
+
+					if (int.TryParse(userInfo[PromoLocalNotifications.REWARD_ID].ToString(), out rewardID))
+					{
+						ProcessRewardFromLocalNotification(rewardID);
+					}
+				}
 			}
 		}
 		#endregion

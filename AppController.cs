@@ -25,6 +25,7 @@ namespace Zedarus.ToolKit
 		private AudioController _audio;
 		private LocalisationManager _localisation;
 		private bool _postInit = false;
+		private AppStateTracker _appStateTracker;
 		#endregion
 
 		#region Unity Methods
@@ -38,6 +39,10 @@ namespace Zedarus.ToolKit
 		#region Init
 		private void Init()
 		{
+			GameObject tracker = new GameObject();
+			_appStateTracker = tracker.AddComponent<AppStateTracker>();
+			_appStateTracker.Init(OnAppBecomesActive, OnAppGoesToBackground);
+
 			InitCrashReporting();
 			InitEvents();
 
@@ -82,25 +87,7 @@ namespace Zedarus.ToolKit
 
 			Localisation.Init();
 
-			if (Data.Player != null && Data.Game.APISettings.LocalNotificationsEnabled && !Data.Player.APIState.LocalNotificationsScheduled)
-			{
-				Debug.Log("Schedule local notifications");
-				foreach (PromoLocalNotifications notif in Data.Game.LocalNotifications)
-				{
-					if (notif.Enabled)
-					{
-						string text = notif.Text;
-						if (notif.UseLocalisation)
-						{
-							text = Localisation.Localise(notif.TextLocalisationID);
-						}
-						API.Promo.ScheduleLocalNotification(text, notif.Action, notif.Date, notif.Repeat, notif.UserInfo);
-					}
-				}
-
-				Data.Player.APIState.ScheduleLocalNotifications();
-				Data.Save(false);
-			}
+			InitLocalNotifications();
 		}
 
 		protected virtual void InitCrashReporting()
@@ -142,12 +129,33 @@ namespace Zedarus.ToolKit
 			API.Store.ProductPurchaseFinished += OnProductPurchaseFinished;
 			API.Sync.SyncFinished += OnSyncFinished;
 			API.Sync.RequestSyncEnable += OnRequestSyncEnable;
-			API.Promo.ProcessUserDataFromLocalNotification += OnProcessUserDataFromLocalNotification;
+			API.Promo.ProcessRewardFromLocalNotification += OnProcessRewardFromLocalNotification;
 		}
 
 		protected virtual bool DisplaySyncConfirmUI(System.Action syncConfirmedHandler, System.Action syncDeniedHandler)
 		{
 			return true;
+		}
+
+		private void InitLocalNotifications()
+		{
+			API.Promo.ClearLocalNotifications();
+
+			if (Data.Game.APISettings.LocalNotificationsEnabled)
+			{
+				foreach (PromoLocalNotifications notif in Data.Game.LocalNotifications)
+				{
+					if (notif.Enabled)
+					{
+						string text = notif.Text;
+						if (notif.UseLocalisation)
+						{
+							text = Localisation.Localise(notif.TextLocalisationID);
+						}
+						API.Promo.ScheduleLocalNotification(text, notif.Action, notif.Date, notif.Repeat, notif.UserInfo);
+					}
+				}
+			}
 		}
 		#endregion
 
@@ -165,6 +173,7 @@ namespace Zedarus.ToolKit
 		protected void OnRemoteDataReceived(string data)
 		{
 			EventManager.SendEvent<string>(IDs.Events.RemoteDataReceived, data);
+			InitLocalNotifications();
 		}
 
 		protected virtual void OnProductPurchaseFinished(string productID, bool success)
@@ -214,7 +223,17 @@ namespace Zedarus.ToolKit
 			return false;
 		}
 
-		protected virtual void OnProcessUserDataFromLocalNotification(IDictionary userData)
+		protected virtual void OnProcessRewardFromLocalNotification(int rewardID)
+		{
+		
+		}
+
+		protected virtual void OnAppBecomesActive()
+		{
+			InitLocalNotifications();
+		}
+
+		protected virtual void OnAppGoesToBackground()
 		{
 		
 		}
@@ -282,5 +301,31 @@ namespace Zedarus.ToolKit
 			}
 		}
 		#endregion
+	}
+
+	public class AppStateTracker : MonoBehaviour
+	{
+		private System.Action _appBecomesActiveCallback = null;
+		private System.Action _appGoesToBackgroundCallback = null;
+
+		public void Init(System.Action appBecomesActiveCallback, System.Action appGoesToBackgroundCallback)
+		{
+			_appBecomesActiveCallback = appBecomesActiveCallback;
+			_appGoesToBackgroundCallback = appGoesToBackgroundCallback;
+			gameObject.name = "App State Tracker";
+			DontDestroyOnLoad(gameObject);
+		}
+
+		private void OnApplicationPause(bool pause)
+		{
+			if (pause && _appGoesToBackgroundCallback != null)
+			{
+				_appGoesToBackgroundCallback();
+			}
+			else if (_appBecomesActiveCallback != null)
+			{
+				_appBecomesActiveCallback();
+			}
+		}
 	}
 }
