@@ -14,6 +14,9 @@ namespace Zedarus.ToolKit.API
 	{	
 		#region Events
 		public event Action<int> ProcessRewardFromLocalNotification;
+		public event Action<string, string> ProcessRemoteUnlockFeature;
+		public event Action<string, int> ProcessRemoteUnlockResource;
+		public event Action<Dictionary<string, string>> ProcessRemoteUnlockParams;
 		#endregion
 
 		#region Properties
@@ -97,6 +100,9 @@ namespace Zedarus.ToolKit.API
 			foreach (IPromoWrapperInterface wrapper in Wrappers)
 			{
 				wrapper.ProcessUserDataFromLocalNotification += OnProcessUserDataFromLocalNotification;
+				wrapper.ProcessRemoteUnlockFeature += OnProcessRemoteUnlockFeature;
+				wrapper.ProcessRemoteUnlockResource += OnProcessRemoteUnlockResource;
+				wrapper.ProcessRemoteUnlockParams += OnProcessRemoteUnlockParams;
 			}
 		}
 
@@ -107,6 +113,9 @@ namespace Zedarus.ToolKit.API
 			foreach (IPromoWrapperInterface wrapper in Wrappers)
 			{
 				wrapper.ProcessUserDataFromLocalNotification -= OnProcessUserDataFromLocalNotification;
+				wrapper.ProcessRemoteUnlockFeature -= OnProcessRemoteUnlockFeature;
+				wrapper.ProcessRemoteUnlockResource -= OnProcessRemoteUnlockResource;
+				wrapper.ProcessRemoteUnlockParams -= OnProcessRemoteUnlockParams;
 			}
 		}
 		#endregion
@@ -125,6 +134,30 @@ namespace Zedarus.ToolKit.API
 						ProcessRewardFromLocalNotification(rewardID);
 					}
 				}
+			}
+		}
+
+		private void OnProcessRemoteUnlockFeature(string feature, string value)
+		{
+			if (ProcessRemoteUnlockFeature != null)
+			{
+				ProcessRemoteUnlockFeature(feature, value);
+			}
+		}
+
+		private void OnProcessRemoteUnlockResource(string resource, int quantity)
+		{
+			if (ProcessRemoteUnlockResource != null)
+			{
+				ProcessRemoteUnlockResource(resource, quantity);
+			}
+		}
+
+		private void OnProcessRemoteUnlockParams(Dictionary<string, string> parameters)
+		{
+			if (ProcessRemoteUnlockParams != null)
+			{
+				ProcessRemoteUnlockParams(parameters);
 			}
 		}
 		#endregion

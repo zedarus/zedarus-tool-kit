@@ -36,11 +36,11 @@ namespace Zedarus.ToolKit.API
 
 	public class BatchWrapper : APIWrapper<BatchWrapper>, IPromoWrapperInterface 
 	{
-		#region Parameters
-		#endregion
-
 		#region Events
 		public event Action<IDictionary> ProcessUserDataFromLocalNotification;
+		public event Action<string, string> ProcessRemoteUnlockFeature;
+		public event Action<string, int> ProcessRemoteUnlockResource;
+		public event Action<Dictionary<string, string>> ProcessRemoteUnlockParams;
 		#endregion
 
 		#region Properties
@@ -191,63 +191,43 @@ namespace Zedarus.ToolKit.API
 
 		#region Event Handlers
 		#if API_PROMO_BATCH
-		private void OnBatchRedeemAutomaticOffer(Offer offer)
+		private void ProcessOffer(Offer offer)
 		{
 			foreach (var feature in offer.Features)
 			{
-				string featureReference = feature.Reference;
-				string value = feature.Value;
-
-				// Provide the feature to the user
-				Debug.Log("OnBatchRedeemAutomaticOffer feature: " + featureReference + " value: " + value);
+				if (ProcessRemoteUnlockFeature != null)
+				{
+					ProcessRemoteUnlockFeature(feature.Reference, feature.Value);
+				}
 			}
 
 			foreach (var resource in offer.Resources)
 			{
-				string resourceReference = resource.Reference;
-				int quantity =  resource.Quantity;
-
-				// Provide the right amount of the resource to the user
-				Debug.Log("OnBatchRedeemAutomaticOffer resource: " + resourceReference + " quantity: " + quantity);
+				if (ProcessRemoteUnlockResource != null)
+				{
+					ProcessRemoteUnlockResource(resource.Reference, resource.Quantity);
+				}
 			}
 
-			ParseOfferAdditionalParameters(offer);
+			if (ProcessRemoteUnlockParams != null && offer.AdditionalParameters != null && offer.AdditionalParameters.Count > 0)
+			{
+				ProcessRemoteUnlockParams(offer.AdditionalParameters);
+			}
+		}
+
+		private void OnBatchRedeemAutomaticOffer(Offer offer)
+		{
+			ProcessOffer(offer);
 		}
 
 		private void OnBatchRedeemCodeSuccess(string code, Offer offer)
 		{
-			// Hide the wait UI
-
-			foreach (var feature in offer.Features)
-			{
-				string featureReference = feature.Reference;
-				string value = feature.Value;
-
-				// Provide the feature to the user
-				Debug.Log("OnBatchRedeemCodeSuccess feature: " + featureReference + " value: " + value);
-			}
-
-			foreach (var resource in offer.Resources)
-			{
-				string resourceReference = resource.Reference;
-				int quantity =  resource.Quantity;
-
-				// Give the given quantity of the resource to the user
-				Debug.Log("OnBatchRedeemCodeSuccess resource: " + resourceReference + " quantity: " + quantity);
-			}
-
-			// Show success UI
-
-			ParseOfferAdditionalParameters(offer);
+			ProcessOffer(offer);
 		}
 
 		private void OnBatchRedeemCodeFailed(string code, FailReason reason, CodeErrorInfo infos)
 		{
-			// Hide the wait UI
-
 			Debug.Log("OnBatchRedeemCodeFailed: " + code);
-
-			// Show a error message to the user using the reason and infos
 		}
 
 		private void OnBatchRedeemURLCodeFound(string code)
@@ -257,36 +237,11 @@ namespace Zedarus.ToolKit.API
 
 		private void OnBatchRedeemURLSuccess(string code, Offer offer)
 		{
-			// Hide the wait UI
-
-			foreach (var feature in offer.Features)
-			{
-				string featureReference = feature.Reference;
-				string value = feature.Value;
-
-				// Provide the feature to the user
-				Debug.Log("OnBatchRedeemURLSuccess feature: " + featureReference + " value: " + value);
-			}
-
-			foreach (var resource in offer.Resources)
-			{
-				string resourceReference = resource.Reference;
-				int quantity =  resource.Quantity;
-
-				// Give the given quantity of the resource to the user
-				Debug.Log("OnBatchRedeemURLSuccess resource: " + resourceReference + " quantity: " + quantity);
-			}
-
-			// Show success UI
-
-			ParseOfferAdditionalParameters(offer);
+			ProcessOffer(offer);
 		}
 
 		private void OnBatchRedeemURLFailed(string code, FailReason reason, CodeErrorInfo infos)
 		{
-			// Hide the wait UI
-
-			// Show a error message to the user using the reason and infos
 			Debug.Log("OnBatchRedeemURLFailed: " + code);
 		}
 
@@ -308,22 +263,7 @@ namespace Zedarus.ToolKit.API
 
 		private void OnBatchRestoreFailed(FailReason reason)
 		{
-			// Hide the wait UI
-
-			// Show a error message to the user using the reaso
 			Debug.Log("OnBatchRestoreFailed: " + reason.ToString());
-		}
-		#endif
-		#endregion
-
-		#region Helpers
-		#if API_PROMO_BATCH
-		private void ParseOfferAdditionalParameters(Offer offer)
-		{
-			foreach (KeyValuePair<string, string> additionaParameter in offer.AdditionalParameters)
-			{
-				Debug.Log("Promo offer additional parameter: " + additionaParameter.Key + " = " +additionaParameter.Value);
-			}
 		}
 		#endif
 		#endregion

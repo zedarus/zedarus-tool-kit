@@ -130,6 +130,9 @@ namespace Zedarus.ToolKit
 			API.Sync.SyncFinished += OnSyncFinished;
 			API.Sync.RequestSyncEnable += OnRequestSyncEnable;
 			API.Promo.ProcessRewardFromLocalNotification += OnProcessRewardFromLocalNotification;
+			API.Promo.ProcessRemoteUnlockFeature += OnProcessRemoteUnlockFeature;
+			API.Promo.ProcessRemoteUnlockResource += OnProcessRemoteUnlockResource;
+			API.Promo.ProcessRemoteUnlockParams += OnProcessRemoteUnlockParams;
 		}
 
 		protected virtual bool DisplaySyncConfirmUI(System.Action syncConfirmedHandler, System.Action syncDeniedHandler)
@@ -226,6 +229,18 @@ namespace Zedarus.ToolKit
 		protected virtual void OnProcessRewardFromLocalNotification(int rewardID)
 		{
 		
+		}
+
+		protected virtual void OnProcessRemoteUnlockFeature(string feature, string value)
+		{
+		}
+
+		protected virtual void OnProcessRemoteUnlockResource(string resource, int quantity)
+		{
+		}
+
+		protected virtual void OnProcessRemoteUnlockParams(Dictionary<string, string> parameters)
+		{
 		}
 
 		protected virtual void OnAppBecomesActive()

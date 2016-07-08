@@ -10,6 +10,9 @@ namespace Zedarus.ToolKit.API
 	{
 		#region Events
 		event Action<IDictionary> ProcessUserDataFromLocalNotification;
+		event Action<string, string> ProcessRemoteUnlockFeature;
+		event Action<string, int> ProcessRemoteUnlockResource;
+		event Action<Dictionary<string, string>> ProcessRemoteUnlockParams;
 		#endregion
 
 		#region Controls
