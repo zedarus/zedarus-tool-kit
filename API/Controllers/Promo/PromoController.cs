@@ -67,6 +67,22 @@ namespace Zedarus.ToolKit.API
 				}
 			}
 		}
+
+		public void RedeemCode(string code)
+		{
+			if (Wrapper != null)	
+			{
+				Wrapper.RedeemCode(code);
+			}
+		}
+
+		public void RestoreRewards()
+		{
+			if (Wrapper != null)	
+			{
+				Wrapper.RestoreRewards();
+			}
+		}
 		#endregion
 
 		#region Queries

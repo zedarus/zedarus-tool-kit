@@ -68,6 +68,15 @@ namespace Zedarus.ToolKit.API
 				config.AndroidAPIKey = batchSettings.APIKey;
 				#endif
 
+				_plugin.Unlock.RedeemAutomaticOffer += new RedeemAutomaticOfferHandler(OnBatchRedeemAutomaticOffer);
+				_plugin.Unlock.RedeemCodeSuccess += new RedeemCodeSuccessHandler(OnBatchRedeemCodeSuccess);
+				_plugin.Unlock.RedeemCodeFailed += new RedeemCodeFailedHandler(OnBatchRedeemCodeFailed);
+				_plugin.Unlock.RedeemURLCodeFound += new RedeemURLCodeFoundHandler(OnBatchRedeemURLCodeFound);
+				_plugin.Unlock.RedeemURLSuccess += new RedeemURLSuccessHandler(OnBatchRedeemURLSuccess);
+				_plugin.Unlock.RedeemURLFailed += new RedeemURLFailedHandler(OnBatchRedeemURLFailed);
+				_plugin.Unlock.RestoreSuccess += new RestoreSuccessHandler(OnBatchRestoreSuccess);
+				_plugin.Unlock.RestoreFailed += new RestoreFailedHandler(OnBatchRestoreFailed);
+
 				_plugin.StartPlugin(config);
 			}
 			#endif
@@ -159,6 +168,20 @@ namespace Zedarus.ToolKit.API
 			UnityEngine.iOS.NotificationServices.ScheduleLocalNotification(notif);
 			#endif
 		}
+
+		public void RedeemCode(string code)
+		{
+			#if API_PROMO_BATCH
+			_plugin.Unlock.RedeemCode(code);
+			#endif
+		}
+
+		public void RestoreRewards()
+		{
+			#if API_PROMO_BATCH
+			_plugin.Unlock.Restore();
+			#endif
+		}
 		#endregion
 
 		#region Event Listeners
@@ -167,6 +190,142 @@ namespace Zedarus.ToolKit.API
 		#endregion
 
 		#region Event Handlers
+		#if API_PROMO_BATCH
+		private void OnBatchRedeemAutomaticOffer(Offer offer)
+		{
+			foreach (var feature in offer.Features)
+			{
+				string featureReference = feature.Reference;
+				string value = feature.Value;
+
+				// Provide the feature to the user
+				Debug.Log("OnBatchRedeemAutomaticOffer feature: " + featureReference + " value: " + value);
+			}
+
+			foreach (var resource in offer.Resources)
+			{
+				string resourceReference = resource.Reference;
+				int quantity =  resource.Quantity;
+
+				// Provide the right amount of the resource to the user
+				Debug.Log("OnBatchRedeemAutomaticOffer resource: " + resourceReference + " quantity: " + quantity);
+			}
+
+			ParseOfferAdditionalParameters(offer);
+		}
+
+		private void OnBatchRedeemCodeSuccess(string code, Offer offer)
+		{
+			// Hide the wait UI
+
+			foreach (var feature in offer.Features)
+			{
+				string featureReference = feature.Reference;
+				string value = feature.Value;
+
+				// Provide the feature to the user
+				Debug.Log("OnBatchRedeemCodeSuccess feature: " + featureReference + " value: " + value);
+			}
+
+			foreach (var resource in offer.Resources)
+			{
+				string resourceReference = resource.Reference;
+				int quantity =  resource.Quantity;
+
+				// Give the given quantity of the resource to the user
+				Debug.Log("OnBatchRedeemCodeSuccess resource: " + resourceReference + " quantity: " + quantity);
+			}
+
+			// Show success UI
+
+			ParseOfferAdditionalParameters(offer);
+		}
+
+		private void OnBatchRedeemCodeFailed(string code, FailReason reason, CodeErrorInfo infos)
+		{
+			// Hide the wait UI
+
+			Debug.Log("OnBatchRedeemCodeFailed: " + code);
+
+			// Show a error message to the user using the reason and infos
+		}
+
+		private void OnBatchRedeemURLCodeFound(string code)
+		{
+			Debug.Log("OnBatchRedeemURLCodeFound: " + code);
+		}
+
+		private void OnBatchRedeemURLSuccess(string code, Offer offer)
+		{
+			// Hide the wait UI
+
+			foreach (var feature in offer.Features)
+			{
+				string featureReference = feature.Reference;
+				string value = feature.Value;
+
+				// Provide the feature to the user
+				Debug.Log("OnBatchRedeemURLSuccess feature: " + featureReference + " value: " + value);
+			}
+
+			foreach (var resource in offer.Resources)
+			{
+				string resourceReference = resource.Reference;
+				int quantity =  resource.Quantity;
+
+				// Give the given quantity of the resource to the user
+				Debug.Log("OnBatchRedeemURLSuccess resource: " + resourceReference + " quantity: " + quantity);
+			}
+
+			// Show success UI
+
+			ParseOfferAdditionalParameters(offer);
+		}
+
+		private void OnBatchRedeemURLFailed(string code, FailReason reason, CodeErrorInfo infos)
+		{
+			// Hide the wait UI
+
+			// Show a error message to the user using the reason and infos
+			Debug.Log("OnBatchRedeemURLFailed: " + code);
+		}
+
+		private void OnBatchRestoreSuccess(List<Feature> features)
+		{
+			// Hide the wait UI
+
+			foreach (var feature in features)
+			{
+				string featureReference = feature.Reference;
+				string value = feature.Value;
+
+				// Provide the feature to the user
+				Debug.Log("OnBatchRestoreSuccess feature: " + featureReference + " value: " + value);
+			}
+
+			// Show success UI
+		}
+
+		private void OnBatchRestoreFailed(FailReason reason)
+		{
+			// Hide the wait UI
+
+			// Show a error message to the user using the reaso
+			Debug.Log("OnBatchRestoreFailed: " + reason.ToString());
+		}
+		#endif
+		#endregion
+
+		#region Helpers
+		#if API_PROMO_BATCH
+		private void ParseOfferAdditionalParameters(Offer offer)
+		{
+			foreach (KeyValuePair<string, string> additionaParameter in offer.AdditionalParameters)
+			{
+				Debug.Log("Promo offer additional parameter: " + additionaParameter.Key + " = " +additionaParameter.Value);
+			}
+		}
+		#endif
 		#endregion
 	}
 }
