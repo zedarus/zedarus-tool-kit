@@ -20,6 +20,7 @@ namespace Zedarus.ToolKit
 	{
 		#region Properties
 		static private bool initialized = false;
+		static private bool initializing = false;
 		private DataManager<GameDataClass, PlayerDataClass> _data;
 		private APIManager _api;
 		private AudioController _audio;
@@ -31,7 +32,7 @@ namespace Zedarus.ToolKit
 		#region Unity Methods
 		public AppController()
 		{
-			if (!initialized)
+			if (!initialized && !initializing)
 				Init();
 		}
 		#endregion
@@ -39,6 +40,8 @@ namespace Zedarus.ToolKit
 		#region Init
 		private void Init()
 		{
+			initializing = true;
+
 			GameObject tracker = new GameObject();
 			_appStateTracker = tracker.AddComponent<AppStateTracker>();
 			_appStateTracker.Init(OnAppBecomesActive, OnAppGoesToBackground);
