@@ -12,6 +12,7 @@ namespace Zedarus.ToolKit.PoolManagement
 		private Transform _container;
 		private bool _autoReuse;
 
+		#region Contstructors
 		public PoolManager(Transform container, int size, bool autoReuse, T[] prefabs, params int[] prefabsShuffleBag)
 		{
 			_autoReuse = autoReuse;
@@ -61,9 +62,37 @@ namespace Zedarus.ToolKit.PoolManagement
 			prefabs = null;
 		}
 
-		public PoolManager(T prefab, Transform container, int size, bool autoReuse) : this(container, size, autoReuse, new T[] { prefab }, 1) { }
+		public PoolManager(Transform container, int size, bool autoReuse, string[] prefabs, params int[] prefabsShuffleBag) : this(container, size, autoReuse, ConvertPathsToPrefabs(prefabs), prefabsShuffleBag) {}
 
+		public PoolManager(Transform parent, string containerName, int size, bool autoReuse, T[] prefabs, params int[] prefabsShuffleBag) : this(CreateContainer(parent, containerName), size, autoReuse, prefabs, prefabsShuffleBag) {}
+		public PoolManager(Transform parent, string containerName, int size, bool autoReuse, string[] prefabs, params int[] prefabsShuffleBag) : this(CreateContainer(parent, containerName), size, autoReuse, prefabs, prefabsShuffleBag) {}
+		public PoolManager(T prefab, Transform container, int size, bool autoReuse) : this(container, size, autoReuse, new T[] { prefab }, 1) { }
 		public PoolManager(string prefab, Transform container, int size, bool autoReuse) : this(Resources.Load<T>(prefab), container, size, autoReuse) { }
+		public PoolManager(T prefab, Transform parent, string containerName, int size, bool autoReuse) : this(prefab, CreateContainer(parent, containerName), size, autoReuse) { }
+		public PoolManager(string prefab, Transform parent, string containerName, int size, bool autoReuse) : this(prefab, CreateContainer(parent, containerName), size, autoReuse) { }
+		#endregion
+
+		#region Constructor Helpers
+		private static Transform CreateContainer(Transform parent, string containerName)
+		{
+			GameObject go = new GameObject(containerName);
+			go.transform.SetParent(parent);
+			go.transform.localPosition = Vector3.zero;
+			return go.transform;
+		}
+
+		private static T[] ConvertPathsToPrefabs(string[] paths)
+		{
+			List<T> prefabs = new List<T>();
+
+			foreach (string path in paths)
+			{
+				prefabs.Add(Resources.Load<T>(path));
+			}
+
+			return prefabs.ToArray();
+		}
+		#endregion
 
 		public virtual void ReturnInactiveItemsToPool(System.Action<T> returnToPoolCallback = null)
 		{
