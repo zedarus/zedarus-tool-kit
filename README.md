@@ -17,8 +17,20 @@ Instead, just create a new class in your local project, extend the required clas
   - **Chartboost**: go to publishing campaigns, open Advanced Targeting and check Block 17+ http://d.pr/i/1cvAb. Remember to do this for all campaigns
   - **AdMob**: unfortunatelly, AdMob does not have an age restriction setting, but you can filter ads categories using this guide: https://support.google.com/admob/answer/3150235?hl=en
   - **AppLovin**: go to managing apps, select your app and then check or uncheck Children's App setting
-  - **Unity Ads**: in Unity Editor, go to Services, Age Designation and select appropriate option
+  - **Unity Ads**: in Unity Editor, go to Services, Age Designation and select appropriate option. Then, go to app setting in Unity Ads dashboar, select Ads Filtering and select option under Ages: http://d.pr/i/171V8
   - **HeyZap**: select your app on dashboard, go to Publisher Setting and select appropriate option under Family Friendly Filter
+- Make sure video interstitials are skippable:
+  - **Chartboost**: no settings
+  - **AdMob**: no settings
+  - **AppLovin**: go to app settings and select appropriate option under Video Settings and Playable Ad Settings
+  - **Unity Ads**: no settings
+  - **HeyZap**: go to publisher settings for the app and select skippable options
+- Make sure reward videos rewards are set correctly for ad networks:
+  - **Chartboost**: no settings
+  - **AdMob**: no settings
+  - **AppLovin**: go to app settings and set correct values under Rewarded Video
+  - **Unity Ads**: no settings
+  - **HeyZap**: no settings
 - Import HeyZap, Chartboost, AdMob, UnityAds and AppLovin SDKs to project. You can just copy them from one of the projects that already have them, or download from HeyZap integration guide (make sure to follow the additional instructions there!)
 - Add `API_ADS_HEYZAP` to project build settings
 - Add `API.Ads.Use(APIs.Ads.HeyZap, 0f, "<your id>");` int `InitAPI()` in your `AppController` class. Replace `<your id>` with the one provided by HeyZap
