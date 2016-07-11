@@ -19,6 +19,10 @@ namespace Zedarus.ToolKit.UI.Elements
 		private float _nextPageShowPercent = 0f;	// how much of a surface area of next page should be visible on screen
 
 		[SerializeField]
+		[Tooltip("If set to false, element width will be ignored")]
+		private bool _useElementWidth = true;
+
+		[SerializeField]
 		[Range(0f, 1f)]
 		private float _pullPercentFromPageWidth = 0.5f;
 
@@ -77,7 +81,15 @@ namespace Zedarus.ToolKit.UI.Elements
 
 			if (_nextPageShowPercent > 0f)
 			{
-				float pageSize = PageWidth * 0.5f - (page.GraphicsSize * _nextPageShowPercent) + page.GraphicsSize * 0.5f;
+				float pageSize = PageWidth;
+				if (_useElementWidth)
+				{
+					pageSize = PageWidth * 0.5f - (page.GraphicsSize * _nextPageShowPercent) + page.GraphicsSize * 0.5f;
+				}
+				else
+				{
+					pageSize = PageWidth * _nextPageShowPercent;
+				}
 				_parallax = pageSize / PageWidth;
 			}
 
