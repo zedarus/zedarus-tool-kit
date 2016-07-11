@@ -10,6 +10,7 @@ namespace Zedarus.ToolKit.UI.Elements
 		private UICarouselScrollSettings _settings;
 		private int _page;
 		private float _dragDistance;
+		private float _pageWidthInPixels;
 		#endregion
 
 		#region Events
@@ -21,6 +22,10 @@ namespace Zedarus.ToolKit.UI.Elements
 		{
 			_page = 0;
 			_settings = settings;
+
+			Vector2 left = Camera.main.ViewportToScreenPoint(new Vector2(0, 0));
+			Vector2 right = Camera.main.ViewportToScreenPoint(new Vector2(1, 0));
+			_pageWidthInPixels = Vector2.Distance(left, right);
 		}
 
 		public void CreatePage(IUICarouselScrollPage page, int layer)
@@ -114,8 +119,7 @@ namespace Zedarus.ToolKit.UI.Elements
 
 		private float SwipeThreshold
 		{
-			// TODO: use different value here
-			get { return _settings.Layers[0].PageWidth * _settings.SwipeThreshold; } 
+			get { return _pageWidthInPixels * _settings.SwipeThreshold; } 
 		}
 		#endregion
 

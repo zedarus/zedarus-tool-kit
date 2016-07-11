@@ -14,6 +14,10 @@ namespace Zedarus.ToolKit.UI.Elements
 		[SerializeField] 
 		private float _parallax = 1f;
 
+		[SerializeField]
+		[Tooltip("If set to true, elements will be attached to pointer/touch when dragging in 1:1")]
+		private bool _ignoreParallaxForScroll = false;
+
 		[SerializeField] 
 		[Range(0f, 2f)]
 		private float _nextPageShowPercent = 0f;	// how much of a surface area of next page should be visible on screen
@@ -123,7 +127,14 @@ namespace Zedarus.ToolKit.UI.Elements
 			// TODO: delta here are screen pixels
 			// TODO: so we need to convert those pixels either in canvas pixels
 			// or in world units (depending on the pivot)
-			TargetScrollPosition += delta * _dragScale; 
+			if (_ignoreParallaxForScroll)
+			{
+				TargetScrollPosition += delta * _dragScale / _parallax; 
+			}
+			else
+			{
+				TargetScrollPosition += delta * _dragScale; 
+			}
 		}
 
 		public bool ShowPage(int page, bool tween = true)
