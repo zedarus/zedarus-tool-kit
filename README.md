@@ -95,7 +95,7 @@ Troubleshooting:
 - Make sure HeyZap plugin is already in and implemented, including Ads controller from above
 - Make sure API_ADS_HEYZAP is added to build settings
 - Add API.RemoteData.Use(APIs.RemoteData.HeyZap, 0f); to AppController
-- To test locally, you can add OnRemoteDataReceived(Resources.Load<TextAsset>("Data/RemoteData").text); in InitAPI() in AppController class
+- To test locally, you can add `OnRemoteDataReceived(Resources.Load<TextAsset>("Data/RemoteData").text)` in `PostInit()` in AppController class
 - You can use http://jsonlint.com to validate your JSON
 - Remember to remove test JSON from HeyZap dashboard after done testing
 
