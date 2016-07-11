@@ -254,6 +254,8 @@ namespace Zedarus.ToolKit.API
 			}
 			if (state.Equals ("incentivized_result_incomplete")) {
 				// The user did not watch the entire video and should not be given a reward.
+				if (InterstitialClosed != null)
+					InterstitialClosed();
 			}
 		}
 		#endregion
