@@ -13,7 +13,12 @@ Instead, just create a new class in your local project, extend the required clas
 ### Ads (HeyZap)
 - Follow integration guide on HeyZap website to setup all the IDs
 - Make sure that all intertitials videos are skippable in all networks
-- Make sure you take *age rating* into account when setting up ads in all networks + mediation
+- Make sure you take *age rating* into account when setting up ads in all networks + mediation:
+  - *Chartboost*: go to publishing campaigns, open Advanced Targeting and check Block 17+ http://d.pr/i/1cvAb. Remember to do this for all campaigns
+  - *AdMob*: unfortunatelly, AdMob does not have an age restriction setting, but you can filter ads categories using this guide: https://support.google.com/admob/answer/3150235?hl=en
+  - *AppLovin*: go to managing apps, select your app and then check or uncheck Children's App setting
+  - *Unity Ads*: in Unity Editor, go to Services, Age Designation and select appropriate option
+  - *HeyZap*: select your app on dashboard, go to Publisher Setting and select appropriate option under Family Friendly Filter
 - Import HeyZap, Chartboost, AdMob, UnityAds and AppLovin SDKs to project. You can just copy them from one of the projects that already have them, or download from HeyZap integration guide (make sure to follow the additional instructions there!)
 - Add `API_ADS_HEYZAP` to project build settings
 - Add `API.Ads.Use(APIs.Ads.HeyZap, 0f, "<your id>");` int `InitAPI()` in your `AppController` class. Replace `<your id>` with the one provided by HeyZap
