@@ -25,6 +25,7 @@ namespace Zedarus.ToolKit.UI
 		public void Init()
 		{
 			_initialLabel = _label.text;
+			ApplyColor(0);
 		}
 
 		public void Reset()
