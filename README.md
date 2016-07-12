@@ -133,6 +133,7 @@ Troubleshooting:
 - Override `LocaliseText` and `LocaliseTextEditor` in your local scripts to avoid meta files missup
 - Override `protected abstract LocalisationManager LocManagerRef { get; }` in `LocaliseText`
 - Add `API_LOC_M2H` to build settings
+- Remember to log language change in analytics API helper
 - Remember to add lproj files to Xcode project for all supported langauges before final build
 - TODO: create localisation packages wrappers system
 
