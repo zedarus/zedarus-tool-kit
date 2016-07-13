@@ -80,12 +80,33 @@ Troubleshooting:
 ### iCloud Sync
 
 - Add Prime31 iCloud plugin to the project
-- Add API_SYNC_ICLOUD to build settings
-- Add API.Sync.Use(APIs.Sync.iCloud, 0f, "bladecloud002.dat"); (change the filename to the one you like though)
-- Make sure all your custom player data model classes have Merge() method implemented
-- Override protected virtual bool DisplaySyncConfirmUI(System.Action syncConfirmedHandler, System.Action syncDeniedHandler) in your AppController. If UI is not ready to display popup right now, return false. In that case, API will try to display this popup in 0.5 sec again.
-- Add Sync button to options screen and change sync state using AppController.Instance.Data.Player.APIState.ChangeSyncState( !AppController.Instance.Data.Player.APIState.SyncEnabled );
-- Don’t forget to call AppController.Instance.API.Sync.ApplyLoadedData(); if sync is enabled again in options screen
+- Add `API_SYNC_ICLOUD` to build settings
+- Add `API.Sync.Use(APIs.Sync.iCloud, 0f, "<filename>.dat")` (change the filename to the one you like though)
+- Make sure all your custom player data model classes have `Merge()` method implemented
+- Override `protected virtual bool DisplaySyncConfirmUI(System.Action syncConfirmedHandler, System.Action syncDeniedHandler)` in your `AppController`. If UI is not ready to display popup right now, return false. In that case, API will try to display this popup in 0.5 sec again.
+- Add sync button to options screen and change sync state using `AppController.Instance.Data.Player.APIState.ChangeSyncState(!AppController.Instance.Data.Player.APIState.SyncEnabled)`
+- Don’t forget to call `AppController.Instance.API.Sync.ApplyLoadedData()` if sync is enabled again in options screen. Here's a sample code for options screen flow:
+
+ ```c#
+ public void OnSyncButtonPress()
+ {
+ 	AppController.Instance.Data.Player.APIState.ChangeSyncState(!AppController.Instance.Data.Player.APIState.SyncEnabled);
+	if (AppController.Instance.Data.Player.APIState.SyncEnabled)
+	{
+		AppController.Instance.API.Sync.ApplyLoadedData();
+	}
+	UpdateSyncButtonState();
+ }
+ 
+ private void UpdateSyncButtonState()
+ {
+	if (_icloudButtonText != null)
+	{
+		_icloudButtonText.text = AppController.Instance.Data.Player.APIState.SyncEnabled ? AppController.Instance.Localisation.Localise(IDs.Localisation.Buttons.ICLOUD_ON) : AppController.Instance.Localisation.Localise(IDs.Localisation.Buttons.ICLOUD_OFF);
+	}
+ }
+ ```
+
 - Remember to enable iCloud support in Xcode with iCloud Documents support
 - Important: sometimes Xcode switches off document support for iCloud, even though iCloud is still turned on. Make sure to check and correct that!
 
@@ -100,7 +121,7 @@ Troubleshooting:
 
 ### Unity Crash Reporting
 
-- If using version of Unity prior to 5.4, add API_CRASH_UNITY to build settings
+- If using version of Unity prior to 5.4, add API_CRASH_UNITY to build settings and follow this guide: http://d.pr/i/14nPZ
 - If using Unity 5.4, just enalbe reporting in Services
 
 ### Native Sharing
