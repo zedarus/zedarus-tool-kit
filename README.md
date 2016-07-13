@@ -107,6 +107,7 @@ Troubleshooting:
  }
  ```
 
+- If you need to know when new data was applied from cloud, listen to `Zedarus.ToolKit.Settings.IDs.Events.CloudSyncFinished` event
 - Remember to enable iCloud support in Xcode with iCloud Documents support
 - Important: sometimes Xcode switches off document support for iCloud, even though iCloud is still turned on. Make sure to check and correct that!
 
