@@ -75,6 +75,16 @@ namespace Zedarus.ToolKit.Audio
 			get { return _playerDataRef; }
 		}
 
+		public bool SoundEnabled
+		{
+			get { return PlayerDataRef.AudioState.SoundEnabled; }
+		}
+
+		public bool MusicEnabled
+		{
+			get { return PlayerDataRef.AudioState.MusicEnabled; }
+		}
+
 		private bool MusicMuted
 		{
 			get 
