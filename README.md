@@ -100,7 +100,7 @@ Troubleshooting:
 
 ### Unity Crash Reporting
 
-- If using version of Unity prior to 5.4, add API_CRASH_UNITY to build settings
+- If using version of Unity prior to 5.4, add API_CRASH_UNITY to build settings and follow this guide: http://d.pr/i/14nPZ
 - If using Unity 5.4, just enalbe reporting in Services
 
 ### Native Sharing
