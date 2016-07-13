@@ -38,7 +38,9 @@ Instead, just create a new class in your local project, extend the required clas
 - Add caching calls in `AppController.OnPostInit()` (like this: `API.Ads.CacheIntersitials(IDs.Ads.Interstitials.BetweenLevel)`)
 - Between level ads: Just use this call when user presses Restart button in game over UI `AppController.Instance.API.Ads.ShowBetweenLevelAd(IDs.Ads.Interstitials.BetweenLevel, OnInterstitialClosed, _adBlock)`. `_adBlock` should be a UI gameobject that blocks all input. API will set it active and inactive automatically
 - Reward calls: just use this call: `AppController.Instance.API.Ads.ShowRewardedVideo(IDs.Ads.RewardVideos.FreeCoins, null, OnVideoRewardCompleted, coinPack.ID)`
-- Promo placement: add call `AppController.Instance.API.Ads.ShowPromo(IDs.Ads.Interstitials.PromoOnPlayButton, OnPromoEnd, _adBlock)` where needed. Also, remember to set correct values in API Settings in game data
+- If you want to use cross-promo placement: 
+  - Add call `AppController.Instance.API.Ads.ShowPromo(IDs.Ads.Interstitials.PromoOnPlayButton, OnPromoEnd, _adBlock)` where needed. Also
+  - Enable promo ads in API Settings in game data and set delay in minutes
 
 Troubleshooting:
 - Tbd
