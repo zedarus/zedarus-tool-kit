@@ -122,9 +122,11 @@ Troubleshooting:
 - Make sure to add MasterAudio plugin first
 - Setup MasterAudio instances in boot scene and make sure they are kept across scenes
 - Then add `AUDIO_MASTER_AUDIO` to build settings
-- Use AppController.Instance.Audio to get access to audio controller
-- Listen to Zedarus.ToolKit.Settings.IDs.Events.AudioStateUpdated event where needed to update UI button state, etc
-- Override Zedarus.ToolKit.UI.Elements.UIButtonAudio in your custom class and add it to all buttons you have in UI
+- Use `AppController.Instance.Audio` to get access to audio controller
+- Use `AppController.Instance.Audio.ToggleSound()` and `AppController.Instance.Audio.ToggleMusic()` if you need to toggle sounds or music mute
+- Listen to `Zedarus.ToolKit.Settings.IDs.Events.AudioStateUpdated` event where needed to update UI button state, etc
+- Use `AppController.Instance.Audio.SoundEnabled` and `AppController.Instance.Audio.MusicEnabled` if you need to check if sounds or music are enabled
+- Override `Zedarus.ToolKit.UI.Elements.UIButtonAudio` class in your custom class and add it to all game objects with `Button` component you have in your UI
 
 ### Localisation
 
