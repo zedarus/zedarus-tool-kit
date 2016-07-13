@@ -151,6 +151,9 @@ Troubleshooting:
 	}
   ```
   
+- Add `LocaliseText` component to UI `Text` components that you want to localise without code
+- Add localisation ids to your `IDs` class
+- Use `AppController.Instance.Localisation.Localise()` method to localise strings in code
 - Add `API_LOC_M2H` to build settings
 - Language change is logged automatically in analytics (just search for `IDs.Events.SetLanguage` event in ZTK code)
 - Remember to add lproj files to Xcode project for all supported langauges before final build
