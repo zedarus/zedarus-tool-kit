@@ -30,7 +30,7 @@ namespace Zedarus.ToolKit.Data.Player
 		[OnDeserializing]
 		private void SetDefaults(StreamingContext sc)
 		{
-			_syncEnabled = false;
+			_syncEnabled = true;
 			_askedSyncPermission = false;
 			_adsEnabled = true;
 			_intertitialCounter = 0;
