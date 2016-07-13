@@ -132,9 +132,27 @@ Troubleshooting:
 
 - Add this localisation package to the game: http://www.m2h.nl/files/LocalizationPackage.pdf
 - Override `LocaliseText` and `LocaliseTextEditor` in your local scripts to avoid meta files missup
-- Override `protected abstract LocalisationManager LocManagerRef { get; }` in `LocaliseText`
+- Override `protected abstract LocalisationManager LocManagerRef { get; }` in `LocaliseText`. It should return reference to `AppContoller.Instance.Localisation` (your **local** controller). But make sure that `AppController` has instance ready first. Here's the code:
+
+  ```c#
+  protected override Zedarus.ToolKit.Localisation.LocalisationManager LocManagerRef 
+	{ 
+		get 
+		{ 
+			if (AppController.HasInstance)
+			{
+				return AppController.Instance.Localisation; 
+			}
+			else
+			{
+				return null;
+			}
+		}
+	}
+  ```
+  
 - Add `API_LOC_M2H` to build settings
-- Remember to log language change in analytics API helper
+- Language change is logged automatically in analytics (just search for `IDs.Events.SetLanguage` event in ZTK code)
 - Remember to add lproj files to Xcode project for all supported langauges before final build
 - TODO: create localisation packages wrappers system
 
