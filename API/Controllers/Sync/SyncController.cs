@@ -38,6 +38,11 @@ namespace Zedarus.ToolKit.API
 			Sync();
 		}
 
+		public void DenySync()
+		{
+			Manager.State.ChangeSyncState(false);
+		}
+
 		public void Sync() 
 		{
 			if (Wrapper != null)
@@ -108,19 +113,26 @@ namespace Zedarus.ToolKit.API
 		#region Event Handlers
 		private void OnSyncFinished(byte[] data)
 		{
-			if (Manager.State.SyncEnabled)
+			if (Manager.State.FirstSync)
 			{
-				if (SyncFinished != null)
-					SyncFinished(data);
-			}
-			else
-			{
+				Manager.State.MarkAsFirstSync();
+
 				if (!Manager.State.AskedSyncPermission)
 				{
 					Manager.State.AskForSyncPermission();
 					if (RequestSyncEnable != null)
 						RequestSyncEnable();
 				}
+				else
+				{
+					if (Manager.State.SyncEnabled && SyncFinished != null)
+						SyncFinished(data);
+				}
+			}
+			else
+			{
+				if (Manager.State.SyncEnabled && SyncFinished != null)
+					SyncFinished(data);
 			}
 		}
 		#endregion

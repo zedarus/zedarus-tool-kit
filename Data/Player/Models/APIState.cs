@@ -18,6 +18,8 @@ namespace Zedarus.ToolKit.Data.Player
 		[SerializeField]
 		private bool _syncEnabled;
 		[SerializeField]
+		private bool _firstSync;
+		[SerializeField]
 		private bool _askedSyncPermission;
 		#endregion
 
@@ -30,6 +32,7 @@ namespace Zedarus.ToolKit.Data.Player
 		[OnDeserializing]
 		private void SetDefaults(StreamingContext sc)
 		{
+			_firstSync = true;
 			_syncEnabled = true;
 			_askedSyncPermission = false;
 			_adsEnabled = true;
@@ -68,6 +71,11 @@ namespace Zedarus.ToolKit.Data.Player
 		{
 			_askedSyncPermission = true;
 		}
+
+		public void MarkAsFirstSync()
+		{
+			_firstSync = false;
+		}
 		#endregion
 
 		#region Getters
@@ -94,6 +102,11 @@ namespace Zedarus.ToolKit.Data.Player
 		public bool AskedSyncPermission
 		{
 			get { return _askedSyncPermission; }
+		}
+
+		public bool FirstSync
+		{
+			get { return _firstSync; }
 		}
 		#endregion
 

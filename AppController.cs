@@ -203,6 +203,7 @@ namespace Zedarus.ToolKit
 		{
 			Data.Player.MergeData(PlayerData.Deserialize<PlayerDataClass>(data));
 			Data.Save(false);
+			EventManager.SendEvent(IDs.Events.CloudSyncFinished);
 		}
 
 		private void OnRequestSyncEnable()
@@ -221,7 +222,7 @@ namespace Zedarus.ToolKit
 
 		private void OnSyncDenied()
 		{
-			
+			API.Sync.DenySync();
 		}
 
 		protected virtual bool OnCheckCustomAchievementCondition(int achievement, object parameterValue)
