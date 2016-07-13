@@ -47,13 +47,13 @@ Troubleshooting:
 
 - Setup IAPs in iTunesConnect
 - Enable UnityPurchases in Services tab
-- Add API.Store.Use(APIs.IAPs.Unity, 0f); to AppController
-- Add API_IAP_UNITY to project build settings
-- Expand IAPProduct class in GameData to create your own products
-- Override protected override StoreProduct[] ProductList in AppController, but don’t forget to include base.ProductList in your new list!
-- Add protected override void OnProductPurchaseFinished(string productID, bool success) override to AppController
-- Remember to add AppController.Instance.API.Store.RestorePurchases(); to options
-- If you support Remove Ads, add AppController.Instance.PurchaseAdsRemoval(); to options screen
+- Add `API.Store.Use(APIs.IAPs.Unity, 0f)` to `AppController`
+- Add `API_IAP_UNITY` to project build settings
+- Expand `IAPProduct` class in `GameData` to create your own products
+- Override `protected override StoreProduct[] ProductList` getter in `AppController`, but don’t forget to include `base.ProductList` in your new list!
+- Add `protected override void OnProductPurchaseFinished(string productID, bool success)` override to `AppController`
+- Remember to add `AppController.Instance.API.Store.RestorePurchases()` to options screen
+- If you support Remove Ads, add `AppController.Instance.PurchaseAdsRemoval()` to options screen
 - Remember to enable IAPs support in Xcode
 
 Troubleshooting:
@@ -62,16 +62,16 @@ Troubleshooting:
 ### Achievements and Leaderboards
 
 - Setup achievements and leaderboards in iTunesConnect
-- Create achievements generic conditions in GameData in Unity
-- Add achievements and leaderboards data to GameData in Unity
-- Add API.Score.Use(APIs.Score.GameCenter, 0f); to AppController
+- Create achievements generic conditions in `GameData` in Unity
+- Add achievements and leaderboards data to `GameData` in Unity
+- Add `API.Score.Use(APIs.Score.GameCenter, 0f)` to `AppController`
 - Add Prime31 GameCenter plugin
-- Add API_SCORE_GAMECENTER to project build settings
-- Add all achievements conditions IDs to Settings.IDs file for easier reference
-- Add AppController.Instance.API.Score.SubmitScore(AppController.Instance.Data.Player.Stats.BestScore,  AppController.Instance.Data.Game.DefaultLeaderboard.CurrentPlatformID); calls where needed
-- Add AppController.Instance.Data.Player.AchievementsTracker.UpdateConditionParameter() calls where needed
-- Add protected override bool OnCheckCustomAchievementCondition(int achievementID, object parameterValue) override to AppController is any custom conditions for achievements are requered
-- Add AppController.Instance.API.Score.DisplayLeaderboardsList(); and AppController.Instance.API.Score.DisplayAchievementsList(); calls where needed
+- Add `API_SCORE_GAMECENTER` to project build settings
+- Add all achievements conditions IDs to `Settings.IDs` file for easier reference
+- Add `AppController.Instance.API.Score.SubmitScore(<score>,  AppController.Instance.Data.Game.DefaultLeaderboard.CurrentPlatformID)` calls where needed, replace leaderboard ID if needed
+- Add `AppController.Instance.Data.Player.AchievementsTracker.UpdateConditionParameter()` calls where needed
+- Add `protected override bool OnCheckCustomAchievementCondition(int achievementID, object parameterValue)` override to `AppController` if any custom conditions for achievements are requered
+- Add `AppController.Instance.API.Score.DisplayLeaderboardsList()` and `AppController.Instance.API.Score.DisplayAchievementsList()` calls where needed
 - Remember to enable GameCenter support in Xcode
 
 Troubleshooting:
@@ -114,30 +114,30 @@ Troubleshooting:
 ### Remote Data
 
 - Make sure HeyZap plugin is already in and implemented, including Ads controller from above
-- Make sure API_ADS_HEYZAP is added to build settings
-- Add API.RemoteData.Use(APIs.RemoteData.HeyZap, 0f); to AppController
-- To test locally, you can add `OnRemoteDataReceived(Resources.Load<TextAsset>("Data/RemoteData").text)` in `PostInit()` in AppController class
+- Make sure `API_ADS_HEYZAP` is added to build settings
+- Add `API.RemoteData.Use(APIs.RemoteData.HeyZap, 0f)` to `AppController`
+- To test locally, you can add `OnRemoteDataReceived(Resources.Load<TextAsset>("Data/RemoteData").text)` in `PostInit()` in `AppController` class
 - You can use http://jsonlint.com to validate your JSON
 - Remember to remove test JSON from HeyZap dashboard after done testing
 
 ### Unity Crash Reporting
 
-- If using version of Unity prior to 5.4, add API_CRASH_UNITY to build settings and follow this guide: http://d.pr/i/14nPZ
+- If using version of Unity prior to 5.4, add `API_CRASH_UNITY` to build settings and follow this guide: http://d.pr/i/14nPZ
 - If using Unity 5.4, just enalbe reporting in Services
 
 ### Native Sharing
 
-- Add Prime31 social plugin, but delete all the Twitter and Facebook related stuff. Basically, you need SharingBinding and SharingManager files + some files in Editor folder for Prime31
-- Add API_SHARE_NATIVE to build settings
-- Add API.Share.Use(APIs.Sharing.Native, 0f); to AppController
-- Add AppController.Instance.API.Share.Share(); call where needed.
+- Add Prime31 social plugin, but delete all the Twitter and Facebook related stuff. Basically, you need `SharingBinding` and `SharingManager` files + some files in Editor folder for Prime31
+- Add `API_SHARE_NATIVE` to build settings
+- Add `API.Share.Use(APIs.Sharing.Native, 0f)` to `AppController`
+- Add `AppController.Instance.API.Share.Share()` call where needed.
 
 ### Analytics
 
 - Enable Unity Analytics in Unity project's services tab
-- Add API_ANALYTICS_UNITY to build settings
-- Add API.Analytics.Use(APIs.Analytics.Unity, 0f); to AppController
-- Add AppController.Instance.API.Analytics.LogEvent() calls where needed
+- Add `API_ANALYTICS_UNITY` to build settings
+- Add `API.Analytics.Use(APIs.Analytics.Unity, 0f)` to `AppController`
+- Add `AppController.Instance.API.Analytics.LogEvent()` calls where needed
 
 ### Audio
 
