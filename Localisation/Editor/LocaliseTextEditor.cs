@@ -85,6 +85,23 @@ namespace Zedarus.ToolKit.Localisation
 				EditorGUILayout.HelpBox(error, MessageType.Warning);
 			}
 
+			if (GUILayout.Button("Test localisation"))
+			{
+				Text label = _textLabel.objectReferenceValue as Text;
+				if (label != null)
+				{
+					LocalisationManager loc = new LocalisationManager();
+
+					EditorUtility.DisplayDialog("Result in english:", loc.Localise(_phrase.stringValue, _page.stringValue), "OK");
+
+					loc = null;
+				}
+				else
+				{
+					Debug.LogError("No reference to text component");
+				}
+			}
+
 			if (GUILayout.Button("Refresh Data"))
 			{
 				LocalisationManager.UpdateData();
