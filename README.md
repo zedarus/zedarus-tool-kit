@@ -205,3 +205,12 @@ Troubleshooting:
 - REMEMBER to use live API key before making final build!
 - Make sure you make build using correct certificate and provision profile
 
+### Helpers
+
+#### `AppController.Instance.Helpers.Promo`
+
+- `SendContactsEmail()` - opens email composition window with email and subject specified in settings in game data
+- `OnMoreLevelsPress()` - opens URL that was specified in settings in game data and return `true`. Returns `false` otherwise so you can do something else, like display rate me popup
+- `OnMoreGamesPress()` - either opens URL or display interstitial ad with custom placement (all specified in settings in game data)
+- `OnFacebookButtonPress()` - opens URL that was specified in settings in game data
+- `OpenRateAppPage()` - open rate URL from game data Rate Popup settings and also logs opening in analytics API
