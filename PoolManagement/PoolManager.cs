@@ -44,7 +44,7 @@ namespace Zedarus.ToolKit.PoolManagement
 						T newPoolObject = GameObject.Instantiate(prefabs[bag.Next()]) as T;
 						if (newPoolObject != null)
 						{
-							newPoolObject.transform.parent = container;
+							newPoolObject.transform.SetParent(container);
 							newPoolObject.Init();
 							_pool.Add(newPoolObject);
 						}

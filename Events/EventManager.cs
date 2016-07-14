@@ -8,13 +8,13 @@ namespace Zedarus.ToolKit.Events
 	public class EventManager : SimplePrivateSingleton<EventManager>
 	{
 		private EventRegister _register;
-		private List<Event> _events;
+//		private List<Event> _events;
 		private List<EventListener> _listeners;
 
 		public EventManager()
 		{
 			_register = new EventRegister();
-			_events = new List<Event>();
+//			_events = new List<Event>();
 			_listeners = new List<EventListener>();
 			//InitSceneObject();
 		}
@@ -107,10 +107,10 @@ namespace Zedarus.ToolKit.Events
 			Instance.DestroyListener<T1,T2,T3,T4>(e, handler);
 		}
 
-		static public void Update()
+		/*static public void Update()
 		{
 			Instance.ProcessEvents();
-		}
+		}*/
 		
 		/// <summary>
 		/// Removes all unprocessed events and listeners
@@ -127,34 +127,61 @@ namespace Zedarus.ToolKit.Events
 		#endregion
 
 		#region Events
-		public void ProcessEvents()
+		/*public void ProcessEvents()
 		{
-			Event eventObject;
-			EventListener listener;
-			for (int e = _events.Count - 1; e >= 0; e--)
+			if (!_processing)
 			{
-				eventObject = _events[e];
-				for (int l = _listeners.Count - 1; l >= 0; l--)
+				_processing = true;
+				Event eventObject;
+				EventListener listener;
+				for (int e = _events.Count - 1; e >= 0; e--)
 				{
-					listener = _listeners[l];
-					if (listener.Event == eventObject.ID)
+					eventObject = _events[e];
+					for (int l = _listeners.Count - 1; l >= 0; l--)
 					{
-						listener.Call(eventObject);
-
-						if (listener.Expired)
-							_listeners.RemoveAt(l);
-
-						if (listener.Consume && _events.Count > e)
+						listener = _listeners[l];
+						if (listener.Event == eventObject.ID)
 						{
-							_events.RemoveAt(e);
-							break;
+							listener.Call(eventObject);
+
+							if (listener.Expired)
+								_listeners.RemoveAt(l);
+
+							if (listener.Consume && _events.Count > e)
+							{
+								_events.RemoveAt(e);
+								break;
+							}
 						}
 					}
 				}
-			}
 
-			// TODO: add lifelength for unprocessed events so they are not removed immidately if not processed
-			_events.Clear();
+				// TODO: add lifelength for unprocessed events so they are not removed immidately if not processed
+//				_events.Clear();
+
+				_processing = false;
+			}
+		}*/
+
+		private void ProcessEventRightNow(Event eventObject)
+		{
+			EventListener listener;
+			for (int l = _listeners.Count - 1; l >= 0; l--)
+			{
+				listener = _listeners[l];
+				if (listener.Event == eventObject.ID)
+				{
+					listener.Call(eventObject);
+
+					if (listener.Expired)
+						_listeners.RemoveAt(l);
+
+					if (listener.Consume)
+					{
+						return;
+					}
+				}
+			}
 		}
 
 		public bool AddEventToRegister(int e)
@@ -166,9 +193,8 @@ namespace Zedarus.ToolKit.Events
 		{
 			if (_register.IsRegistered(e))
 			{
-				_events.Add(new Event(e));
-				UpdateSceneObject();
-				ProcessEvents();
+//				_events.Add(new Event(e));
+				ProcessEventRightNow(new Event(e));
 			} else
 				Debug.LogError("Can't send event with ID " + e + " because it's not registerd");
 		}
@@ -177,9 +203,8 @@ namespace Zedarus.ToolKit.Events
 		{
 			if (_register.IsRegistered(e))
 			{
-				_events.Add(new Event<T1>(e, param1));
-				UpdateSceneObject();
-				ProcessEvents();
+//				_events.Add(new Event<T1>(e, param1));
+				ProcessEventRightNow(new Event<T1>(e, param1));
 			} else
 				Debug.LogError("Can't send event with ID " + e + " because it's not registerd");
 		}
@@ -188,9 +213,8 @@ namespace Zedarus.ToolKit.Events
 		{
 			if (_register.IsRegistered(e))
 			{
-				_events.Add(new Event<T1,T2>(e, param1, param2));
-				UpdateSceneObject();
-				ProcessEvents();
+//				_events.Add(new Event<T1,T2>(e, param1, param2));
+				ProcessEventRightNow(new Event<T1,T2>(e, param1, param2));
 			} else
 				Debug.LogError("Can't send event with ID " + e + " because it's not registerd");
 		}
@@ -199,9 +223,8 @@ namespace Zedarus.ToolKit.Events
 		{
 			if (_register.IsRegistered(e))
 			{
-				_events.Add(new Event<T1,T2,T3>(e, param1, param2, param3));
-				UpdateSceneObject();
-				ProcessEvents();
+//				_events.Add(new Event<T1,T2,T3>(e, param1, param2, param3));
+				ProcessEventRightNow(new Event<T1,T2,T3>(e, param1, param2, param3));
 			} else
 				Debug.LogError("Can't send event with ID " + e + " because it's not registerd");
 		}
@@ -210,9 +233,8 @@ namespace Zedarus.ToolKit.Events
 		{
 			if (_register.IsRegistered(e))
 			{
-				_events.Add(new Event<T1,T2,T3,T4>(e, param1, param2, param3, param4));
-				UpdateSceneObject();
-				ProcessEvents();
+//				_events.Add(new Event<T1,T2,T3,T4>(e, param1, param2, param3, param4));
+				ProcessEventRightNow(new Event<T1,T2,T3,T4>(e, param1, param2, param3, param4));
 			} else
 				Debug.LogError("Can't send event with ID " + e + " because it's not registerd");
 		}
@@ -233,31 +255,26 @@ namespace Zedarus.ToolKit.Events
 		public void CreateListener(int e, System.Action handler, bool consume, bool oneTime)
 		{
 			_listeners.Add(new EventListener(e, handler, consume, oneTime));
-			UpdateSceneObject();
 		}
 
 		public void CreateListener<T>(int e, System.Action<T> handler, bool consume, bool oneTime)
 		{
 			_listeners.Add(new EventListener<T>(e, handler, consume, oneTime));
-			UpdateSceneObject();
 		}
 
 		public void CreateListener<T1,T2>(int e, System.Action<T1,T2> handler, bool consume, bool oneTime)
 		{
 			_listeners.Add(new EventListener<T1,T2>(e, handler, consume, oneTime));
-			UpdateSceneObject();
 		}
 
 		public void CreateListener<T1,T2,T3>(int e, System.Action<T1,T2,T3> handler, bool consume, bool oneTime)
 		{
 			_listeners.Add(new EventListener<T1,T2,T3>(e, handler, consume, oneTime));
-			UpdateSceneObject();
 		}
 
 		public void CreateListener<T1,T2,T3,T4>(int e, System.Action<T1,T2,T3,T4> handler, bool consume, bool oneTime)
 		{
 			_listeners.Add(new EventListener<T1,T2,T3,T4>(e, handler, consume, oneTime));
-			UpdateSceneObject();
 		}
 
 		public void DestroyListener(int e, System.Action handler)
@@ -292,46 +309,12 @@ namespace Zedarus.ToolKit.Events
 				if (_listeners[i].Event == e && _listeners[i].Handler.Equals(methodName))
 					_listeners.RemoveAt(i);
 			}
-			UpdateSceneObject();
 		}
 		#endregion
 
 		public void ClearEventsAndListeners() 
 		{
 			_listeners.Clear();
-			UpdateSceneObject();
 		}
-
-		#region Scene Object
-		//private float _lastCheckTime = 0;
-		//private GameObject _go;
-
-		private void InitSceneObject()
-		{
-			/*
-			if (_go == null)
-			{
-				GameObject g = GameObject.Find("ZTKEventManager");
-				if (g == null)
-				{
-					_go = new GameObject("ZTKEventManager");
-					_go.AddComponent<EventManagerProcessor>();
-				}
-				else
-					_go = g;
-			}*/
-		}
-
-		private void UpdateSceneObject()
-		{
-			/*
-			if (Time.realtimeSinceStartup - _lastCheckTime > 5f)
-			{
-				InitSceneObject();
-				_lastCheckTime = Time.realtimeSinceStartup;
-			}
-			*/
-		}
-		#endregion
 	}
 }
