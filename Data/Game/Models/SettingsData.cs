@@ -39,6 +39,30 @@ namespace Zedarus.ToolKit.Data.Game
 		[SerializeField]
 		[DataField("Contact Email Subject")]
 		private string _contactEmailSubject = "Game Title";
+
+		//
+		// Social & Promo
+		//
+		[SerializeField]
+		[DataGroup("Social & Promo Settings")]
+		[DataField("Facebook Page URL")]
+		private string _facebookURL = "";
+
+		[SerializeField]
+		[DataField("Use ads for more games")]
+		private bool _useAdsForMoreGames = false;
+
+		[SerializeField]
+		[DataField("More Games URL / Ad Placement")]
+		private string _moreGamesURLOrPlacement = "";
+
+		[SerializeField]
+		[DataField("Use link for more levels")]
+		private bool _useLinkForMoreLevels = false;
+
+		[SerializeField]
+		[DataField("More levels URL")]
+		private string _moreLevelsURL = "";
 		#endregion
 
 		#region Initalization
@@ -60,16 +84,6 @@ namespace Zedarus.ToolKit.Data.Game
 			_build = build;
 		}
 		#endif
-
-		public void SendContactEmail()
-		{
-			Application.OpenURL("mailto:" + ContactEmail + "?subject=" + EscapeURL(ContactEmailSubject));
-		}
-
-		private string EscapeURL(string url)
-		{
-			return WWW.EscapeURL(url).Replace("+","%20");
-		}
 		#endregion
 
 		#region Getters
@@ -91,6 +105,31 @@ namespace Zedarus.ToolKit.Data.Game
 		public string ContactEmailSubject
 		{
 			get { return _contactEmailSubject; }
+		}
+
+		public string FacebookURL
+		{
+			get { return _facebookURL; }
+		}
+
+		public bool UseAdsForMoreGames
+		{
+			get { return _useAdsForMoreGames; }		
+		}
+
+		public string MoreGamesAdPlacement
+		{
+			get { return _moreGamesURLOrPlacement; }
+		}
+
+		public bool UseLinkForMoreLevels
+		{
+			get { return _useLinkForMoreLevels; }
+		}
+
+		public string MoreLevelsURL
+		{
+			get { return _moreLevelsURL; }
 		}
 
 		public string GetCurrentPlatformStoreLink(bool shortVersion)
@@ -117,7 +156,7 @@ namespace Zedarus.ToolKit.Data.Game
 			if (shortVersion)
 				return _googlePlayLinkShort;
 			else
-			return _googlePlayLink;
+				return _googlePlayLink;
 		}
 		#endregion
 

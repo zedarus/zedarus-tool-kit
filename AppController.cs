@@ -12,6 +12,7 @@ using Zedarus.ToolKit.Settings;
 using Zedarus.ToolKit.Events;
 using Zedarus.ToolKit.Audio;
 using Zedarus.ToolKit.Localisation;
+using Zedarus.ToolKit.Helpers;
 
 namespace Zedarus.ToolKit
 {
@@ -27,6 +28,7 @@ namespace Zedarus.ToolKit
 		private LocalisationManager _localisation;
 		private bool _postInit = false;
 		private AppStateTracker _appStateTracker;
+		private AppHelpers _helpers = null;
 		#endregion
 
 		#region Unity Methods
@@ -103,6 +105,7 @@ namespace Zedarus.ToolKit
 		protected virtual void InitEvents()
 		{
 			IDs.Init();
+			EventManager.AddListener<string>(IDs.Events.DisplayAdPlacement, OnDisplayAdPlacement);
 		}
 
 		protected virtual void InitGameData()
@@ -256,6 +259,11 @@ namespace Zedarus.ToolKit
 		{
 		
 		}
+
+		private void OnDisplayAdPlacement(string placement)
+		{
+			API.Ads.ShowIntersitital(placement, null);
+		}
 		#endregion
 
 		#region Getters
@@ -300,6 +308,19 @@ namespace Zedarus.ToolKit
 				}
 
 				return _localisation;
+			}
+		}
+
+		public AppHelpers Helpers
+		{
+			get 
+			{
+				if (_helpers == null)
+				{
+					_helpers = new AppHelpers(Data.Game, API);
+				}
+
+				return _helpers;
 			}
 		}
 
