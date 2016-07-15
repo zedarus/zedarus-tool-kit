@@ -4,7 +4,7 @@ A bunch or reusable classes, utilities and tools that I'm using in my games in U
 
 ## Important
 
-Since this project ignores Unity's `.meta` files, you should **NEVER** add any `MonoBehaviour` classes from this project directly to your scene objects as components, because as you `GUID` for those scripts change between projects, you might have "Missing Behaviour" error.
+Since this project ignores Unity's `.meta` files, you should **NEVER** add any `MonoBehaviour` classes from this project directly to your scene objects as components, because as `GUID` for those scripts change between projects, you might have "Missing Behaviour" error.
 
 Instead, just create a new class in your local project, extend the required class from ZTK and then add it as a component.
 
@@ -41,9 +41,6 @@ Instead, just create a new class in your local project, extend the required clas
 - If you want to use cross-promo placement: 
   - Add call `AppController.Instance.API.Ads.ShowPromo(IDs.Ads.Interstitials.PromoOnPlayButton, OnPromoEnd, _adBlock)` where needed. Also
   - Enable promo ads in API Settings in game data and set delay in minutes
-
-Troubleshooting:
-- Tbd
 
 ### IAPs
 
