@@ -199,7 +199,7 @@ Troubleshooting:
 - Add `AppController.Instance.API.Promo.RestoreRewards()` call where needed (along with IAPs restore?)
 - Add `AppController.Instance.API.Promo.RedeemCode(code.text)` if requered, but read this:
 - REMEMBER: We recommend against using promocodes on iOS. Apple guidelines indicate that promocodes are not permitted. Though some apps do successfully integrate this functionality, Batch does not recommend the practice.
-- REMEMBER to use live API key before making final build!
+- :exclamation: REMEMBER to use live API key before making final build!
 - :exclamation: **Xcode**: Make sure you make build using correct certificate and provision profile
 - :exclamation: **Xcode**: Enable push notifications in Xcode
 - :exclamation: **Xcode**: if you are planning to add promo codes support or redeem links, add Batch's custom scheme in Info.plsit
