@@ -33,6 +33,14 @@ namespace Zedarus.ToolKit.API
 		#endregion
 
 		#region Controls
+		public void LogEvent(string eventName)
+		{
+			foreach (IAnalyticsWrapperInterface wrapper in Wrappers)
+			{
+				wrapper.LogEvent(eventName); 
+			}
+		}
+
 		public void LogEvent(string eventName, Dictionary<string, object> parameters)
 		{
 			foreach (IAnalyticsWrapperInterface wrapper in Wrappers)

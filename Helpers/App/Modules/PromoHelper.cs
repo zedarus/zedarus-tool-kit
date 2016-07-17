@@ -23,6 +23,7 @@ namespace Zedarus.ToolKit.Helpers.Modules
 
 		public bool OnMoreLevelsPress()
 		{
+			API.Analytics.LogEvent("Promo - Open More Levels");
 			if (GameData.Settings.UseLinkForMoreLevels)
 			{
 				Application.OpenURL(GameData.Settings.MoreLevelsURL);
@@ -37,6 +38,7 @@ namespace Zedarus.ToolKit.Helpers.Modules
 
 		public void OnMoreGamesPress()
 		{
+			API.Analytics.LogEvent("Promo - Open More Games");
 			if (GameData.Settings.UseAdsForMoreGames)
 			{
 				// TODO: use event here temporarily, only because we can't access AppController directly from here because of generics right now
@@ -50,6 +52,7 @@ namespace Zedarus.ToolKit.Helpers.Modules
 
 		public void OnFacebookButtonPress()
 		{
+			API.Analytics.LogEvent("Promo - Open Facebook Page");
 			Application.OpenURL(GameData.Settings.FacebookURL);
 		}
 
