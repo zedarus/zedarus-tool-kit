@@ -4,7 +4,7 @@ A bunch or reusable classes, utilities and tools that I'm using in my games in U
 
 ## Important
 
-Since this project ignores Unity's `.meta` files, you should **NEVER** add any `MonoBehaviour` classes from this project directly to your scene objects as components, because as you `GUID` for those scripts change between projects, you might have "Missing Behaviour" error.
+Since this project ignores Unity's `.meta` files, you should **NEVER** add any `MonoBehaviour` classes from this project directly to your scene objects as components, because as `GUID` for those scripts change between projects, you might have "Missing Behaviour" error.
 
 Instead, just create a new class in your local project, extend the required class from ZTK and then add it as a component.
 
@@ -41,9 +41,6 @@ Instead, just create a new class in your local project, extend the required clas
 - If you want to use cross-promo placement: 
   - Add call `AppController.Instance.API.Ads.ShowPromo(IDs.Ads.Interstitials.PromoOnPlayButton, OnPromoEnd, _adBlock)` where needed. Also
   - Enable promo ads in API Settings in game data and set delay in minutes
-
-Troubleshooting:
-- Tbd
 
 ### IAPs
 
@@ -205,3 +202,12 @@ Troubleshooting:
 - REMEMBER to use live API key before making final build!
 - Make sure you make build using correct certificate and provision profile
 
+### Helpers
+
+#### `AppController.Instance.Helpers.Promo`
+
+- `SendContactsEmail()` - opens email composition window with email and subject specified in settings in game data
+- `OnMoreLevelsPress()` - opens URL that was specified in settings in game data and return `true`. Returns `false` otherwise so you can do something else, like display rate me popup
+- `OnMoreGamesPress()` - either opens URL or display interstitial ad with custom placement (all specified in settings in game data)
+- `OnFacebookButtonPress()` - opens URL that was specified in settings in game data
+- `OpenRateAppPage()` - open rate URL from game data Rate Popup settings and also logs opening in analytics API
