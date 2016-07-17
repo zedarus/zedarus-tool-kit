@@ -53,7 +53,7 @@ Instead, just create a new class in your local project, extend the required clas
 - Add `protected override void OnProductPurchaseFinished(string productID, bool success)` override to `AppController`
 - Remember to add `AppController.Instance.API.Store.RestorePurchases()` to options screen
 - If you support Remove Ads, add `AppController.Instance.PurchaseAdsRemoval()` to options screen
-- Remember to enable IAPs support in Xcode
+- :exclamation: **Xcode**: Remember to enable IAPs support in Xcode
 
 Troubleshooting:
 - Sometimes sandbox requests take too long to process during testing, that’s okay
@@ -71,7 +71,7 @@ Troubleshooting:
 - Add `AppController.Instance.Data.Player.AchievementsTracker.UpdateConditionParameter()` calls where needed
 - Add `protected override bool OnCheckCustomAchievementCondition(int achievementID, object parameterValue)` override to `AppController` if any custom conditions for achievements are requered
 - Add `AppController.Instance.API.Score.DisplayLeaderboardsList()` and `AppController.Instance.API.Score.DisplayAchievementsList()` calls where needed
-- Remember to enable GameCenter support in Xcode
+- :exclamation: **Xcode**: Remember to enable GameCenter support in Xcode
 
 Troubleshooting:
 - Achievements and leaderboards sometimes updated slow in sandbox 
@@ -107,8 +107,8 @@ Troubleshooting:
  ```
 
 - If you need to know when new data was applied from cloud, listen to `Zedarus.ToolKit.Settings.IDs.Events.CloudSyncFinished` event
-- Remember to enable iCloud support in Xcode with iCloud Documents support
-- Important: sometimes Xcode switches off document support for iCloud, even though iCloud is still turned on. Make sure to check and correct that!
+- :exclamation: **Xcode**: Remember to enable iCloud support in Xcode with iCloud Documents support
+- :exclamation: **Xcode**: Sometimes Xcode switches off document support for iCloud, even though iCloud is still turned on. Make sure to check and correct that!
 
 ### Remote Data
 
@@ -200,7 +200,9 @@ Troubleshooting:
 - Add `AppController.Instance.API.Promo.RedeemCode(code.text)` if requered, but read this:
 - REMEMBER: We recommend against using promocodes on iOS. Apple guidelines indicate that promocodes are not permitted. Though some apps do successfully integrate this functionality, Batch does not recommend the practice.
 - REMEMBER to use live API key before making final build!
-- Make sure you make build using correct certificate and provision profile
+- :exclamation: **Xcode**: Make sure you make build using correct certificate and provision profile
+- :exclamation: **Xcode**: Enable push notifications in Xcode
+- :exclamation: **Xcode**: if you are planning to add promo codes support or redeem links, add Batch's custom scheme in Info.plsit
 
 ### Helpers
 
