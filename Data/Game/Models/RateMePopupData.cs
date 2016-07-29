@@ -68,14 +68,24 @@ namespace Zedarus.ToolKit.Data.Game
 			get { return _reward; }
 		}
 
+		private string AppleURL
+		{
+			get { return _appleURL; }
+		}
+
+		private string GoogleURL
+		{
+			get { return _googleURL; }
+		}
+
 		public string CurrentPlatformURL
 		{
 			get
 			{
 				#if UNITY_IOS
-				return _appleURL;
+				return AppleURL;
 				#elif UNITY_ANDROID
-				return _googleURL;
+				return GoogleURL;
 				#else
 				return "http://www.bladesliders.com";
 				#endif

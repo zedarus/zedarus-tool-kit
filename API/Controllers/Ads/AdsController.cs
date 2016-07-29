@@ -58,7 +58,7 @@ namespace Zedarus.ToolKit.API
 				wrapper.CacheInterstitial(tag);
 				foreach (string otherTag in otherTags)
 				{
-					wrapper.CacheInterstitial(tag);
+					wrapper.CacheInterstitial(otherTag);
 				}
 			}
 
@@ -76,7 +76,7 @@ namespace Zedarus.ToolKit.API
 				wrapper.CacheRewardedVideo(tag);
 				foreach (string otherTag in otherTags)
 				{
-					wrapper.CacheRewardedVideo(tag);
+					wrapper.CacheRewardedVideo(otherTag);
 				}
 			}
 
