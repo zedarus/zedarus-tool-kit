@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Zedarus Tool Kit by zedarus</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Zedarus Tool Kit</h1>
+      <h2 class="project-tagline"></h2>
+      <a href="https://github.com/zedarus/zedarus-tool-kit" class="btn">View on GitHub</a>
+      <a href="https://github.com/zedarus/zedarus-tool-kit/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/zedarus/zedarus-tool-kit/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h1>
+<a id="zedarus-tool-kit" class="anchor" href="#zedarus-tool-kit" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Zedarus Tool Kit</h1>
+
+<p>A bunch or reusable classes, utilities and tools that I'm using in my games in Unity.</p>
+
+<h2>
+<a id="important" class="anchor" href="#important" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Important</h2>
+
+<p>Since this project ignores Unity's <code>.meta</code> files, you should <strong>NEVER</strong> add any <code>MonoBehaviour</code> classes from this project directly to your scene objects as components, because as <code>GUID</code> for those scripts change between projects, you might have "Missing Behaviour" error.</p>
+
+<p>Instead, just create a new class in your local project, extend the required class from ZTK and then add it as a component.</p>
+
+<h2>
+<a id="integration-guides-ios" class="anchor" href="#integration-guides-ios" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Integration Guides (iOS)</h2>
+
+<h3>
+<a id="ads-heyzap" class="anchor" href="#ads-heyzap" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Ads (HeyZap)</h3>
+
+<ul>
+<li>Follow integration guide on HeyZap website to setup all the IDs</li>
+<li>Make sure you take <strong>age rating</strong> into account when setting up ads in all networks + mediation:
+
+<ul>
+<li>
+<strong>Chartboost</strong>: go to publishing campaigns, open Advanced Targeting and check Block 17+ <a href="http://d.pr/i/1cvAb">http://d.pr/i/1cvAb</a>. Remember to do this for all campaigns</li>
+<li>
+<strong>AdMob</strong>: unfortunatelly, AdMob does not have an age restriction setting, but you can filter ads categories using this guide: <a href="https://support.google.com/admob/answer/3150235?hl=en">https://support.google.com/admob/answer/3150235?hl=en</a>
+</li>
+<li>
+<strong>AppLovin</strong>: go to managing apps, select your app and then check or uncheck Children's App setting</li>
+<li>
+<strong>Unity Ads</strong>: in Unity Editor, go to Services, Age Designation and select appropriate option. Then, go to app setting in Unity Ads dashboar, select Ads Filtering and select option under Ages: <a href="http://d.pr/i/171V8">http://d.pr/i/171V8</a>
+</li>
+<li>
+<strong>HeyZap</strong>: select your app on dashboard, go to Publisher Setting and select appropriate option under Family Friendly Filter</li>
+</ul>
+</li>
+<li>Make sure video interstitials are skippable:
+
+<ul>
+<li>
+<strong>Chartboost</strong>: no settings</li>
+<li>
+<strong>AdMob</strong>: no settings</li>
+<li>
+<strong>AppLovin</strong>: go to app settings and select appropriate option under Video Settings and Playable Ad Settings</li>
+<li>
+<strong>Unity Ads</strong>: no settings</li>
+<li>
+<strong>HeyZap</strong>: go to publisher settings for the app and select skippable options</li>
+</ul>
+</li>
+<li>Make sure reward videos rewards are set correctly for ad networks:
+
+<ul>
+<li>
+<strong>Chartboost</strong>: no settings</li>
+<li>
+<strong>AdMob</strong>: no settings</li>
+<li>
+<strong>AppLovin</strong>: go to app settings and set correct values under Rewarded Video</li>
+<li>
+<strong>Unity Ads</strong>: no settings</li>
+<li>
+<strong>HeyZap</strong>: no settings</li>
+</ul>
+</li>
+<li>Import HeyZap, Chartboost, AdMob, UnityAds and AppLovin SDKs to project. You can just copy them from one of the projects that already have them, or download from HeyZap integration guide (make sure to follow the additional instructions there!)</li>
+<li>Add <code>API_ADS_HEYZAP</code> to project build settings</li>
+<li>Add <code>API.Ads.Use(APIs.Ads.HeyZap, 0f, "&lt;your id&gt;");</code> int <code>InitAPI()</code> in your <code>AppController</code> class. Replace <code>&lt;your id&gt;</code> with the one provided by HeyZap</li>
+<li>Add <code>AppController.Instance.API.Ads.ShowTestUI(true);</code> somewhere in options screen button callback</li>
+<li>Add ads placements to <code>IDs</code> class, the most generic ones are: <code>between_level</code>, <code>crosspromo</code> and various placements for incentivized ads: <code>free_coins</code>, <code>xp_boost</code>, etc</li>
+<li>Add caching calls in <code>AppController.OnPostInit()</code> (like this: <code>API.Ads.CacheIntersitials(IDs.Ads.Interstitials.BetweenLevel)</code>)</li>
+<li>Between level ads: Just use this call when user presses Restart button in game over UI <code>AppController.Instance.API.Ads.ShowBetweenLevelAd(IDs.Ads.Interstitials.BetweenLevel, OnInterstitialClosed, _adBlock)</code>. <code>_adBlock</code> should be a UI gameobject that blocks all input. API will set it active and inactive automatically</li>
+<li>Reward calls: just use this call: <code>AppController.Instance.API.Ads.ShowRewardedVideo(IDs.Ads.RewardVideos.FreeCoins, null, OnVideoRewardCompleted, coinPack.ID)</code>
+</li>
+<li>If you want to use cross-promo placement: 
+
+<ul>
+<li>Add call <code>AppController.Instance.API.Ads.ShowPromo(IDs.Ads.Interstitials.PromoOnPlayButton, OnPromoEnd, _adBlock)</code> where needed. Also</li>
+<li>Enable promo ads in API Settings in game data and set delay in minutes</li>
+</ul>
+</li>
+</ul>
+
+<h3>
+<a id="iaps" class="anchor" href="#iaps" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>IAPs</h3>
+
+<ul>
+<li>Setup IAPs in iTunesConnect</li>
+<li>Enable UnityPurchases in Services tab</li>
+<li>Add <code>API.Store.Use(APIs.IAPs.Unity, 0f)</code> to <code>AppController</code>
+</li>
+<li>Add <code>API_IAP_UNITY</code> to project build settings</li>
+<li>Expand <code>IAPProduct</code> class in <code>GameData</code> to create your own products</li>
+<li>Override <code>protected override StoreProduct[] ProductList</code> getter in <code>AppController</code>, but don’t forget to include <code>base.ProductList</code> in your new list!</li>
+<li>Add <code>protected override void OnProductPurchaseFinished(string productID, bool success)</code> override to <code>AppController</code>
+</li>
+<li>Remember to add <code>AppController.Instance.API.Store.RestorePurchases()</code> to options screen</li>
+<li>If you support Remove Ads, add <code>AppController.Instance.PurchaseAdsRemoval()</code> to options screen</li>
+<li>
+<g-emoji alias="exclamation" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/2757.png">❗</g-emoji> <strong>Xcode</strong>: Remember to enable IAPs support in Xcode</li>
+</ul>
+
+<p>Troubleshooting:</p>
+
+<ul>
+<li>Sometimes sandbox requests take too long to process during testing, that’s okay</li>
+</ul>
+
+<h3>
+<a id="achievements-and-leaderboards" class="anchor" href="#achievements-and-leaderboards" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Achievements and Leaderboards</h3>
+
+<ul>
+<li>Setup achievements and leaderboards in iTunesConnect</li>
+<li>Create achievements generic conditions in <code>GameData</code> in Unity</li>
+<li>Add achievements and leaderboards data to <code>GameData</code> in Unity</li>
+<li>Add <code>API.Score.Use(APIs.Score.GameCenter, 0f)</code> to <code>AppController</code>
+</li>
+<li>Add Prime31 GameCenter plugin</li>
+<li>Add <code>API_SCORE_GAMECENTER</code> to project build settings</li>
+<li>Add all achievements conditions IDs to <code>Settings.IDs</code> file for easier reference</li>
+<li>Add <code>AppController.Instance.API.Score.SubmitScore(&lt;score&gt;,  AppController.Instance.Data.Game.DefaultLeaderboard.CurrentPlatformID)</code> calls where needed, replace leaderboard ID if needed</li>
+<li>Add <code>AppController.Instance.Data.Player.AchievementsTracker.UpdateConditionParameter()</code> calls where needed</li>
+<li>Add <code>protected override bool OnCheckCustomAchievementCondition(int achievementID, object parameterValue)</code> override to <code>AppController</code> if any custom conditions for achievements are requered</li>
+<li>Add <code>AppController.Instance.API.Score.DisplayLeaderboardsList()</code> and <code>AppController.Instance.API.Score.DisplayAchievementsList()</code> calls where needed</li>
+<li>
+<g-emoji alias="exclamation" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/2757.png">❗</g-emoji> <strong>Xcode</strong>: Remember to enable GameCenter support in Xcode</li>
+</ul>
+
+<p>Troubleshooting:</p>
+
+<ul>
+<li>Achievements and leaderboards sometimes updated slow in sandbox </li>
+</ul>
+
+<h3>
+<a id="icloud-sync" class="anchor" href="#icloud-sync" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>iCloud Sync</h3>
+
+<ul>
+<li>Add Prime31 iCloud plugin to the project</li>
+<li>Add <code>API_SYNC_ICLOUD</code> to build settings</li>
+<li>Add <code>API.Sync.Use(APIs.Sync.iCloud, 0f, "&lt;filename&gt;.dat")</code> (change the filename to the one you like though)</li>
+<li>Make sure all your custom player data model classes have <code>Merge()</code> method implemented</li>
+<li>Override <code>protected virtual bool DisplaySyncConfirmUI(System.Action syncConfirmedHandler, System.Action syncDeniedHandler)</code> in your <code>AppController</code>. If UI is not ready to display popup right now, return false. In that case, API will try to display this popup in 0.5 sec again.</li>
+<li>Add sync button to options screen and change sync state using <code>AppController.Instance.Data.Player.APIState.ChangeSyncState(!AppController.Instance.Data.Player.APIState.SyncEnabled)</code>
+</li>
+<li>
+<p>Don’t forget to call <code>AppController.Instance.API.Sync.ApplyLoadedData()</code> if sync is enabled again in options screen. Here's a sample code for options screen flow:</p>
+
+<div class="highlight highlight-source-cs"><pre><span class="pl-k">public</span> <span class="pl-k">void</span> OnSyncButtonPress()
+{
+  AppController.Instance.Data.Player.APIState.ChangeSyncState(!AppController.Instance.Data.Player.APIState.SyncEnabled);
+  <span class="pl-k">if</span> (AppController.Instance.Data.Player.APIState.SyncEnabled)
+  {
+      AppController.Instance.API.Sync.ApplyLoadedData();
+  }
+  UpdateSyncButtonState();
+}
+
+<span class="pl-k">private</span> <span class="pl-k">void</span> UpdateSyncButtonState()
+{
+  <span class="pl-k">if</span> (_icloudButtonText != <span class="pl-c1">null</span>)
+  {
+      _icloudButtonText.text = AppController.Instance.Data.Player.APIState.SyncEnabled ? AppController.Instance.Localisation.Localise(IDs.Localisation.Buttons.ICLOUD_ON) : AppController.Instance.Localisation.Localise(IDs.Localisation.Buttons.ICLOUD_OFF);
+  }
+}</pre></div>
+</li>
+<li><p>If you need to know when new data was applied from cloud, listen to <code>Zedarus.ToolKit.Settings.IDs.Events.CloudSyncFinished</code> event</p></li>
+<li>
+<g-emoji alias="exclamation" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/2757.png">❗</g-emoji> <strong>Xcode</strong>: Remember to enable iCloud support in Xcode with iCloud Documents support</li>
+<li>
+<g-emoji alias="exclamation" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/2757.png">❗</g-emoji> <strong>Xcode</strong>: Sometimes Xcode switches off document support for iCloud, even though iCloud is still turned on. Make sure to check and correct that!</li>
+</ul>
+
+<h3>
+<a id="remote-data" class="anchor" href="#remote-data" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Remote Data</h3>
+
+<ul>
+<li>Make sure HeyZap plugin is already in and implemented, including Ads controller from above</li>
+<li>Make sure <code>API_ADS_HEYZAP</code> is added to build settings</li>
+<li>Add <code>API.RemoteData.Use(APIs.RemoteData.HeyZap, 0f)</code> to <code>AppController</code>
+</li>
+<li>To test locally, you can add <code>OnRemoteDataReceived(Resources.Load&lt;TextAsset&gt;("Data/RemoteData").text)</code> in <code>PostInit()</code> in <code>AppController</code> class</li>
+<li>You can use <a href="http://jsonlint.com">http://jsonlint.com</a> to validate your JSON</li>
+<li>Remember to remove test JSON from HeyZap dashboard after done testing</li>
+</ul>
+
+<h3>
+<a id="unity-crash-reporting" class="anchor" href="#unity-crash-reporting" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Unity Crash Reporting</h3>
+
+<ul>
+<li>If using version of Unity prior to 5.4, add <code>API_CRASH_UNITY</code> to build settings and follow this guide: <a href="http://d.pr/i/14nPZ">http://d.pr/i/14nPZ</a>
+</li>
+<li>If using Unity 5.4, just enalbe reporting in Services</li>
+</ul>
+
+<h3>
+<a id="native-sharing" class="anchor" href="#native-sharing" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Native Sharing</h3>
+
+<ul>
+<li>Add Prime31 social plugin, but delete all the Twitter and Facebook related stuff. Basically, you need <code>SharingBinding</code> and <code>SharingManager</code> files + some files in Editor folder for Prime31</li>
+<li>Add <code>API_SHARE_NATIVE</code> to build settings</li>
+<li>Add <code>API.Share.Use(APIs.Sharing.Native, 0f)</code> to <code>AppController</code>
+</li>
+<li>Add <code>AppController.Instance.API.Share.Share()</code> call where needed.</li>
+</ul>
+
+<h3>
+<a id="analytics" class="anchor" href="#analytics" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Analytics</h3>
+
+<ul>
+<li>Enable Unity Analytics in Unity project's services tab</li>
+<li>Add <code>API_ANALYTICS_UNITY</code> to build settings</li>
+<li>Add <code>API.Analytics.Use(APIs.Analytics.Unity, 0f)</code> to <code>AppController</code>
+</li>
+<li>Add <code>AppController.Instance.API.Analytics.LogEvent()</code> calls where needed</li>
+</ul>
+
+<h3>
+<a id="audio" class="anchor" href="#audio" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Audio</h3>
+
+<ul>
+<li>Make sure to add MasterAudio plugin first</li>
+<li>Setup MasterAudio instances in boot scene and make sure they are kept across scenes</li>
+<li>Then add <code>AUDIO_MASTER_AUDIO</code> to build settings</li>
+<li>Use <code>AppController.Instance.Audio</code> to get access to audio controller</li>
+<li>Use <code>AppController.Instance.Audio.ToggleSound()</code> and <code>AppController.Instance.Audio.ToggleMusic()</code> if you need to toggle sounds or music mute</li>
+<li>Listen to <code>Zedarus.ToolKit.Settings.IDs.Events.AudioStateUpdated</code> event where needed to update UI button state, etc</li>
+<li>Use <code>AppController.Instance.Audio.SoundEnabled</code> and <code>AppController.Instance.Audio.MusicEnabled</code> if you need to check if sounds or music are enabled</li>
+<li>Override <code>Zedarus.ToolKit.UI.Elements.UIButtonAudio</code> class in your custom class and add it to all game objects with <code>Button</code> component you have in your UI</li>
+</ul>
+
+<h3>
+<a id="localisation" class="anchor" href="#localisation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Localisation</h3>
+
+<ul>
+<li>Add this localisation package to the game: <a href="http://www.m2h.nl/files/LocalizationPackage.pdf">http://www.m2h.nl/files/LocalizationPackage.pdf</a>
+</li>
+<li>Override <code>LocaliseText</code> and <code>LocaliseTextEditor</code> in your local scripts to avoid meta files missup</li>
+<li>
+<p>Override <code>protected abstract LocalisationManager LocManagerRef { get; }</code> in <code>LocaliseText</code>. It should return reference to <code>AppContoller.Instance.Localisation</code> (your <strong>local</strong> controller). But make sure that <code>AppController</code> has instance ready first. Here's the code:</p>
+
+<div class="highlight highlight-source-cs"><pre><span class="pl-k">protected</span> <span class="pl-k">override</span> Zedarus.ToolKit.Localisation.LocalisationManager LocManagerRef 
+  { 
+      <span class="pl-k">get</span> 
+      { 
+          <span class="pl-k">if</span> (AppController.HasInstance)
+          {
+              <span class="pl-k">return</span> AppController.Instance.Localisation; 
+          }
+          <span class="pl-k">else</span>
+          {
+              <span class="pl-k">return</span> <span class="pl-c1">null</span>;
+          }
+      }
+  }</pre></div>
+</li>
+<li><p>Add <code>LocaliseText</code> component to UI <code>Text</code> components that you want to localise without code</p></li>
+<li>Add localisation ids to your <code>IDs</code> class</li>
+<li>Use <code>AppController.Instance.Localisation.Localise()</code> method to localise strings in code</li>
+<li>Add <code>API_LOC_M2H</code> to build settings</li>
+<li>Language change is logged automatically in analytics (just search for <code>IDs.Events.SetLanguage</code> event in ZTK code)</li>
+<li>Remember to add lproj files to Xcode project for all supported langauges before final build</li>
+<li>TODO: create localisation packages wrappers system</li>
+</ul>
+
+<h3>
+<a id="promo" class="anchor" href="#promo" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Promo</h3>
+
+<ul>
+<li>Setup your app on Batch.com using this guide: <a href="https://batch.com/doc/unity/prerequisites.html">https://batch.com/doc/unity/prerequisites.html</a>
+</li>
+<li>Generate push certificate and provision profiles: <a href="https://batch.com/doc/ios/prerequisites.html#_creating-a-certificate">https://batch.com/doc/ios/prerequisites.html#_creating-a-certificate</a>
+</li>
+<li>Download and add Bathc.com plugin to project. Make sure you put the C# files into Plugin folder, not root folder</li>
+<li>Add <code>API_PROMO_BATCH</code> to project's build settings</li>
+<li>Add <code>API.Promo.Use(APIs.Promo.Batch, 0f, "&lt;your_dev_or_live_key&gt;")</code> to your <code>AppController</code>
+</li>
+<li>Call <code>AppController.Instance.API.Promo.RequestNotificationsPermission()</code> somewhere at the start of the game. For example, when player click “Play” button or with some delay in main menu</li>
+<li>Test remote push notifications on this page: <a href="https://dashboard.batch.com/app/7265/settings#/push-settings">https://dashboard.batch.com/app/7265/settings#/push-settings</a>
+</li>
+<li>Add and setup local notifications in game data</li>
+<li>Note: local notifications are canceled, scheduled and rescheduled in base AppController class everytime app is started or comes back from background</li>
+<li>Override <code>OnProcessRewardFromLocalNotification(int rewardID)</code> in your <code>AppController</code> to handle rewards from local notifications</li>
+<li>REDEEM:</li>
+<li>Setup unlock inventory in your app settings on batch.com and follow documentation: <a href="https://batch.com/doc/unlock/overview.html">https://batch.com/doc/unlock/overview.html</a>
+</li>
+<li>Override <code>OnProcessRemoteUnlockFeature(string feature, string value)</code>, <code>OnProcessRemoteUnlockResource(string resource, int quantity)</code> and <code>OnProcessRemoteUnlockParams(Dictionary&lt;string, string&gt; parameters)</code> in your <code>AppController</code> to correctly process remote unlocks. <strong>important</strong>: <code>UIManager</code> might not be available at the time of this call, so make sure you cache the message and display it later if it doesn't. TODO: handle this the same way as in iCloud permission popup</li>
+<li>If you are planning to use redeem links from Bathc, make sure to add special URL scheme in Xcode, more on this here: <a href="https://batch.com/doc/unlock/overview.html">https://batch.com/doc/unlock/overview.html</a>
+</li>
+<li>Add <code>AppController.Instance.API.Promo.RestoreRewards()</code> call where needed (along with IAPs restore?)</li>
+<li>Add <code>AppController.Instance.API.Promo.RedeemCode(code.text)</code> if requered, but read this:</li>
+<li>REMEMBER: We recommend against using promocodes on iOS. Apple guidelines indicate that promocodes are not permitted. Though some apps do successfully integrate this functionality, Batch does not recommend the practice.</li>
+<li>
+<g-emoji alias="exclamation" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/2757.png">❗</g-emoji> REMEMBER to use live API key before making final build!</li>
+<li>
+<g-emoji alias="exclamation" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/2757.png">❗</g-emoji> <strong>Xcode</strong>: Make sure you make build using correct certificate and provision profile</li>
+<li>
+<g-emoji alias="exclamation" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/2757.png">❗</g-emoji> <strong>Xcode</strong>: Enable push notifications in Xcode</li>
+<li>
+<g-emoji alias="exclamation" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/2757.png">❗</g-emoji> <strong>Xcode</strong>: if you are planning to add promo codes support or redeem links, add Batch's custom scheme in Info.plsit</li>
+</ul>
+
+<h3>
+<a id="helpers" class="anchor" href="#helpers" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Helpers</h3>
+
+<h4>
+<a id="appcontrollerinstancehelperspromo" class="anchor" href="#appcontrollerinstancehelperspromo" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><code>AppController.Instance.Helpers.Promo</code>
+</h4>
+
+<ul>
+<li>
+<code>SendContactsEmail()</code> - opens email composition window with email and subject specified in settings in game data</li>
+<li>
+<code>OnMoreLevelsPress()</code> - opens URL that was specified in settings in game data and return <code>true</code>. Returns <code>false</code> otherwise so you can do something else, like display rate me popup</li>
+<li>
+<code>OnMoreGamesPress()</code> - either opens URL or display interstitial ad with custom placement (all specified in settings in game data)</li>
+<li>
+<code>OnFacebookButtonPress()</code> - opens URL that was specified in settings in game data</li>
+<li>
+<code>OpenRateAppPage()</code> - open rate URL from game data Rate Popup settings and also logs opening in analytics API</li>
+</ul>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/zedarus/zedarus-tool-kit">Zedarus Tool Kit</a> is maintained by <a href="https://github.com/zedarus">zedarus</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
