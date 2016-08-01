@@ -485,18 +485,31 @@ namespace Zedarus.ToolKit.Data.Game
 			return "NONE";
 		}
 
-		private List<string> GetGameModelListNamesForID(int id)
+		private Dictionary<int, string> GetGameModelListNamesForID(int id, bool useFilters)
 		{
 			IList list = GetListForTable(id);
 
 			if (list != null)
 			{
-				List<string> names = new List<string>();
+				Dictionary<int, string> names = new Dictionary<int, string>();
 
-				foreach (IGameDataModel modelData in list)
+				for (int i = 0; i < list.Count; i++)
 				{
+					IGameDataModel modelData = list[i] as IGameDataModel;
 					if (modelData != null)
-						names.Add(modelData.ListName);
+					{
+						if (useFilters)
+						{
+							if (DoesModelPassFilters(modelData))
+							{
+								names.Add(i, modelData.ListName);
+							}
+						}
+						else
+						{
+							names.Add(i, modelData.ListName);
+						}
+					}
 				}
 
 				return names;
@@ -565,22 +578,23 @@ namespace Zedarus.ToolKit.Data.Game
 
 		public bool IsModelDataAList(int modelID)
 		{
-			return GetGameModelListNamesForID(modelID) != null;
+			return GetGameModelListNamesForID(modelID, false) != null;
 		}
 
 		public int RenderModelsDataListView(int modelID)
 		{
 			int selectedModelDataIndex = -1;
-			List<string> modelsData = GetGameModelListNamesForID(modelID);
+			Dictionary<int, string> modelsData = GetGameModelListNamesForID(modelID, true);
+
 			if (modelsData != null)
 			{
-				for (int i = 0; i < modelsData.Count; i++)
+				foreach (KeyValuePair<int, string> m in modelsData)
 				{
 					EditorGUILayout.BeginHorizontal();
 
-					if (GUILayout.Button(modelsData[i], "box", GUILayout.ExpandWidth(true)))
+					if (GUILayout.Button(m.Value, "box", GUILayout.ExpandWidth(true)))
 					{
-						selectedModelDataIndex = i;
+						selectedModelDataIndex = m.Key;
 					}
 
 					EditorGUILayout.EndHorizontal();
@@ -623,6 +637,7 @@ namespace Zedarus.ToolKit.Data.Game
 		#region Filters
 		private List<GameDataModelFilter> _filters = new List<GameDataModelFilter>();
 
+		// TODO: remember filters for each model and switch between them
 		public void AddFilter()
 		{
 			_filters.Add(new GameDataModelFilter());
@@ -633,7 +648,70 @@ namespace Zedarus.ToolKit.Data.Game
 			_filters.Clear();
 		}
 
-		private void RenderFilter(int modelID, GameDataModelFilter filter)
+		private bool IsFieldTypeSupportedForFilters(System.Type type)
+		{
+			return type == typeof(string) ||
+				type == typeof(int) ||
+				type == typeof(float) ||
+				type == typeof(bool);
+		}
+
+		private bool DoesModelPassFilters(IGameDataModel modelData)
+		{
+			FieldInfo[] fields = GameDataModel.GetFields(modelData.GetType());
+			object[] attrs = null;
+			foreach (FieldInfo field in fields)
+			{
+				attrs = field.GetCustomAttributes(typeof(DataField), true);
+				foreach (object attr in attrs)
+				{
+					DataField fieldAttr = attr as DataField;
+					if (fieldAttr != null && fieldAttr.useForFiltering)
+					{
+						object value = field.GetValue(modelData);
+
+						foreach (GameDataModelFilter filter in _filters)
+						{
+							if (filter.PropertyName != null && filter.PropertyName.Equals(field.Name))
+							{
+								if (field.FieldType == typeof(string))
+								{
+									if (!filter.CompareToString(value))
+									{
+										return false;
+									}
+								}
+								else if (field.FieldType == typeof(int))
+								{
+									if (!filter.CompareToInt(value))
+									{
+										return false;
+									}
+								}
+								else if (field.FieldType == typeof(float))
+								{
+									if (!filter.CompareToFloat(value))
+									{
+										return false;
+									}
+								}
+								else if (field.FieldType == typeof(bool))
+								{
+									if (!filter.CompareToBool(value))
+									{
+										return false;
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+
+			return true;
+		}
+
+		private bool RenderFilter(int modelID, GameDataModelFilter filter)
 		{
 			FieldInfo f = _tables[modelID];
 
@@ -660,18 +738,21 @@ namespace Zedarus.ToolKit.Data.Game
 			object[] attrs = null;
 			foreach (FieldInfo field in fields)
 			{
-				attrs = field.GetCustomAttributes(typeof(DataField), true);
-				foreach (object attr in attrs)
+				if (IsFieldTypeSupportedForFilters(field.FieldType))
 				{
-					DataField fieldAttr = attr as DataField;
-					if (fieldAttr != null && fieldAttr.useForFiltering)
+					attrs = field.GetCustomAttributes(typeof(DataField), true);
+					foreach (object attr in attrs)
 					{
-						selectedFields.Add(field);
-						selectedFieldsNames.Add(fieldAttr.EditorLabel);
-
-						if (field.Name.Equals(filter.PropertyName))
+						DataField fieldAttr = attr as DataField;
+						if (fieldAttr != null && fieldAttr.useForFiltering)
 						{
-							selectionIndex = selectedFieldsNames.Count - 1;
+							selectedFields.Add(field);
+							selectedFieldsNames.Add(fieldAttr.EditorLabel);
+
+							if (field.Name.Equals(filter.PropertyName))
+							{
+								selectionIndex = selectedFieldsNames.Count - 1;
+							}
 						}
 					}
 				}
@@ -682,9 +763,16 @@ namespace Zedarus.ToolKit.Data.Game
 			selectionIndex = EditorGUILayout.Popup(selectionIndex, selectedFieldsNames.ToArray());
 			filter.FilterValue = EditorGUILayout.TextField(filter.FilterValue);
 
+			if (GUILayout.Button("-"))
+			{
+				return true;
+			}
+
 			EditorGUILayout.EndHorizontal();
 
 			filter.PropertyName = selectedFields[selectionIndex].Name;
+
+			return false;
 		}
 
 		public void RenderFilters(int modelID)
@@ -694,9 +782,12 @@ namespace Zedarus.ToolKit.Data.Game
 				EditorGUILayout.LabelField("Filters:");
 			}
 
-			foreach (GameDataModelFilter filter in _filters)
+			for (int i = _filters.Count - 1; i >= 0; i--)
 			{
-				RenderFilter(modelID, filter);
+				if (RenderFilter(modelID, _filters[i]))
+				{
+					_filters.RemoveAt(i);
+				}
 			}
 
 			if (_filters.Count > 0)
