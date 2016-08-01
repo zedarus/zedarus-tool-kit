@@ -50,6 +50,7 @@ namespace Zedarus.ToolKit.Data.Game
 		public bool autoRender = true;
 		public bool renderWhenIncluded = true;
 		public System.Type foreignKeyForTable = null;
+		public bool useForFiltering = true;
 
 		public DataField(string editorLabel)
 		{

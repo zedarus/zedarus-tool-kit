@@ -619,6 +619,92 @@ namespace Zedarus.ToolKit.Data.Game
 				list.RemoveAt(index);
 		}
 		#endregion
+
+		#region Filters
+		private List<GameDataModelFilter> _filters = new List<GameDataModelFilter>();
+
+		public void AddFilter()
+		{
+			_filters.Add(new GameDataModelFilter());
+		}
+
+		public void ClearFilters()
+		{
+			_filters.Clear();
+		}
+
+		private void RenderFilter(int modelID, GameDataModelFilter filter)
+		{
+			FieldInfo f = _tables[modelID];
+
+			System.Type type = null;
+
+			if (f.FieldType.IsArray)
+			{
+				type = f.FieldType.GetElementType();
+			}
+			else if (f.FieldType.IsGenericType)
+			{
+				type = f.FieldType.GetGenericArguments()[0];
+			}
+			else
+			{
+				type = f.FieldType;
+			}
+
+			List<FieldInfo> selectedFields = new List<FieldInfo>();
+			List<string> selectedFieldsNames = new List<string>();
+			int selectionIndex = 0;
+
+			FieldInfo[] fields = GameDataModel.GetFields(type);
+			object[] attrs = null;
+			foreach (FieldInfo field in fields)
+			{
+				attrs = field.GetCustomAttributes(typeof(DataField), true);
+				foreach (object attr in attrs)
+				{
+					DataField fieldAttr = attr as DataField;
+					if (fieldAttr != null && fieldAttr.useForFiltering)
+					{
+						selectedFields.Add(field);
+						selectedFieldsNames.Add(fieldAttr.EditorLabel);
+
+						if (field.Name.Equals(filter.PropertyName))
+						{
+							selectionIndex = selectedFieldsNames.Count - 1;
+						}
+					}
+				}
+			}
+
+			EditorGUILayout.BeginHorizontal();
+
+			selectionIndex = EditorGUILayout.Popup(selectionIndex, selectedFieldsNames.ToArray());
+			filter.FilterValue = EditorGUILayout.TextField(filter.FilterValue);
+
+			EditorGUILayout.EndHorizontal();
+
+			filter.PropertyName = selectedFields[selectionIndex].Name;
+		}
+
+		public void RenderFilters(int modelID)
+		{
+			if (_filters.Count > 0)
+			{
+				EditorGUILayout.LabelField("Filters:");
+			}
+
+			foreach (GameDataModelFilter filter in _filters)
+			{
+				RenderFilter(modelID, filter);
+			}
+
+			if (_filters.Count > 0)
+			{
+				EditorGUILayout.Space();
+			}
+		}
+		#endregion
 		#endif
 	}
 

@@ -772,11 +772,16 @@ namespace Zedarus.ToolKit.Data.Game
 		#region Helpers - Runtime
 		private FieldInfo[] GetFields(IGameDataModel target)
 		{
+			return GetFields(target.GetType());
+		}
+
+		public static FieldInfo[] GetFields(System.Type type)
+		{
 			List<FieldInfo> fields = new List<FieldInfo>();
 
-			fields.AddRange(target.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance));
+			fields.AddRange(type.GetFields(BindingFlags.NonPublic | BindingFlags.Instance));
 
-			System.Type baseType = target.GetType().BaseType;
+			System.Type baseType = type.BaseType;
 
 			while (baseType != null)
 			{
