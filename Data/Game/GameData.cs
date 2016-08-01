@@ -485,18 +485,31 @@ namespace Zedarus.ToolKit.Data.Game
 			return "NONE";
 		}
 
-		private List<string> GetGameModelListNamesForID(int id)
+		private Dictionary<int, string> GetGameModelListNamesForID(int id, bool useFilters)
 		{
 			IList list = GetListForTable(id);
 
 			if (list != null)
 			{
-				List<string> names = new List<string>();
+				Dictionary<int, string> names = new Dictionary<int, string>();
 
-				foreach (IGameDataModel modelData in list)
+				for (int i = 0; i < list.Count; i++)
 				{
+					IGameDataModel modelData = list[i] as IGameDataModel;
 					if (modelData != null)
-						names.Add(modelData.ListName);
+					{
+						if (useFilters)
+						{
+							if (DoesModelPassFilters(id, modelData))
+							{
+								names.Add(i, modelData.ListName);
+							}
+						}
+						else
+						{
+							names.Add(i, modelData.ListName);
+						}
+					}
 				}
 
 				return names;
@@ -565,22 +578,23 @@ namespace Zedarus.ToolKit.Data.Game
 
 		public bool IsModelDataAList(int modelID)
 		{
-			return GetGameModelListNamesForID(modelID) != null;
+			return GetGameModelListNamesForID(modelID, false) != null;
 		}
 
 		public int RenderModelsDataListView(int modelID)
 		{
 			int selectedModelDataIndex = -1;
-			List<string> modelsData = GetGameModelListNamesForID(modelID);
+			Dictionary<int, string> modelsData = GetGameModelListNamesForID(modelID, true);
+
 			if (modelsData != null)
 			{
-				for (int i = 0; i < modelsData.Count; i++)
+				foreach (KeyValuePair<int, string> m in modelsData)
 				{
 					EditorGUILayout.BeginHorizontal();
 
-					if (GUILayout.Button(modelsData[i], "box", GUILayout.ExpandWidth(true)))
+					if (GUILayout.Button(m.Value, "box", GUILayout.ExpandWidth(true)))
 					{
-						selectedModelDataIndex = i;
+						selectedModelDataIndex = m.Key;
 					}
 
 					EditorGUILayout.EndHorizontal();
@@ -617,6 +631,198 @@ namespace Zedarus.ToolKit.Data.Game
 		{
 			if (list != null && index >= 0 && index < list.Count)
 				list.RemoveAt(index);
+		}
+		#endregion
+
+		#region Filters
+		private Dictionary<int, List<GameDataModelFilter>> _filters = new Dictionary<int, List<GameDataModelFilter>>();
+
+		// TODO: remember filters for each model and switch between them
+		public void AddFilter(int modelID)
+		{
+			if (!_filters.ContainsKey(modelID))
+			{
+				_filters.Add(modelID, new List<GameDataModelFilter>());
+			}
+
+			_filters[modelID].Add(new GameDataModelFilter());
+		}
+
+		private bool IsFieldTypeSupportedForFilters(System.Type type)
+		{
+			return type == typeof(string) ||
+				type == typeof(int) ||
+				type == typeof(float) ||
+				type == typeof(bool);
+		}
+
+		private bool DoesModelPassFilters(int modelID, IGameDataModel modelData)
+		{
+			List<GameDataModelFilter> filters = null;
+
+			if (_filters.ContainsKey(modelID))
+			{
+				filters = _filters[modelID];
+			}
+			else
+			{
+				return true;
+			}
+
+			FieldInfo[] fields = GameDataModel.GetFields(modelData.GetType());
+			object[] attrs = null;
+			foreach (FieldInfo field in fields)
+			{
+				attrs = field.GetCustomAttributes(typeof(DataField), true);
+				foreach (object attr in attrs)
+				{
+					DataField fieldAttr = attr as DataField;
+					if (fieldAttr != null && fieldAttr.useForFiltering)
+					{
+						object value = field.GetValue(modelData);
+
+						foreach (GameDataModelFilter filter in filters)
+						{
+							if (filter.PropertyName != null && filter.PropertyName.Equals(field.Name))
+							{
+								if (field.FieldType == typeof(string))
+								{
+									if (!filter.CompareToString(value))
+									{
+										return false;
+									}
+								}
+								else if (field.FieldType == typeof(int))
+								{
+									if (!filter.CompareToInt(value))
+									{
+										return false;
+									}
+								}
+								else if (field.FieldType == typeof(float))
+								{
+									if (!filter.CompareToFloat(value))
+									{
+										return false;
+									}
+								}
+								else if (field.FieldType == typeof(bool))
+								{
+									if (!filter.CompareToBool(value))
+									{
+										return false;
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+
+			return true;
+		}
+
+		private bool RenderFilter(int modelID, GameDataModelFilter filter)
+		{
+			FieldInfo f = _tables[modelID];
+
+			System.Type type = null;
+
+			if (f.FieldType.IsArray)
+			{
+				type = f.FieldType.GetElementType();
+			}
+			else if (f.FieldType.IsGenericType)
+			{
+				type = f.FieldType.GetGenericArguments()[0];
+			}
+			else
+			{
+				type = f.FieldType;
+			}
+
+			List<FieldInfo> selectedFields = new List<FieldInfo>();
+			List<string> selectedFieldsNames = new List<string>();
+			int selectionIndex = 0;
+
+			FieldInfo[] fields = GameDataModel.GetFields(type);
+			object[] attrs = null;
+			foreach (FieldInfo field in fields)
+			{
+				if (IsFieldTypeSupportedForFilters(field.FieldType))
+				{
+					attrs = field.GetCustomAttributes(typeof(DataField), true);
+					foreach (object attr in attrs)
+					{
+						DataField fieldAttr = attr as DataField;
+						if (fieldAttr != null && fieldAttr.useForFiltering)
+						{
+							selectedFields.Add(field);
+							selectedFieldsNames.Add(fieldAttr.EditorLabel);
+
+							if (field.Name.Equals(filter.PropertyName))
+							{
+								selectionIndex = selectedFieldsNames.Count - 1;
+							}
+						}
+					}
+				}
+			}
+
+			EditorGUILayout.BeginHorizontal();
+
+			selectionIndex = EditorGUILayout.Popup(selectionIndex, selectedFieldsNames.ToArray());
+			filter.FilterValue = EditorGUILayout.TextField(filter.FilterValue);
+
+			if (GUILayout.Button("-"))
+			{
+				return true;
+			}
+
+			EditorGUILayout.EndHorizontal();
+
+			filter.PropertyName = selectedFields[selectionIndex].Name;
+
+			return false;
+		}
+
+		public void RenderFilters(int modelID)
+		{
+			bool hasFilters = false;
+			int removeFilter = -1;
+
+			if (_filters.ContainsKey(modelID))
+			{
+				hasFilters = _filters[modelID].Count > 0;
+
+				if (hasFilters)
+				{
+					EditorGUILayout.LabelField("Filters:");
+				}
+				
+				for (int i = 0; i < _filters[modelID].Count; i++)
+				{
+					if (RenderFilter(modelID, _filters[modelID][i]))
+					{
+						removeFilter = i;
+					}
+				}
+			}
+
+			if (removeFilter >= 0)
+			{
+				_filters[modelID].RemoveAt(removeFilter);
+			}
+
+			if (GUILayout.Button("Add filter"))
+			{
+				AddFilter(modelID);
+			}
+
+			if (hasFilters)
+			{
+				EditorGUILayout.Space();
+			}
 		}
 		#endregion
 		#endif

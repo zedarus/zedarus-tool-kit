@@ -203,6 +203,8 @@ namespace Zedarus.ToolKit.Data.Game
 					}
 				}
 
+				_data.RenderFilters(_currentModelID);
+
 				if (GUILayout.Button("New"))
 				{
 					GUI.FocusControl(null);
