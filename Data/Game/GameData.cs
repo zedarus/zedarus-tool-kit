@@ -500,7 +500,7 @@ namespace Zedarus.ToolKit.Data.Game
 					{
 						if (useFilters)
 						{
-							if (DoesModelPassFilters(modelData))
+							if (DoesModelPassFilters(id, modelData))
 							{
 								names.Add(i, modelData.ListName);
 							}
@@ -635,17 +635,17 @@ namespace Zedarus.ToolKit.Data.Game
 		#endregion
 
 		#region Filters
-		private List<GameDataModelFilter> _filters = new List<GameDataModelFilter>();
+		private Dictionary<int, List<GameDataModelFilter>> _filters = new Dictionary<int, List<GameDataModelFilter>>();
 
 		// TODO: remember filters for each model and switch between them
-		public void AddFilter()
+		public void AddFilter(int modelID)
 		{
-			_filters.Add(new GameDataModelFilter());
-		}
+			if (!_filters.ContainsKey(modelID))
+			{
+				_filters.Add(modelID, new List<GameDataModelFilter>());
+			}
 
-		public void ClearFilters()
-		{
-			_filters.Clear();
+			_filters[modelID].Add(new GameDataModelFilter());
 		}
 
 		private bool IsFieldTypeSupportedForFilters(System.Type type)
@@ -656,8 +656,19 @@ namespace Zedarus.ToolKit.Data.Game
 				type == typeof(bool);
 		}
 
-		private bool DoesModelPassFilters(IGameDataModel modelData)
+		private bool DoesModelPassFilters(int modelID, IGameDataModel modelData)
 		{
+			List<GameDataModelFilter> filters = null;
+
+			if (_filters.ContainsKey(modelID))
+			{
+				filters = _filters[modelID];
+			}
+			else
+			{
+				return true;
+			}
+
 			FieldInfo[] fields = GameDataModel.GetFields(modelData.GetType());
 			object[] attrs = null;
 			foreach (FieldInfo field in fields)
@@ -670,7 +681,7 @@ namespace Zedarus.ToolKit.Data.Game
 					{
 						object value = field.GetValue(modelData);
 
-						foreach (GameDataModelFilter filter in _filters)
+						foreach (GameDataModelFilter filter in filters)
 						{
 							if (filter.PropertyName != null && filter.PropertyName.Equals(field.Name))
 							{
@@ -777,20 +788,38 @@ namespace Zedarus.ToolKit.Data.Game
 
 		public void RenderFilters(int modelID)
 		{
-			if (_filters.Count > 0)
-			{
-				EditorGUILayout.LabelField("Filters:");
-			}
+			bool hasFilters = false;
+			int removeFilter = -1;
 
-			for (int i = _filters.Count - 1; i >= 0; i--)
+			if (_filters.ContainsKey(modelID))
 			{
-				if (RenderFilter(modelID, _filters[i]))
+				hasFilters = _filters[modelID].Count > 0;
+
+				if (hasFilters)
 				{
-					_filters.RemoveAt(i);
+					EditorGUILayout.LabelField("Filters:");
+				}
+				
+				for (int i = 0; i < _filters[modelID].Count; i++)
+				{
+					if (RenderFilter(modelID, _filters[modelID][i]))
+					{
+						removeFilter = i;
+					}
 				}
 			}
 
-			if (_filters.Count > 0)
+			if (removeFilter >= 0)
+			{
+				_filters[modelID].RemoveAt(removeFilter);
+			}
+
+			if (GUILayout.Button("Add filter"))
+			{
+				AddFilter(modelID);
+			}
+
+			if (hasFilters)
 			{
 				EditorGUILayout.Space();
 			}

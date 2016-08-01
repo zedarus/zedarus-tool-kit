@@ -203,14 +203,7 @@ namespace Zedarus.ToolKit.Data.Game
 					}
 				}
 
-//				EditorGUILayout.TextField("Filter", "");
-
 				_data.RenderFilters(_currentModelID);
-
-				if (GUILayout.Button("Add filter"))
-				{
-					_data.AddFilter();
-				}
 
 				if (GUILayout.Button("New"))
 				{
