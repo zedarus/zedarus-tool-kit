@@ -47,8 +47,9 @@ namespace Zedarus.ToolKit.Data.Game
 		#endregion
 
 		#region Filtering
-		public GameDataQuery<T> Where(string fieldName, object value)
+		public GameDataQuery<T> Where(string fieldName, object value, params object[] otherValues)
 		{
+			object fieldValue = null;
 			foreach (FieldInfo field in _fields)
 			{
 				// TODO: trim fielname here
@@ -58,9 +59,21 @@ namespace Zedarus.ToolKit.Data.Game
 
 					foreach (T result in _results)
 					{
-						if (field.GetValue(result).Equals(value))
+						fieldValue = field.GetValue(result);
+						if (fieldValue.Equals(value))
 						{
 							filteredResults.Add(result);
+						}
+
+						if (otherValues != null && otherValues.Length > 0)
+						{
+							foreach (object v in otherValues)
+							{
+								if (fieldValue.Equals(otherValues))
+								{
+									filteredResults.Add(result);
+								}
+							}
 						}
 					}
 

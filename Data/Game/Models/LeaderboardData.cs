@@ -25,6 +25,15 @@ namespace Zedarus.ToolKit.Data.Game
 		private string _googleID = "";
 		#endregion
 
+		public struct Fields
+		{
+			public const string ID = "_id";
+			public const string Name = "_name";
+			public const string Default = "_default";
+			public const string AppleID = "_appleID";
+			public const string GoogleID = "_googleID";
+		}
+
 		#region Initalization
 		public LeaderboardData() : base() { }
 		public LeaderboardData(int id) : base(id) { }
