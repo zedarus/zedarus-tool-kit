@@ -157,6 +157,36 @@ namespace Zedarus.ToolKit.Data.Game
 		}
 		#endregion
 
+		#region Queries
+		public GameDataQuery<T> Get<T>() where T : class, IGameDataModel 
+		{
+			FieldInfo[] fields = GetFields(this);
+			List<T> values = new List<T>();
+
+			foreach (FieldInfo field in fields)
+			{
+				DataTable table = GetTableAttributeForField(field);
+				if (table != null && table.Type == typeof(T))
+				{
+					object value = field.GetValue(this);
+
+					if (value.GetType().IsGenericType)
+					{
+						values.AddRange(value as List<T>);
+					}
+					else
+					{
+						values.Add(value as T);
+					}
+				}
+			}
+
+			GameDataQuery<T> query = new GameDataQuery<T>(values.ToArray());
+			values.Clear();
+			return query;
+		}
+		#endregion
+
 		#region Getters
 		public APISettingsData APISettings
 		{
