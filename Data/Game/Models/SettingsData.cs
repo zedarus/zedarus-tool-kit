@@ -92,6 +92,11 @@ namespace Zedarus.ToolKit.Data.Game
 			get { return _version; }
 		}
 
+		public string FullVersion
+		{
+			get { return string.Format("v{0} ({1:D})", Version, Build); }
+		}
+
 		public int Build
 		{
 			get { return _build; }
