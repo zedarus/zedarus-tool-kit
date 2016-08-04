@@ -44,9 +44,12 @@ namespace Zedarus.ToolKit
 		{
 			initializing = true;
 
-			GameObject tracker = new GameObject();
-			_appStateTracker = tracker.AddComponent<AppStateTracker>();
-			_appStateTracker.Init(OnAppBecomesActive, OnAppGoesToBackground);
+			if (Application.isPlaying)
+			{
+				GameObject tracker = new GameObject();
+				_appStateTracker = tracker.AddComponent<AppStateTracker>();
+				_appStateTracker.Init(OnAppBecomesActive, OnAppGoesToBackground);
+			}
 
 			InitCrashReporting();
 			InitEvents();
@@ -353,7 +356,11 @@ namespace Zedarus.ToolKit
 			_appBecomesActiveCallback = appBecomesActiveCallback;
 			_appGoesToBackgroundCallback = appGoesToBackgroundCallback;
 			gameObject.name = "App State Tracker";
-			DontDestroyOnLoad(gameObject);
+
+			if (Application.isPlaying)
+			{
+				DontDestroyOnLoad(gameObject);
+			}
 		}
 
 		private void OnApplicationPause(bool pause)
