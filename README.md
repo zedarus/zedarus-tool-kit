@@ -213,3 +213,47 @@ Troubleshooting:
 - `OnMoreGamesPress()` - either opens URL or display interstitial ad with custom placement (all specified in settings in game data)
 - `OnFacebookButtonPress()` - opens URL that was specified in settings in game data
 - `OpenRateAppPage()` - open rate URL from game data Rate Popup settings and also logs opening in analytics API
+
+### Extentions
+
+- Override `InitExtentions()` method in your `AppController`
+
+#### One Tap Games
+
+##### Second Chance Popup
+
+- Add `AddExtention(new SecondChancePopup(Data.Game, API, "<video ad>"));` in your `InitExtentions()` override in `AppController`
+- Add this to your `GameData` class and set setting you like in game data editor in Unity
+
+  ```c#
+  [SerializeField]
+  [DataTable(15, "Second Chance Popup Settings", typeof(SecondChancePopupData))]
+  private SecondChancePopupData _seconChancePopupSettings;
+  ```
+
+- Subscribe (and also remember to unsubscribe!) to second chance popup events:
+
+  ```c#
+  SecondChancePopup secondChancePopup = AppController.Instance.GetExtention<SecondChancePopup>();
+  if (secondChancePopup != null)
+  {
+  	secondChancePopup.PayForSecondChance += OnPayForSecondChance;
+  	secondChancePopup.UseSecondChance += OnUseSecondChance;
+  	secondChancePopup.DeclineSecondChance += OnDeclineSecondChance;
+  }
+  ```
+
+- Call `AppController.Instance.GetExtention<SecondChancePopup>().RegisterSessionStart()` and `AppController.Instance.GetExtention<SecondChancePopup>().RegisterSessionEnd()` when game session starts and end. *Important* to note, that both should only be called when actual session starts or ends, not when second chance was used. So `RegisterSessionStart()` should not be called when player's character was resurrected for example, and  `RegisterSessionEnd()` should not be called exactly on player's death, because he might use second chance. Instead, you need first to check if player used second chance, and only then call this method
+- Call this before you enter game over state:
+
+  ```c#
+  AppController.Instance.GetExtention<SecondChancePopup>().DisplayPopup(
+  UIManager.Instance, IDs.UI.Popups.GenericPopup, "Second chance message", 
+  <player's score>, <player's wallet balance>,
+  "Free", "{0:n0} coins", "No"
+  )
+  ```
+
+  This returns `true` if second chance popup is pesented (and so you need to wait for player's choice before finally entering game over state), and `false` if not and you can safely enter final game over state in that case
+
+

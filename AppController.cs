@@ -13,6 +13,7 @@ using Zedarus.ToolKit.Events;
 using Zedarus.ToolKit.Audio;
 using Zedarus.ToolKit.Localisation;
 using Zedarus.ToolKit.Helpers;
+using Zedarus.ToolKit.Extentions;
 
 namespace Zedarus.ToolKit
 {
@@ -29,6 +30,7 @@ namespace Zedarus.ToolKit
 		private bool _postInit = false;
 		private AppStateTracker _appStateTracker;
 		private AppHelpers _helpers = null;
+		private List<Extention> _extentions = new List<Extention>();
 		#endregion
 
 		#region Unity Methods
@@ -44,9 +46,12 @@ namespace Zedarus.ToolKit
 		{
 			initializing = true;
 
-			GameObject tracker = new GameObject();
-			_appStateTracker = tracker.AddComponent<AppStateTracker>();
-			_appStateTracker.Init(OnAppBecomesActive, OnAppGoesToBackground);
+			if (Application.isPlaying)
+			{
+				GameObject tracker = new GameObject();
+				_appStateTracker = tracker.AddComponent<AppStateTracker>();
+				_appStateTracker.Init(OnAppBecomesActive, OnAppGoesToBackground);
+			}
 
 			InitCrashReporting();
 			InitEvents();
@@ -93,6 +98,7 @@ namespace Zedarus.ToolKit
 			Localisation.Init();
 
 			InitLocalNotifications();
+			InitExtentions();
 		}
 
 		protected virtual void InitCrashReporting()
@@ -139,6 +145,11 @@ namespace Zedarus.ToolKit
 			API.Promo.ProcessRemoteUnlockFeature += OnProcessRemoteUnlockFeature;
 			API.Promo.ProcessRemoteUnlockResource += OnProcessRemoteUnlockResource;
 			API.Promo.ProcessRemoteUnlockParams += OnProcessRemoteUnlockParams;
+		}
+
+		protected virtual void InitExtentions()
+		{
+			
 		}
 
 		protected virtual bool DisplaySyncConfirmUI(System.Action syncConfirmedHandler, System.Action syncDeniedHandler)
@@ -341,6 +352,31 @@ namespace Zedarus.ToolKit
 			}
 		}
 		#endregion
+
+		#region Extentions
+		protected void AddExtention(Extention extention)
+		{
+			if (!_extentions.Contains(extention))
+			{
+				_extentions.Add(extention);
+			}
+		}
+
+		public T GetExtention<T>() where T : Extention
+		{
+			// TODO: cache
+
+			foreach (Extention extention in _extentions)
+			{
+				if (extention.GetType().Equals(typeof(T)))
+				{
+					return extention as T;
+				}
+			}
+
+			return null;
+		}
+		#endregion
 	}
 
 	public class AppStateTracker : MonoBehaviour
@@ -353,7 +389,11 @@ namespace Zedarus.ToolKit
 			_appBecomesActiveCallback = appBecomesActiveCallback;
 			_appGoesToBackgroundCallback = appGoesToBackgroundCallback;
 			gameObject.name = "App State Tracker";
-			DontDestroyOnLoad(gameObject);
+
+			if (Application.isPlaying)
+			{
+				DontDestroyOnLoad(gameObject);
+			}
 		}
 
 		private void OnApplicationPause(bool pause)
