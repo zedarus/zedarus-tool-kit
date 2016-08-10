@@ -5,6 +5,7 @@ using Zedarus.ToolKit.Data.Game;
 using Zedarus.ToolKit.Data.Player;
 using Zedarus.ToolKit.UI;
 using Zedarus.ToolKit.API;
+using Zedarus.ToolKit.Localisation;
 
 namespace Zedarus.ToolKit.Extentions.OneTapGames.SecondChancePopup
 {
@@ -45,8 +46,9 @@ namespace Zedarus.ToolKit.Extentions.OneTapGames.SecondChancePopup
 			_sessions++;
 		}
 
-		public bool DisplayPopup(UIManager uiManager, string genericPopupID, string popupMessage, int score, int coinsBalance, 
-			string freeChanceButtonLabel, string paidChanceButtonLabel, string cancelButtonLabel)
+		public bool DisplayPopup(UIManager uiManager, string genericPopupID, string popupHeader, string popupMessage, int score, int coinsBalance, 
+			string freeChanceButtonLabel, string paidChanceButtonLabel, string cancelButtonLabel, 
+			int freeChanceButtonColorID = 0, int paidChanceButtonColorID = 0, int cancelButtonColorID = 0)
 		{
 
 			if (CanUseSecondChance(score))
@@ -54,22 +56,22 @@ namespace Zedarus.ToolKit.Extentions.OneTapGames.SecondChancePopup
 				List<Zedarus.ToolKit.UI.UIGenericPopupButtonData> buttons = new List<Zedarus.ToolKit.UI.UIGenericPopupButtonData>();
 
 				buttons.Add(new Zedarus.ToolKit.UI.UIGenericPopupButtonData(
-						freeChanceButtonLabel, OnFreeSecondChanceConfirmed
+					freeChanceButtonLabel, OnFreeSecondChanceConfirmed, freeChanceButtonColorID
 					));
 
 				int price = _data.Price;
 				if (coinsBalance >= price)
 				{
 					string label = string.Format(paidChanceButtonLabel, price);
-					buttons.Add(new Zedarus.ToolKit.UI.UIGenericPopupButtonData(label, OnPaidSecondChanceConfirmed));
+					buttons.Add(new Zedarus.ToolKit.UI.UIGenericPopupButtonData(label, OnPaidSecondChanceConfirmed, paidChanceButtonColorID));
 				}
 
 				buttons.Add(new Zedarus.ToolKit.UI.UIGenericPopupButtonData(
-						cancelButtonLabel, OnSecondChanceDenied
+					cancelButtonLabel, OnSecondChanceDenied, cancelButtonColorID
 					));
 
 				uiManager.OpenPopup(genericPopupID, new Zedarus.ToolKit.UI.UIGenericPopupData(
-						popupMessage, null, buttons.ToArray()
+					popupHeader, popupMessage, buttons.ToArray()
 					));
 
 				return true;
