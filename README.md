@@ -15,7 +15,7 @@ Instead, just create a new class in your local project, extend the required clas
 - Make sure you take **age rating** into account when setting up ads in all networks + mediation:
   - **Chartboost**: go to publishing campaigns, open Advanced Targeting and check Block 17+ http://d.pr/i/1cvAb. Remember to do this for all campaigns
   - **AdMob**: unfortunatelly, AdMob does not have an age restriction setting, but you can filter ads categories using this guide: https://support.google.com/admob/answer/3150235?hl=en
-  - **AppLovin**: go to managing apps, select your app and then check or uncheck Children's App setting
+  - **AppLovin**: go to managing apps, select your app and then check or uncheck Children's App setting, then check settings under Ad Filtering
   - **Unity Ads**: in Unity Editor, go to Services, Age Designation and select appropriate option. Then, go to app setting in Unity Ads dashboar, select Ads Filtering and select option under Ages: http://d.pr/i/171V8
   - **HeyZap**: select your app on dashboard, go to Publisher Setting and select appropriate option under Family Friendly Filter
 - Make sure video interstitials are skippable:
