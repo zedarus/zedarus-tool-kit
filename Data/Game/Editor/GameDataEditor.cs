@@ -29,6 +29,7 @@ namespace Zedarus.ToolKit.Data.Game
 		private GameData _data = null;
 		private IGameDataModel _model = null;
 
+		private Vector2 _globalScrollPos = Vector2.zero;
 		private Vector2 _modelsViewScrollPos = Vector2.zero;
 		private Vector2 _modelsListViewScrollPos = Vector2.zero;
 		private Vector2 _editViewScrollPos = Vector2.zero;
@@ -85,11 +86,15 @@ namespace Zedarus.ToolKit.Data.Game
 					_data.ResetOpenModelRequest();
 				}
 
+				_globalScrollPos = EditorGUILayout.BeginScrollView(_globalScrollPos, "box", GUILayout.ExpandHeight(true));
+
 				EditorGUILayout.BeginHorizontal(GUILayout.ExpandWidth(true));
 				RenderModelsView();
 				RenderModelsListView();
 				RenderEditArea();
 				EditorGUILayout.EndHorizontal();
+
+				EditorGUILayout.EndScrollView();
 			}
 			else
 			{
