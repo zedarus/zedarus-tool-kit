@@ -256,4 +256,33 @@ Troubleshooting:
 
   This returns `true` if second chance popup is pesented (and so you need to wait for player's choice before finally entering game over state), and `false` if not and you can safely enter final game over state in that case
 
+##### Double Coins Popup
 
+- Add `AddExtention(new Zedarus.ToolKit.Extentions.OneTapGames.DoubleCoinsPopup.DoubleCoinsPopup(Data.Game, API, "<double_coins_video_ad_id>"));` in your `InitExtentions()` override in `AppController`
+- Add this to your `GameData` class and set setting you like in game data editor in Unity
+
+  ```c#
+  [SerializeField]
+  [DataTable(5, "Double Coins Popup Settings", typeof(DoubleCoinsPopupData))]
+  private DoubleCoinsPopupData _doubleCoinsPopupData;
+  ```
+
+- Subscribe (and also remember to unsubscribe!) to popup events:
+
+  ```c#
+  DoubleCoinsPopup doubleCoinsPopup = AppController.Instance.GetExtention<DoubleCoinsPopup>();
+  if (doubleCoinsPopup != null)
+  {
+  	doubleCoinsPopup.DoubleCoinsConfirm += OnDoubleEarnedCoinsConfirm;
+  	doubleCoinsPopup.DoubleCoinsCancel += OnDoubleEarnedCoinsCancel;
+  }
+  ```
+
+- Call `AppController.Instance.GetExtention<DoubleCoinsPopup>().RegisterSessionStart()` and `AppController.Instance.GetExtention<DoubleCoinsPopup>().RegisterSessionEnd()` when game session starts and end. *Important* to note, that both should only be called when actual session starts or ends, not when second chance was used, etc. So `RegisterSessionStart()` should *not* be called when player's character was resurrected for example, and  `RegisterSessionEnd()` should not be called exactly on player's death, because he might use second chance. Instead, you need first to check if player used second chance, and only then call this method
+- Call this before you enter game over state:
+
+  ```c#
+  AppController.Instance.GetExtention<DoubleCoinsPopup>().DisplayPopup();
+  ```
+
+  This returns `true` if popup is pesented (and so you need to wait for player's choice before finally entering game over state), and `false` if not and you can safely enter final game over state in that case
