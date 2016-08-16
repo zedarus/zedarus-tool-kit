@@ -14,6 +14,7 @@ namespace Zedarus.ToolKit.Localisation
 		[SerializeField] private string _page;
 		[SerializeField] private string _phrase;
 		[SerializeField] private bool _localiseAtStart = false;
+		[SerializeField] private bool _localiseOnEnable = false;
 
 		private string _localisedString = null;
 		private object[] _cachedArgs = null;
@@ -26,6 +27,17 @@ namespace Zedarus.ToolKit.Localisation
 				_textLabel = GetComponent<Text>();
 
 			if (_localiseAtStart)
+			{
+				StartCoroutine(LocaliseWhenReady());
+			}
+		}
+
+		private void OnEnable()
+		{
+			if (_textLabel == null)
+				_textLabel = GetComponent<Text>();
+
+			if (_localiseOnEnable)
 			{
 				StartCoroutine(LocaliseWhenReady());
 			}
@@ -65,10 +77,11 @@ namespace Zedarus.ToolKit.Localisation
 				if (LocManagerRef != null && LocManagerRef.Ready)
 				{
 					Localise();
+					break;
 				}
 				else
 				{
-					yield return new WaitForSecondsRealtime(0.1f);
+					yield return new WaitForSecondsRealtime(0.2f);
 				}
 			}
 		}

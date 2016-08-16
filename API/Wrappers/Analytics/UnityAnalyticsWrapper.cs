@@ -47,7 +47,14 @@ namespace Zedarus.ToolKit.API
 		public void LogEvent(string eventName, Dictionary<string,object> parameters)
 		{
 			#if API_ANALYTICS_UNITY
-			AnalyticsResult result = Analytics.CustomEvent(eventName, parameters);
+			if (parameters != null)
+			{
+				AnalyticsResult result = Analytics.CustomEvent(eventName, parameters);
+			}
+			else
+			{
+				LogEvent(eventName);
+			}
 			#endif
 
 			/*if (GlobalSettings.Instance.DevelopmentBuild)

@@ -15,6 +15,7 @@ namespace Zedarus.ToolKit.Localisation
 		private SerializedProperty _page;
 		private SerializedProperty _phrase;
 		private SerializedProperty _localiseAtStart;
+		private SerializedProperty _localiseOnEnable;
 
 		private void OnEnable()
 		{
@@ -23,6 +24,7 @@ namespace Zedarus.ToolKit.Localisation
 			_page = _target.FindProperty("_page");
 			_phrase = _target.FindProperty("_phrase");
 			_localiseAtStart = _target.FindProperty("_localiseAtStart");
+			_localiseOnEnable = _target.FindProperty("_localiseOnEnable");
 		}
 
 		public override void OnInspectorGUI()
@@ -78,6 +80,7 @@ namespace Zedarus.ToolKit.Localisation
 
 			// Params:
 			EditorGUILayout.PropertyField(_localiseAtStart);
+			EditorGUILayout.PropertyField(_localiseOnEnable);
 
 			if (error.Length > 0)
 			{
