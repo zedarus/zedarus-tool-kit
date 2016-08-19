@@ -103,6 +103,21 @@ namespace Zedarus.ToolKit.Data.Game
 			}
 		}
 
+		public T Random
+		{
+			get
+			{
+				if (_results != null && _results.Length > 0)
+				{
+					return _results[UnityEngine.Random.Range(0, _results.Length)];
+				}
+				else
+				{
+					return null; 
+				}
+			}
+		}
+
 		public T[] All
 		{
 			get { return _results; }
