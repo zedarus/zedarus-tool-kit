@@ -132,6 +132,7 @@ namespace Zedarus.ToolKit.Extentions.OneTapGames.FreeRemoveAds
 		private void OnRewardVideoReward(int productID)
 		{
 			_playerData.RegisterFreeAdsRemoval();
+			Zedarus.ToolKit.Events.EventManager.SendEvent(Zedarus.ToolKit.Settings.IDs.Events.AdsDisabled);
 
 			if (_ui != null)
 			{
