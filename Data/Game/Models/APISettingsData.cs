@@ -15,6 +15,10 @@ namespace Zedarus.ToolKit.Data.Game
 		[DataField("Interstitials Delay")]
 		[DataValidateMin(0)]
 		private int _intertitialsDelay = 3;
+		[SerializeField]
+		[DataField("Free Ads Removal Duration (hours)")]
+		[DataValidateMin(1)]
+		private int _freeAdsRemovalDuration = 24;
 
 		[DataGroup("Remove Ads IAP")]
 		[SerializeField]
@@ -86,6 +90,11 @@ namespace Zedarus.ToolKit.Data.Game
 		public bool LocalNotificationsEnabled
 		{
 			get { return _localNotificationsEnabled; }
+		}
+
+		public int FreeAdsRemovalDurationHours
+		{
+			get { return _freeAdsRemovalDuration; }
 		}
 		#endregion
 

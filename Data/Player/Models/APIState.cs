@@ -21,6 +21,8 @@ namespace Zedarus.ToolKit.Data.Player
 		private bool _firstSync;
 		[SerializeField]
 		private bool _askedSyncPermission;
+		[OptionalField]
+		private DateTime _freeAdsRemovalTimestampUTC;
 		#endregion
 
 		#region Init
@@ -38,6 +40,7 @@ namespace Zedarus.ToolKit.Data.Player
 			_adsEnabled = true;
 			_intertitialCounter = 0;
 			_promoDisplayDate = new DateTime(1986, 7, 21);
+			_freeAdsRemovalTimestampUTC = new DateTime(1986, 7, 21);
 		}
 		#endregion
 
@@ -60,6 +63,11 @@ namespace Zedarus.ToolKit.Data.Player
 		public void RegisterPromoDisplay()
 		{
 			_promoDisplayDate = DateTime.UtcNow;
+		}
+
+		public void RegisterFreeAdsRemoval()
+		{
+			_freeAdsRemovalTimestampUTC = DateTime.UtcNow;
 		}
 
 		public void ChangeSyncState(bool enabled)
@@ -92,6 +100,11 @@ namespace Zedarus.ToolKit.Data.Player
 		public DateTime LastPromoDisplayDate
 		{
 			get { return _promoDisplayDate; }
+		}
+
+		public DateTime LastFreeAdsRemovalDate
+		{
+			get { return _freeAdsRemovalTimestampUTC; }
 		}
 
 		public bool SyncEnabled

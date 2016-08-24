@@ -266,7 +266,9 @@ namespace Zedarus.ToolKit.API
 			get
 			{
 				if (Enabled)
+				{
 					return Manager.State.IntertitialCounter >= Manager.Settings.IntertitialsDelay;
+				}
 				else
 					return false;
 			}
@@ -382,7 +384,31 @@ namespace Zedarus.ToolKit.API
 		{
 			get 
 			{
-				return Manager.State.AdsEnabled && Manager.Settings.AdsEnabled;
+				return Manager.State.AdsEnabled && Manager.Settings.AdsEnabled && !FreeAdsRemovalEnabled;
+			}
+		}
+
+		public bool FreeAdsRemovalEnabled
+		{
+			get
+			{
+				return FreeAdsRemovalMinutes <= Manager.Settings.FreeAdsRemovalDurationHours * 60;
+			}
+		}
+
+		public int FreeAdsRemovalMinutes
+		{
+			get 
+			{ 
+				return Convert.ToInt32((DateTime.UtcNow - Manager.State.LastFreeAdsRemovalDate).TotalMinutes);; 
+			}
+		}
+
+		public int FreeAdsRemovalMinutesRemaining
+		{
+			get 
+			{ 
+				return Manager.Settings.FreeAdsRemovalDurationHours * 60 - FreeAdsRemovalMinutes; 
 			}
 		}
 		#endregion

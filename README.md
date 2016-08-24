@@ -286,3 +286,9 @@ Troubleshooting:
   ```
 
   This returns `true` if popup is pesented (and so you need to wait for player's choice before finally entering game over state), and `false` if not and you can safely enter final game over state in that case
+
+##### Free Remove Ads
+
+- Add `AddExtention(new Zedarus.ToolKit.Extentions.OneTapGames.FreeRemoveAds.FreeRemoveAds(Data.Game, Data.Player, API, "<double_coins_video_ad_id>"));` in your `InitExtentions()` override in `AppController`
+- Set correct settings in API settings section in Game Data DB
+- Call `DisplayPopup()` method on `FreeRemoveAds` instance and pass all required parameters
