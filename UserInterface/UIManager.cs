@@ -42,6 +42,11 @@ namespace Zedarus.ToolKit.UI
 		{
 			_instance = this;	// TODO: remove this later
 			_timeSinceStart = 0f;
+
+			if (_autoInit && _autoInitDelay <= 0)
+			{
+				Init();
+			}
 		}
 
 		private void Update()
