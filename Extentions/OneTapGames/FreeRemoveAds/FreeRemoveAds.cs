@@ -22,6 +22,7 @@ namespace Zedarus.ToolKit.Extentions.OneTapGames.FreeRemoveAds
 		private string _failureButton = null;
 		private UIManager _ui;
 		private string _genericPopupID;
+		private bool _rewardReceived = false;
 		#endregion
 
 		#region Events
@@ -107,6 +108,7 @@ namespace Zedarus.ToolKit.Extentions.OneTapGames.FreeRemoveAds
 		private void OnFreeRemoveClick()
 		{
 			LogAnalytics("free");
+			_rewardReceived = false;
 			_api.Ads.ShowRewardedVideo(_videoAdID, OnRewardVideoClose, OnRewardVideoReward, 0);
 		}
 
@@ -126,11 +128,12 @@ namespace Zedarus.ToolKit.Extentions.OneTapGames.FreeRemoveAds
 
 		private void OnRewardVideoClose()
 		{
-			Zedarus.ToolKit.DelayedCall.Create(WaitAndCheckForReward, 1f);
+			Zedarus.ToolKit.DelayedCall.Create(WaitAndCheckForReward, 3f);
 		}
 
 		private void OnRewardVideoReward(int productID)
 		{
+			_rewardReceived = true;
 			_playerData.RegisterFreeAdsRemoval();
 			Zedarus.ToolKit.Events.EventManager.SendEvent(Zedarus.ToolKit.Settings.IDs.Events.AdsDisabled);
 
@@ -144,7 +147,7 @@ namespace Zedarus.ToolKit.Extentions.OneTapGames.FreeRemoveAds
 
 		private void WaitAndCheckForReward()
 		{
-			if (_ui != null)
+			if (_ui != null && !_rewardReceived)
 			{
 				_ui.OpenPopup(_genericPopupID, new Zedarus.ToolKit.UI.UIGenericPopupData(
 					null, _failureMessage, new Zedarus.ToolKit.UI.UIGenericPopupButtonData(_failureButton)
