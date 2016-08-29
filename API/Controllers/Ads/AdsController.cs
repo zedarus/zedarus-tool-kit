@@ -351,6 +351,11 @@ namespace Zedarus.ToolKit.API
 			if (GrantReward != null)
 				GrantReward();
 
+			if (Manager.Settings.ResetInterstitialsOnReward)
+			{
+				Manager.State.ResetInterstitialCounter();
+			}
+
 			if (_rewardCallback != null)
 			{
 				_rewardCallback(_rewardProductID);

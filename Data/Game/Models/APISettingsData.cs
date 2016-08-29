@@ -19,6 +19,9 @@ namespace Zedarus.ToolKit.Data.Game
 		[DataField("Free Ads Removal Duration (hours)")]
 		[DataValidateMin(1)]
 		private int _freeAdsRemovalDuration = 24;
+		[SerializeField]
+		[DataField("Reset interstitials on reward video")]
+		private bool _resetInterstitialsOnReward = true;
 
 		[DataGroup("Remove Ads IAP")]
 		[SerializeField]
@@ -95,6 +98,11 @@ namespace Zedarus.ToolKit.Data.Game
 		public int FreeAdsRemovalDurationHours
 		{
 			get { return _freeAdsRemovalDuration; }
+		}
+
+		public bool ResetInterstitialsOnReward
+		{
+			get { return _resetInterstitialsOnReward; }
 		}
 		#endregion
 
