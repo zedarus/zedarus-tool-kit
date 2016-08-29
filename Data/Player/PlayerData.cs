@@ -52,7 +52,20 @@ namespace Zedarus.ToolKit.Data.Player
 		#endregion
 
 		#region Merging
-		public void MergeData(PlayerData dataToMerge)
+		public bool ShouldMergeData(PlayerData dataToMerge)
+		{
+			if (dataToMerge != null)
+			{
+				if (DateTime.Compare(dataToMerge.Timestamp, Timestamp) > 0)
+				{
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		public bool MergeData(PlayerData dataToMerge)
 		{
 			if (dataToMerge != null)
 			{
@@ -65,8 +78,12 @@ namespace Zedarus.ToolKit.Data.Player
 							_models[model.Key].Merge(model.Value);
 						}
 					}
+
+					return true;
 				}
 			}
+
+			return false;
 		}
 		#endregion
 

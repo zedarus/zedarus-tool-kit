@@ -81,11 +81,6 @@ namespace Zedarus.ToolKit.API
 				return false;
 			}
 
-//			PlayerData remoteData = GetPlayerData();
-//			if (remoteData != null)
-//				data.Merge(remoteData);
-			
-//			byte[] bytes = UnitySerializer.Serialize(data);
 			bool result = P31CloudFile.writeAllBytes(Filename, data);
 			
 			ZedLogger.Log("File written in the cloud: " + result, LoggerContext.iCloud);
@@ -102,8 +97,6 @@ namespace Zedarus.ToolKit.API
 			if (P31CloudFile.exists(Filename))
 			{
 				return P31CloudFile.readAllBytes(Filename);
-//				PlayerData data = UnitySerializer.Deserialize<PlayerData>(bytes);
-//				return bytes;
 			}
 			
 			ZedLogger.Log("Could not restore player data from cloud", LoggerContext.iCloud);

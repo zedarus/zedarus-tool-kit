@@ -140,7 +140,6 @@ namespace Zedarus.ToolKit
 			API.RemoteData.DataReceived += OnRemoteDataReceived;
 			API.Store.ProductPurchaseFinished += OnProductPurchaseFinished;
 			API.Sync.SyncFinished += OnSyncFinished;
-			API.Sync.RequestSyncEnable += OnRequestSyncEnable;
 			API.Promo.ProcessRewardFromLocalNotification += OnProcessRewardFromLocalNotification;
 			API.Promo.ProcessRemoteUnlockFeature += OnProcessRemoteUnlockFeature;
 			API.Promo.ProcessRemoteUnlockResource += OnProcessRemoteUnlockResource;
@@ -215,9 +214,41 @@ namespace Zedarus.ToolKit
 
 		private void OnSyncFinished(byte[] data)
 		{
-			Data.Player.MergeData(PlayerData.Deserialize<PlayerDataClass>(data));
-			Data.Save(false);
-			EventManager.SendEvent(IDs.Events.CloudSyncFinished);
+			bool sync = false;
+			PlayerDataClass removeData = PlayerData.Deserialize<PlayerDataClass>(data);
+
+			if (Data.Player.APIState.FirstSync)
+			{
+				bool shouldMerge = Data.Player.ShouldMergeData(removeData);
+
+				if (shouldMerge)
+				{
+					Data.Player.APIState.MarkAsFirstSync();
+
+					if (!Data.Player.APIState.AskedSyncPermission)
+					{
+						Data.Player.APIState.AskForSyncPermission();
+						OnRequestSyncEnable();
+					}
+					else
+					{
+						sync = Data.Player.APIState.SyncEnabled;
+					}
+				}
+			}
+			else
+			{
+				sync = Data.Player.APIState.SyncEnabled;
+			}
+
+			if (sync)
+			{
+				if (Data.Player.MergeData(removeData))
+				{
+					Data.Save(false);
+					EventManager.SendEvent(IDs.Events.CloudSyncFinished);
+				}
+			}
 		}
 
 		private void OnRequestSyncEnable()

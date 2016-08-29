@@ -9,7 +9,6 @@ namespace Zedarus.ToolKit.API
 	{
 		#region Events
 		public event Action<byte[]> SyncFinished;
-		public event Action RequestSyncEnable;
 		#endregion
 		
 		#region Initialization
@@ -57,7 +56,7 @@ namespace Zedarus.ToolKit.API
 				return false;
 		}
 		
-		public byte[] GetPlayerData() 
+		private byte[] GetPlayerData() 
 		{
 			if (Wrapper != null)
 				return Wrapper.GetData();
@@ -113,27 +112,8 @@ namespace Zedarus.ToolKit.API
 		#region Event Handlers
 		private void OnSyncFinished(byte[] data)
 		{
-			if (Manager.State.FirstSync)
-			{
-				Manager.State.MarkAsFirstSync();
-
-				if (!Manager.State.AskedSyncPermission)
-				{
-					Manager.State.AskForSyncPermission();
-					if (RequestSyncEnable != null)
-						RequestSyncEnable();
-				}
-				else
-				{
-					if (Manager.State.SyncEnabled && SyncFinished != null)
-						SyncFinished(data);
-				}
-			}
-			else
-			{
-				if (Manager.State.SyncEnabled && SyncFinished != null)
-					SyncFinished(data);
-			}
+			if (SyncFinished != null)
+				SyncFinished(data);
 		}
 		#endregion
 	}
