@@ -546,7 +546,7 @@ namespace Zedarus.ToolKit.Data.Game
 			}
 			else
 			{
-				float minX = float.MaxValue;
+				/*float minX = float.MaxValue;
 				float maxX = float.MinValue;
 				float minY = float.MaxValue;
 				float maxY = float.MinValue;
@@ -571,16 +571,27 @@ namespace Zedarus.ToolKit.Data.Game
 						minY = key.value;
 					}
 				}
-				bounds = Rect.MinMaxRect(minX, minY, maxX, maxY);
+				bounds = Rect.MinMaxRect(minX, minY, maxX, maxY);*/
 			}
 
-			curve = EditorGUILayout.CurveField(
-				attribute.EditorLabel, 
-				curve, 
-				color, 
-				bounds,
-				layoutOptions.ToArray()
-			);
+			if (curveAttribute != null)
+			{
+				curve = EditorGUILayout.CurveField(
+					attribute.EditorLabel, 
+					curve, 
+					color, 
+					bounds,
+					layoutOptions.ToArray()
+				);
+			}
+			else
+			{
+				curve = EditorGUILayout.CurveField(
+					attribute.EditorLabel, 
+					curve,
+					layoutOptions.ToArray()
+				);
+			}
 
 			Keyframe minValueFrame = new Keyframe(0f, float.MaxValue);
 			Keyframe maxValueFrame = new Keyframe(0f, float.MinValue);
