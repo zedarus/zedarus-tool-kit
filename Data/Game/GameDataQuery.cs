@@ -69,7 +69,7 @@ namespace Zedarus.ToolKit.Data.Game
 						{
 							foreach (object v in otherValues)
 							{
-								if (fieldValue.Equals(otherValues))
+								if (fieldValue.Equals(v))
 								{
 									filteredResults.Add(result);
 								}
