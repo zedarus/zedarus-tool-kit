@@ -91,9 +91,16 @@ namespace Zedarus.ToolKit.Data.Game
 
 				fieldCount++;
 			}
+
+			RenderEditorFormExtention();
 		}
 
 		public virtual string ListName { get { return "#" + ID.ToString(); } }
+
+		protected virtual void RenderEditorFormExtention()
+		{
+			
+		}
 
 		public virtual void RenderPreviewForForeignKey()
 		{
