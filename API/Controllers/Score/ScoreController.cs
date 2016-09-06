@@ -119,7 +119,7 @@ namespace Zedarus.ToolKit.API
 				if (Wrapper != null)
 					return Wrapper.PlayerID;
 				else
-					return false;
+					return null;
 			}
 		}
 		#endregion
