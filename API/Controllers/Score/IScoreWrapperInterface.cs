@@ -8,6 +8,7 @@ namespace Zedarus.ToolKit.API
 	public interface IScoreWrapperInterface
 	{
 		#region Events
+		event Action<List<ScoreData>> ScoreLoaded;
 		#endregion
 		
 		#region Controls
@@ -18,6 +19,7 @@ namespace Zedarus.ToolKit.API
 		void DisplayAchievementsList();
 		void DisplayLeaderboardsList();
 		void DisplayDefaultView();
+		void RequestScore(string leaderboardID, ScoreController.TimeScope timeScope, bool friendsOnly, int start, int end);
 		#endregion
 		
 		#region Queries

@@ -12,6 +12,10 @@ namespace Zedarus.ToolKit.API
 {
 	public class GameCenterWrapper : APIWrapper<GameCenterWrapper>, IScoreWrapperInterface 
 	{
+		#region Events
+		public event Action<List<ScoreData>> ScoreLoaded;
+		#endregion
+
 		#region Setup
 		protected override void Setup(APIWrapperSettings settings) 
 		{
@@ -106,6 +110,34 @@ namespace Zedarus.ToolKit.API
 				Login();
 			#endif
 		}
+
+		public void RequestScore(string leaderboardID, ScoreController.TimeScope timeScope, bool friendsOnly, int start, int end)
+		{
+			#if UNITY_IPHONE && API_SCORE_GAMECENTER
+			if (Enabled)
+			{
+				GameCenterLeaderboardTimeScope convertedScope = GameCenterLeaderboardTimeScope.AllTime;
+
+				switch (timeScope)
+				{
+					case ScoreController.TimeScope.Today:
+						convertedScope = GameCenterLeaderboardTimeScope.Today;
+						break;
+					case ScoreController.TimeScope.Week:
+						convertedScope = GameCenterLeaderboardTimeScope.Week;
+						break;
+					case ScoreController.TimeScope.AllTime:
+					default:
+						convertedScope = GameCenterLeaderboardTimeScope.AllTime;
+						break;
+				}
+
+				GameCenterBinding.retrieveScores(friendsOnly, convertedScope, start, end, leaderboardID);
+			}
+			else
+				Login();
+			#endif
+		}
 		#endregion
 		
 		#region Queries
@@ -121,6 +153,34 @@ namespace Zedarus.ToolKit.API
 		#endregion
 		
 		#region Helpers
+		private void SendScoreLoadedEvent(GameCenterRetrieveScoresResult scores)
+		{
+			if (ScoreLoaded != null)
+			{
+				List<ScoreData> scoresData = new List<ScoreData>();
+				ScoreData scoreData = null;
+
+				foreach (GameCenterScore score in scores.scores)
+				{
+					scoreData = new ScoreData();
+					scoreData.category = score.category;
+					scoreData.formattedValue = score.formattedValue;
+					scoreData.value = score.value;
+					scoreData.context = score.context;
+					scoreData.rawDate = score.rawDate;
+					scoreData.playerId = score.playerId;
+					scoreData.rank = score.rank;
+					scoreData.isFriend = score.isFriend;
+					scoreData.alias = score.alias;
+					scoreData.maxRange = score.maxRange;
+					scoresData.Add(scoreData);
+				}
+
+				ScoreLoaded(scoresData);
+				scoresData = null;
+			}
+		}
+
 		private bool Enabled
 		{
 			get 
@@ -155,8 +215,8 @@ namespace Zedarus.ToolKit.API
 			GameCenterManager.reportScoreFinishedEvent += reportScoreFinished;
 			GameCenterManager.retrieveScoresFailedEvent += retrieveScoresFailed;
 			GameCenterManager.scoresLoadedEvent += scoresLoaded;
-			GameCenterManager.retrieveScoresForPlayerIdFailedEvent += retrieveScoresForPlayerIdFailed;
-			GameCenterManager.scoresForPlayerIdLoadedEvent += scoresForPlayerIdLoaded;
+			GameCenterManager.retrieveScoresForPlayerIdsFailedEvent += retrieveScoresForPlayerIdFailed;
+			GameCenterManager.scoresForPlayerIdsLoadedEvent += scoresForPlayerIdLoaded;
 			
 			// Achievements
 			GameCenterManager.reportAchievementFailedEvent += reportAchievementFailed;
@@ -198,8 +258,8 @@ namespace Zedarus.ToolKit.API
 			GameCenterManager.reportScoreFinishedEvent -= reportScoreFinished;
 			GameCenterManager.retrieveScoresFailedEvent -= retrieveScoresFailed;
 			GameCenterManager.scoresLoadedEvent -= scoresLoaded;
-			GameCenterManager.retrieveScoresForPlayerIdFailedEvent -= retrieveScoresForPlayerIdFailed;
-			GameCenterManager.scoresForPlayerIdLoadedEvent -= scoresForPlayerIdLoaded;
+			GameCenterManager.retrieveScoresForPlayerIdsFailedEvent -= retrieveScoresForPlayerIdFailed;
+			GameCenterManager.scoresForPlayerIdsLoadedEvent -= scoresForPlayerIdLoaded;
 			
 			// Achievements
 			GameCenterManager.reportAchievementFailedEvent -= reportAchievementFailed;
@@ -292,6 +352,8 @@ namespace Zedarus.ToolKit.API
 			ZedLogger.Log("scoresLoaded");
 			foreach(GameCenterScore s in scores.scores)
 				ZedLogger.Log(s);
+
+			SendScoreLoadedEvent(scores);
 		}
 		
 		private void retrieveScoresFailed(string error)
@@ -309,6 +371,8 @@ namespace Zedarus.ToolKit.API
 			ZedLogger.Log("scoresForPlayerIdLoaded");
 			foreach(GameCenterScore s in scores.scores)
 				ZedLogger.Log(s);
+
+			SendScoreLoadedEvent(scores);
 		}
 		
 		private void reportScoreFinished(string category)

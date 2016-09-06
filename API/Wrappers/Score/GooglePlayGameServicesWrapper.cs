@@ -9,6 +9,10 @@ namespace Zedarus.ToolKit.API
 {
 	public class GooglePlayGameServicesWrapper : APIWrapper<GooglePlayGameServicesWrapper>, IScoreWrapperInterface
 	{
+		#region Events
+		public event Action<List<ScoreData>> ScoreLoaded;
+		#endregion
+
 		#region Parameters
 		private int _defaultView = 0;
 		#endregion
@@ -110,6 +114,8 @@ namespace Zedarus.ToolKit.API
 			if (_defaultView > 1)
 				_defaultView = 0;
 		}
+
+		public void RequestScore(string leaderboardID, ScoreController.TimeScope timeScope, bool friendsOnly, int start, int end) {}
 		#endregion
 		
 		#region Queries
