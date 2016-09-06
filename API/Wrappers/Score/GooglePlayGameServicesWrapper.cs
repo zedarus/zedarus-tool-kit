@@ -128,6 +128,11 @@ namespace Zedarus.ToolKit.API
 		{
 			get { return Enabled; }
 		}
+
+		public string PlayerID
+		{
+			get { return null; }
+		}
 		#endregion
 		
 		#region Helpers

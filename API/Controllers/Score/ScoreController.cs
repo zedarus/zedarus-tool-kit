@@ -111,6 +111,17 @@ namespace Zedarus.ToolKit.API
 					return false;
 			}
 		}
+
+		public string PlayerID
+		{
+			get
+			{
+				if (Wrapper != null)
+					return Wrapper.PlayerID;
+				else
+					return false;
+			}
+		}
 		#endregion
 
 		#region Event Listeners

@@ -150,6 +150,25 @@ namespace Zedarus.ToolKit.API
 		{
 			get { return Enabled; }
 		}
+
+		public string PlayerID
+		{
+			get 
+			{ 
+				#if UNITY_IPHONE && API_SCORE_GAMECENTER
+				if (Enabled)
+				{
+					return GameCenterBinding.playerIdentifier();
+				}
+				else
+				{
+					return null;
+				}
+				#else
+				return null;
+				#endif
+			}
+		}
 		#endregion
 		
 		#region Helpers
