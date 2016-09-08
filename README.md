@@ -190,7 +190,7 @@ Troubleshooting:
 - Call `AppController.Instance.API.Promo.RequestNotificationsPermission()` somewhere at the start of the game. For example, when player click “Play” button or with some delay in main menu
 - Test remote push notifications on this page: https://dashboard.batch.com/app/7265/settings#/push-settings
 - :exclamation: REMEMBER to use live API key before making final build!
-- :exclamation: **Xcode**: Make sure you make build using correct certificate and provision profile
+- :exclamation: **Xcode**: Make sure you make build using correct certificate and provision profile, even if just making development build!
 - :exclamation: **Xcode**: Enable push notifications in Xcode
 - :exclamation: **Xcode**: if you are planning to add promo codes support or redeem links, add Batch's custom scheme in
  
