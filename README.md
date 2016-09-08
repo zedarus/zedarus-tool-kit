@@ -129,7 +129,7 @@ Troubleshooting:
 - Add Prime31 social plugin, but delete all the Twitter and Facebook related stuff. Basically, you need `SharingBinding` and `SharingManager` files + some files in Editor folder for Prime31
 - Add `API_SHARE_NATIVE` to build settings
 - Add `API.Share.Use(APIs.Sharing.Native, 0f)` to `AppController`
-- Add `AppController.Instance.API.Share.Share()` call where needed.
+- Add helper method from Promo helpers to share score text (see description below)
 
 ### Analytics
 
