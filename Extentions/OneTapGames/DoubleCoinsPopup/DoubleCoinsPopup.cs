@@ -142,6 +142,13 @@ namespace Zedarus.ToolKit.Extentions.OneTapGames.DoubleCoinsPopup
 				DoubleCoinsCancel();
 			}
 		}
+
+		private void LogAnalytics(string action)
+		{
+			_api.Analytics.LogEvent("Monetisation - Double Coins", new Dictionary<string, object> {
+				{ "action", action }
+			});
+		}
 		#endregion
 
 		#region Getters
@@ -150,18 +157,14 @@ namespace Zedarus.ToolKit.Extentions.OneTapGames.DoubleCoinsPopup
 		#region UI Callbacks
 		private void OnDoubleConfirmed()
 		{
-			_api.Analytics.LogEvent("Monetisation - Double Coins", new Dictionary<string, object> {
-				{ "action", "yes" }
-			});
+			LogAnalytics("yes");
 
 			_api.Ads.ShowRewardedVideo(_videoAdID, OnSecondChanceRewardVideoClose, OnSecondChanceRewardVideoReward, 0);
 		}
 
 		private void OnCancel()
 		{
-			_api.Analytics.LogEvent("Monetisation - Double Coins", new Dictionary<string, object> {
-				{ "action", "no" }
-			});
+			LogAnalytics("no");
 
 			Decline();
 		}

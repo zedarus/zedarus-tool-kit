@@ -136,6 +136,13 @@ namespace Zedarus.ToolKit.Extentions.OneTapGames.SecondChancePopup
 				DeclineSecondChance();
 			}
 		}
+
+		private void LogAnalytics(string action)
+		{
+			_api.Analytics.LogEvent("Monetisation - Second Chance", new Dictionary<string, object> {
+				{ "action", action }
+			});
+		}
 		#endregion
 
 		#region Getters
@@ -148,14 +155,14 @@ namespace Zedarus.ToolKit.Extentions.OneTapGames.SecondChancePopup
 		#region UI Callbacks
 		private void OnFreeSecondChanceConfirmed()
 		{
-//			Analytics.Instance.LogSecondChanceUse(Analytics.SecondChanceAction.UseAds);
+			LogAnalytics("UseAds");
 
 			_api.Ads.ShowRewardedVideo(_videoAdID, OnSecondChanceRewardVideoClose, OnSecondChanceRewardVideoReward, 0);
 		}
 
 		private void OnPaidSecondChanceConfirmed()
 		{
-//			Analytics.Instance.LogSecondChanceUse(Analytics.SecondChanceAction.UseCoins);
+			LogAnalytics("UseCoins");
 
 			if (PayForSecondChance != null)
 			{
@@ -167,7 +174,7 @@ namespace Zedarus.ToolKit.Extentions.OneTapGames.SecondChancePopup
 
 		private void OnSecondChanceDenied()
 		{
-//			Analytics.Instance.LogSecondChanceUse(Analytics.SecondChanceAction.Decline);
+			LogAnalytics("Decline");
 
 			Decline();
 
