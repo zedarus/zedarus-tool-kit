@@ -40,7 +40,19 @@ namespace Zedarus.ToolKit.API
 		#endregion
 
 		#region Controls
-		public void RequestNotificationsPermission()
+		public void RequestNotificationsPermission(float delay = 0f)
+		{
+			if (delay <= 0)
+			{
+				RequestNotifications();
+			}
+			else
+			{
+				DelayedCall.Create(RequestNotifications, delay, true, true, "Request Push Notifications");
+			}
+		}
+
+		private void RequestNotifications()
 		{
 			if (Wrapper != null)
 			{

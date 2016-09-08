@@ -66,6 +66,12 @@ namespace Zedarus.ToolKit.Helpers.Modules
 			API.Analytics.LogRateApp(true);
 			Application.OpenURL(GameData.RateMePopup.CurrentPlatformURL);
 		}
+
+		public void ShareScore(string text)
+		{
+			API.Analytics.LogEvent("Promo - Share Score");
+			API.Share.Share(text, null, null);
+		}
 		#endregion
 
 		#region Helpers
