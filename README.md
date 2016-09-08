@@ -180,7 +180,7 @@ Troubleshooting:
 - Remember to add lproj files to Xcode project for all supported langauges before final build
 - TODO: create localisation packages wrappers system
 
-### Promo
+### Push Notifications
 
 - Setup your app on Batch.com using this guide: https://batch.com/doc/unity/prerequisites.html
 - Generate push certificate and provision profiles: https://batch.com/doc/ios/prerequisites.html#_creating-a-certificate
@@ -189,20 +189,25 @@ Troubleshooting:
 - Add `API.Promo.Use(APIs.Promo.Batch, 0f, "<your_dev_or_live_key>")` to your `AppController`
 - Call `AppController.Instance.API.Promo.RequestNotificationsPermission()` somewhere at the start of the game. For example, when player click “Play” button or with some delay in main menu
 - Test remote push notifications on this page: https://dashboard.batch.com/app/7265/settings#/push-settings
-- Add and setup local notifications in game data
-- Note: local notifications are canceled, scheduled and rescheduled in base AppController class everytime app is started or comes back from background
-- Override `OnProcessRewardFromLocalNotification(int rewardID)` in your `AppController` to handle rewards from local notifications
-- REDEEM:
+- :exclamation: REMEMBER to use live API key before making final build!
+- :exclamation: **Xcode**: Make sure you make build using correct certificate and provision profile
+- :exclamation: **Xcode**: Enable push notifications in Xcode
+- :exclamation: **Xcode**: if you are planning to add promo codes support or redeem links, add Batch's custom scheme in
+ 
+### Remote Rewards
+
 - Setup unlock inventory in your app settings on batch.com and follow documentation: https://batch.com/doc/unlock/overview.html
 - Override `OnProcessRemoteUnlockFeature(string feature, string value)`, `OnProcessRemoteUnlockResource(string resource, int quantity)` and `OnProcessRemoteUnlockParams(Dictionary<string, string> parameters)` in your `AppController` to correctly process remote unlocks. **important**: `UIManager` might not be available at the time of this call, so make sure you cache the message and display it later if it doesn't. TODO: handle this the same way as in iCloud permission popup
 - If you are planning to use redeem links from Bathc, make sure to add special URL scheme in Xcode, more on this here: https://batch.com/doc/unlock/overview.html
 - Add `AppController.Instance.API.Promo.RestoreRewards()` call where needed (along with IAPs restore?)
 - Add `AppController.Instance.API.Promo.RedeemCode(code.text)` if requered, but read this:
 - REMEMBER: We recommend against using promocodes on iOS. Apple guidelines indicate that promocodes are not permitted. Though some apps do successfully integrate this functionality, Batch does not recommend the practice.
-- :exclamation: REMEMBER to use live API key before making final build!
-- :exclamation: **Xcode**: Make sure you make build using correct certificate and provision profile
-- :exclamation: **Xcode**: Enable push notifications in Xcode
-- :exclamation: **Xcode**: if you are planning to add promo codes support or redeem links, add Batch's custom scheme in Info.plsit
+
+### Local Push Notifications
+
+- Add and setup local notifications in game data
+- Note: local notifications are canceled, scheduled and rescheduled in base AppController class everytime app is started or comes back from background
+- Override `OnProcessRewardFromLocalNotification(int rewardID)` in your `AppController` to handle rewards from local notifications
 
 ### Helpers
 
