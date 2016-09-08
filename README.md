@@ -196,6 +196,7 @@ Troubleshooting:
  
 ### Remote Rewards
 
+- Setup push notifications first
 - Setup unlock inventory in your app settings on batch.com and follow documentation: https://batch.com/doc/unlock/overview.html
 - Override `OnProcessRemoteUnlockFeature(string feature, string value)`, `OnProcessRemoteUnlockResource(string resource, int quantity)` and `OnProcessRemoteUnlockParams(Dictionary<string, string> parameters)` in your `AppController` to correctly process remote unlocks. **important**: `UIManager` might not be available at the time of this call, so make sure you cache the message and display it later if it doesn't. TODO: handle this the same way as in iCloud permission popup
 - If you are planning to use redeem links from Bathc, make sure to add special URL scheme in Xcode, more on this here: https://batch.com/doc/unlock/overview.html
