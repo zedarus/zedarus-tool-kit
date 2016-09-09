@@ -277,7 +277,7 @@ namespace Zedarus.ToolKit
 
 		protected virtual void OnProcessRewardFromLocalNotification(int rewardID)
 		{
-		
+			API.Analytics.LogEvent("Promo - Local Notification", new Dictionary<string, object> {{ "rewardID", rewardID }});
 		}
 
 		protected virtual void OnProcessRemoteUnlockFeature(string feature, string value)
