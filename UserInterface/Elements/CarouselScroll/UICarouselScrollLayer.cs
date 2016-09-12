@@ -116,9 +116,16 @@ namespace Zedarus.ToolKit.UI.Elements
 			Pivot.localPosition = new Vector2(ScrollPosition * Parallax, 0);
 
 			// TODO: optimize this
+			Vector2 pivotPosition = Vector2.zero;
+
+			if (Pivot.parent != null)
+			{
+				pivotPosition = Pivot.parent.transform.position;
+			}
+
 			foreach (IUICarouselScrollPage page in _pages)
 			{
-				page.UpdateScrollPivot(Pivot.parent.transform.position);
+				page.UpdateScrollPivot(pivotPosition);
 			}
 		}
 

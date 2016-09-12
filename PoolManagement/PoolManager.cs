@@ -63,6 +63,7 @@ namespace Zedarus.ToolKit.PoolManagement
 		}
 
 		public PoolManager(Transform container, int size, bool autoReuse, string[] prefabs, params int[] prefabsShuffleBag) : this(container, size, autoReuse, ConvertPathsToPrefabs(prefabs), prefabsShuffleBag) {}
+		public PoolManager(Transform container, int size, bool autoReuse) : this(container, size, autoReuse, new string[0]) {}
 
 		public PoolManager(Transform parent, string containerName, int size, bool autoReuse, T[] prefabs, params int[] prefabsShuffleBag) : this(CreateContainer(parent, containerName), size, autoReuse, prefabs, prefabsShuffleBag) {}
 		public PoolManager(Transform parent, string containerName, int size, bool autoReuse, string[] prefabs, params int[] prefabsShuffleBag) : this(CreateContainer(parent, containerName), size, autoReuse, prefabs, prefabsShuffleBag) {}
