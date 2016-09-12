@@ -172,6 +172,7 @@ namespace Zedarus.ToolKit.API
 		#endregion
 		
 		#region Helpers
+		#if UNITY_IPHONE && API_SCORE_GAMECENTER
 		private void SendScoreLoadedEvent(GameCenterRetrieveScoresResult scores)
 		{
 			if (ScoreLoaded != null)
@@ -199,6 +200,7 @@ namespace Zedarus.ToolKit.API
 				scoresData = null;
 			}
 		}
+		#endif
 
 		private bool Enabled
 		{
