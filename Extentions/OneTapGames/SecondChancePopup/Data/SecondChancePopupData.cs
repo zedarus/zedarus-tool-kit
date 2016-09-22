@@ -10,6 +10,10 @@ namespace Zedarus.ToolKit.Extentions.OneTapGames.SecondChancePopup
 	{
 		#region Properties
 		[SerializeField]
+		[DataField("Enabled")]
+		private bool _enabled = true;
+
+		[SerializeField]
 		[DataField("Price")]
 		private int _price = 20;
 
@@ -32,6 +36,11 @@ namespace Zedarus.ToolKit.Extentions.OneTapGames.SecondChancePopup
 		#endregion
 
 		#region Getters
+		public bool Enabled
+		{
+			get { return _enabled; }
+		}
+
 		public int Price
 		{
 			get { return _price; }

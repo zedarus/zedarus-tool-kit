@@ -141,6 +141,11 @@ namespace Zedarus.ToolKit.Extentions.OneTapGames.SecondChancePopup
 				canDisplay = false;
 			}
 
+			if (!_data.Enabled)
+			{
+				canDisplay = false;
+			}
+
 			return canDisplay;
 		}
 		#endregion
