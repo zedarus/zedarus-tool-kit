@@ -12,7 +12,6 @@ namespace Zedarus.ToolKit.Extentions.OneTapGames.FreeRemoveAds
 	public class FreeRemoveAds : Extention
 	{
 		#region Properties
-		private APIManager _api;
 		private APISettingsData _gameData;
 		private APIState _playerData;
 		private string _videoAdID = null;
@@ -30,11 +29,10 @@ namespace Zedarus.ToolKit.Extentions.OneTapGames.FreeRemoveAds
 		#endregion
 
 		#region Init
-		public FreeRemoveAds(GameData gameData, PlayerData playerData, APIManager apiManager, string videoAdID) : base()
+		public FreeRemoveAds(GameData gameData, PlayerData playerData, APIManager apiManager, string videoAdID) : base(apiManager)
 		{
 			_gameData = gameData.APISettings;
 			_playerData = playerData.APIState;
-			_api = apiManager;
 			_videoAdID = videoAdID;
 		}
 		#endregion
@@ -95,7 +93,7 @@ namespace Zedarus.ToolKit.Extentions.OneTapGames.FreeRemoveAds
 		#region Helpers
 		private void LogAnalytics(string action)
 		{
-			_api.Analytics.LogEvent("Monetisation - Remove Ads Popup", new Dictionary<string, object> {
+			API.Analytics.LogEvent("Monetisation - Remove Ads Popup", new Dictionary<string, object> {
 				{ "action", action }
 			});
 		}
@@ -109,7 +107,7 @@ namespace Zedarus.ToolKit.Extentions.OneTapGames.FreeRemoveAds
 		{
 			LogAnalytics("free");
 			_rewardReceived = false;
-			_api.Ads.ShowRewardedVideo(_videoAdID, OnRewardVideoClose, OnRewardVideoReward, 0);
+			API.Ads.ShowRewardedVideo(_videoAdID, OnRewardVideoClose, OnRewardVideoReward, 0);
 		}
 
 		private void OnPaidRemoveClick()
@@ -117,7 +115,7 @@ namespace Zedarus.ToolKit.Extentions.OneTapGames.FreeRemoveAds
 			LogAnalytics("paid");
 			if (_gameData.AdsEnabled)
 			{
-				_api.Store.Purchase(_gameData.RemoveAdsIAPID, null);
+				API.Store.Purchase(_gameData.RemoveAdsIAPID, null);
 			}
 		}
 

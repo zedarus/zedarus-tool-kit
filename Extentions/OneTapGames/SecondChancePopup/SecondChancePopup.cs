@@ -9,29 +9,40 @@ using Zedarus.ToolKit.Localisation;
 
 namespace Zedarus.ToolKit.Extentions.OneTapGames.SecondChancePopup
 {
-	public class SecondChancePopup : Extention
+	public class SecondChancePopup : ExtentionUIPopup
 	{
 		#region Properties
-		private APIManager _api;
 		private SecondChancePopupData _data;
+		private Wallet _wallet;
 		private bool _newSession = false;
 		private string _videoAdID = null;
 		private int _sessions = 0;
+		public System.Action<bool> _callback;
 		#endregion
 
-		#region Events
-		public event System.Action<int> PayForSecondChance;
-		public event System.Action UseSecondChance;
-		public event System.Action DeclineSecondChance;
+		#region Settings
+		private const int BUTTON_FREE = 3;
+		private const int BUTTON_PAID = 4;
+		private const int BUTTON_CANCEL = 5;
 		#endregion
 
 		#region Init
-		public SecondChancePopup(GameData gameData, APIManager apiManager, string videoAdID) : base()
+		// TODO: document this
+		public SecondChancePopup(GameData gameData, APIManager apiManager, Wallet wallet, LocalisationManager localisation, string videoAdID, string genericPopupID, 
+			object popupHeadeStringID, object popupMessageStringID, 
+			object freeChanceButtonLabelID, object paidChanceButtonLabelID, object cancelButtonLabelID, 
+			int freeChanceButtonColorID = 0, int paidChanceButtonColorID = 0, int cancelButtonColorID = 0) : base(apiManager, localisation, genericPopupID, popupHeadeStringID, popupMessageStringID)
 		{
+			// TODO: check for null here and throw exception
 			_data = gameData.Get<SecondChancePopupData>().First;
-			_api = apiManager;
+			_wallet = wallet;
+
 			_videoAdID = videoAdID;
 			_sessions = 0;
+
+			CreateButtonKeys(BUTTON_FREE, freeChanceButtonLabelID, freeChanceButtonColorID);
+			CreateButtonKeys(BUTTON_PAID, paidChanceButtonLabelID, paidChanceButtonColorID);
+			CreateButtonKeys(BUTTON_CANCEL, cancelButtonLabelID, cancelButtonColorID);
 		}
 		#endregion
 
@@ -46,38 +57,32 @@ namespace Zedarus.ToolKit.Extentions.OneTapGames.SecondChancePopup
 			_sessions++;
 		}
 
-		public bool DisplayPopup(UIManager uiManager, string genericPopupID, string popupHeader, string popupMessage, int score, int coinsBalance, 
-			string freeChanceButtonLabel, string paidChanceButtonLabel, string cancelButtonLabel, 
-			int freeChanceButtonColorID = 0, int paidChanceButtonColorID = 0, int cancelButtonColorID = 0)
+		public bool DisplayPopup(UIManager uiManager, int score, System.Action<bool> callback)
 		{
-
 			if (CanUseSecondChance(score))
 			{
-				List<Zedarus.ToolKit.UI.UIGenericPopupButtonData> buttons = new List<Zedarus.ToolKit.UI.UIGenericPopupButtonData>();
-
-				buttons.Add(new Zedarus.ToolKit.UI.UIGenericPopupButtonData(
-					freeChanceButtonLabel, OnFreeSecondChanceConfirmed, freeChanceButtonColorID
-					));
-
-				int price = _data.Price;
-				if (coinsBalance >= price)
+				if (_wallet.Balance >= _data.Price)
 				{
-					string label = string.Format(paidChanceButtonLabel, price);
-					buttons.Add(new Zedarus.ToolKit.UI.UIGenericPopupButtonData(label, OnPaidSecondChanceConfirmed, paidChanceButtonColorID));
+					DisplayPopup(uiManager, 
+						CreateButton(BUTTON_FREE, OnFreeSecondChanceConfirmed, BUTTON_FREE),
+						CreateButton(string.Format(Localise(BUTTON_PAID), _data.Price), OnPaidSecondChanceConfirmed, BUTTON_PAID),
+						CreateButton(BUTTON_CANCEL, OnSecondChanceDenied, BUTTON_CANCEL)
+					);
+				}
+				else
+				{
+					DisplayPopup(uiManager, 
+						CreateButton(BUTTON_FREE, OnFreeSecondChanceConfirmed, BUTTON_FREE),
+						CreateButton(BUTTON_CANCEL, OnSecondChanceDenied, BUTTON_CANCEL)
+					);
 				}
 
-				buttons.Add(new Zedarus.ToolKit.UI.UIGenericPopupButtonData(
-					cancelButtonLabel, OnSecondChanceDenied, cancelButtonColorID
-					));
-
-				uiManager.OpenPopup(genericPopupID, new Zedarus.ToolKit.UI.UIGenericPopupData(
-					popupHeader, popupMessage, buttons.ToArray()
-					));
-
+				_callback = callback;
 				return true;
 			}
 			else
 			{
+				_callback = null;
 				return false;
 			}
 		}
@@ -122,18 +127,20 @@ namespace Zedarus.ToolKit.Extentions.OneTapGames.SecondChancePopup
 		private void Use()
 		{
 			_newSession = false;
-			if (UseSecondChance != null)
+			if (_callback != null)
 			{
-				UseSecondChance();
+				_callback(true);
+				_callback = null;
 			}
 		}
 
 		private void Decline()
 		{
 			_newSession = false;
-			if (DeclineSecondChance != null)
+			if (_callback != null)
 			{
-				DeclineSecondChance();
+				_callback(false);
+				_callback = null;
 			}
 		}
 		#endregion
@@ -148,31 +155,26 @@ namespace Zedarus.ToolKit.Extentions.OneTapGames.SecondChancePopup
 		#region UI Callbacks
 		private void OnFreeSecondChanceConfirmed()
 		{
-//			Analytics.Instance.LogSecondChanceUse(Analytics.SecondChanceAction.UseAds);
-
-			_api.Ads.ShowRewardedVideo(_videoAdID, OnSecondChanceRewardVideoClose, OnSecondChanceRewardVideoReward, 0);
+			LogAnalytics("free");
+			API.Ads.ShowRewardedVideo(_videoAdID, OnSecondChanceRewardVideoClose, OnSecondChanceRewardVideoReward, 0);
 		}
 
 		private void OnPaidSecondChanceConfirmed()
 		{
-//			Analytics.Instance.LogSecondChanceUse(Analytics.SecondChanceAction.UseCoins);
-
-			if (PayForSecondChance != null)
+			if (_wallet != null)
 			{
-				PayForSecondChance(_data.Price);
+				if (_wallet.Withdraw(_data.Price))
+				{
+					LogAnalytics("paid");
+					Use();
+				}
 			}
-
-			Use();
 		}
 
 		private void OnSecondChanceDenied()
 		{
-//			Analytics.Instance.LogSecondChanceUse(Analytics.SecondChanceAction.Decline);
-
+			LogAnalytics("cancel");
 			Decline();
-
-//			_secondChanceDeclined = true;
-//			GameOverEnter();
 		}
 
 		private void OnSecondChanceRewardVideoClose()
@@ -186,11 +188,6 @@ namespace Zedarus.ToolKit.Extentions.OneTapGames.SecondChancePopup
 			{
 				Decline();
 			}
-//			if (_state.CurrentState == State.GameOver)
-//			{
-//				_secondChanceDeclined = true;
-//				GameOverEnter();
-//			}
 		}
 
 		private void OnSecondChanceRewardVideoReward(int productID)
@@ -199,11 +196,13 @@ namespace Zedarus.ToolKit.Extentions.OneTapGames.SecondChancePopup
 			{
 				Use();
 			}
-//			if (_state.CurrentState == State.GameOver)
-//			{
-//				_fist.Ressurect();
-//				_state.ChangeState(State.Playing);
-//			}
+		}
+		#endregion
+
+		#region Analytics
+		protected override string EventName
+		{
+			get { return "Second Chance Popup"; }
 		}
 		#endregion
 	}

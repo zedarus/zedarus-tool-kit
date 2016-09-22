@@ -12,7 +12,6 @@ namespace Zedarus.ToolKit.Extentions.OneTapGames.DoubleCoinsPopup
 	public class DoubleCoinsPopup : Extention
 	{
 		#region Properties
-		private APIManager _api;
 		private DoubleCoinsPopupData _data;
 		private bool _newSession = false;
 		private bool _openSession = false;
@@ -27,10 +26,9 @@ namespace Zedarus.ToolKit.Extentions.OneTapGames.DoubleCoinsPopup
 		#endregion
 
 		#region Init
-		public DoubleCoinsPopup(GameData gameData, APIManager apiManager, string videoAdID) : base()
+		public DoubleCoinsPopup(GameData gameData, APIManager apiManager, string videoAdID) : base(apiManager)
 		{
 			_data = gameData.Get<DoubleCoinsPopupData>().First;
-			_api = apiManager;
 			_videoAdID = videoAdID;
 			_sessions = 0;
 		}
@@ -150,16 +148,16 @@ namespace Zedarus.ToolKit.Extentions.OneTapGames.DoubleCoinsPopup
 		#region UI Callbacks
 		private void OnDoubleConfirmed()
 		{
-			_api.Analytics.LogEvent("Monetisation - Double Coins", new Dictionary<string, object> {
+			API.Analytics.LogEvent("Monetisation - Double Coins", new Dictionary<string, object> {
 				{ "action", "yes" }
 			});
 
-			_api.Ads.ShowRewardedVideo(_videoAdID, OnSecondChanceRewardVideoClose, OnSecondChanceRewardVideoReward, 0);
+			API.Ads.ShowRewardedVideo(_videoAdID, OnSecondChanceRewardVideoClose, OnSecondChanceRewardVideoReward, 0);
 		}
 
 		private void OnCancel()
 		{
-			_api.Analytics.LogEvent("Monetisation - Double Coins", new Dictionary<string, object> {
+			API.Analytics.LogEvent("Monetisation - Double Coins", new Dictionary<string, object> {
 				{ "action", "no" }
 			});
 
