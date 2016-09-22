@@ -27,11 +27,28 @@ namespace Zedarus.ToolKit.Extentions.OneTapGames.SecondChancePopup
 		#endregion
 
 		#region Init
-		// TODO: document this
+		/// <summary>
+		/// Initializes a new instance of the
+		/// <see cref="Zedarus.ToolKit.Extentions.OneTapGames.SecondChancePopup.SecondChancePopup"/> class.
+		/// </summary>
+		/// <param name="gameData">Reference to game data in your correct AppController</param>
+		/// <param name="apiManager">Reference to API manager.</param>
+		/// <param name="wallet">Reference to Wallet object in player's data with required currency.</param>
+		/// <param name="localisation">Localisation manager reference.</param>
+		/// <param name="videoAdID">Reward video ad placement ID.</param>
+		/// <param name="genericPopupID">Generic popup ID.</param>
+		/// <param name="popupHeaderStringID">Popup header string localisation ID. Pass null if not required.</param>
+		/// <param name="popupMessageStringID">Popup message string localisation ID. Pass null if not required.</param>
+		/// <param name="freeChanceButtonLabelID">Localisation ID for "Use for free" button.</param>
+		/// <param name="paidChanceButtonLabelID">Localisation ID for "Use for in-game currency" button. String needs to contain placeholder for price number in currency.</param>
+		/// <param name="cancelButtonLabelID">Localisation ID for "Cancel" button.</param>
+		/// <param name="freeChanceButtonColorID">Color ID for "Use for free" button.</param>
+		/// <param name="paidChanceButtonColorID">Color ID for "Use for in-game currency" button.</param>
+		/// <param name="cancelButtonColorID">Color ID for "Cancel" button.</param>
 		public SecondChancePopup(GameData gameData, APIManager apiManager, Wallet wallet, LocalisationManager localisation, string videoAdID, string genericPopupID, 
-			object popupHeadeStringID, object popupMessageStringID, 
+			object popupHeaderStringID, object popupMessageStringID, 
 			object freeChanceButtonLabelID, object paidChanceButtonLabelID, object cancelButtonLabelID, 
-			int freeChanceButtonColorID = 0, int paidChanceButtonColorID = 0, int cancelButtonColorID = 0) : base(apiManager, localisation, genericPopupID, popupHeadeStringID, popupMessageStringID)
+			int freeChanceButtonColorID = 0, int paidChanceButtonColorID = 0, int cancelButtonColorID = 0) : base(apiManager, localisation, genericPopupID, popupHeaderStringID, popupMessageStringID)
 		{
 			// TODO: check for null here and throw exception
 			_data = gameData.Get<SecondChancePopupData>().First;

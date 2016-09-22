@@ -140,16 +140,16 @@ namespace Zedarus.ToolKit.Extentions.OneTapGames.DoubleCoinsPopup
 				DoubleCoinsCancel();
 			}
 		}
-
-		private void LogAnalytics(string action)
-		{
-			_api.Analytics.LogEvent("Monetisation - Double Coins", new Dictionary<string, object> {
-				{ "action", action }
-			});
-		}
 		#endregion
 
 		#region Getters
+		#endregion
+
+		#region Analytics
+		protected override string EventName
+		{
+			get { return "Double Coins Popup"; }
+		}
 		#endregion
 
 		#region UI Callbacks

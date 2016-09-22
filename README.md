@@ -228,7 +228,7 @@ Troubleshooting:
 
 ##### Second Chance Popup
 
-- Add `AddExtention(new SecondChancePopup(Data.Game, API, "<video ad>"));` in your `InitExtentions()` override in `AppController`
+- Add `AddExtention(new SecondChancePopup(...));` in your `InitExtentions()` override in `AppController`. Class' constructor is documented, so just follow instructions for each parameter to setup extention correctly.
 - Add this to your `GameData` class and set setting you like in game data editor in Unity
 
   ```c#
@@ -237,30 +237,16 @@ Troubleshooting:
   private SecondChancePopupData _seconChancePopupSettings;
   ```
 
-- Subscribe (and also remember to unsubscribe!) to second chance popup events:
-
-  ```c#
-  SecondChancePopup secondChancePopup = AppController.Instance.GetExtention<SecondChancePopup>();
-  if (secondChancePopup != null)
-  {
-  	secondChancePopup.PayForSecondChance += OnPayForSecondChance;
-  	secondChancePopup.UseSecondChance += OnUseSecondChance;
-  	secondChancePopup.DeclineSecondChance += OnDeclineSecondChance;
-  }
-  ```
-
 - Call `AppController.Instance.GetExtention<SecondChancePopup>().RegisterSessionStart()` and `AppController.Instance.GetExtention<SecondChancePopup>().RegisterSessionEnd()` when game session starts and end. *Important* to note, that both should only be called when actual session starts or ends, not when second chance was used. So `RegisterSessionStart()` should not be called when player's character was resurrected for example, and  `RegisterSessionEnd()` should not be called exactly on player's death, because he might use second chance. Instead, you need first to check if player used second chance, and only then call this method
 - Call this before you enter game over state:
 
   ```c#
   AppController.Instance.GetExtention<SecondChancePopup>().DisplayPopup(
-  UIManager.Instance, IDs.UI.Popups.GenericPopup, "Second chance message", 
-  <player's score>, <player's wallet balance>,
-  "Free", "{0:n0} coins", "No"
-  )
+  UIManager.Instance, <player's score>, <callback>
+  );
   ```
 
-  This returns `true` if second chance popup is pesented (and so you need to wait for player's choice before finally entering game over state), and `false` if not and you can safely enter final game over state in that case
+  This returns `true` if second chance popup is pesented (and so you need to wait for player's choice before finally entering game over state), and `false` if not and you can safely enter final game over state in that case. Callback should a method that receives `bool` parameter. If parameter is `true` then second chance should be activated. If `false` then user decinded not use second chance.
 
 ##### Double Coins Popup
 
