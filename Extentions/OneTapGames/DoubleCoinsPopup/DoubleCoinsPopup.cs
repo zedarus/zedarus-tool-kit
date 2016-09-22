@@ -9,39 +9,53 @@ using Zedarus.ToolKit.Localisation;
 
 namespace Zedarus.ToolKit.Extentions.OneTapGames.DoubleCoinsPopup
 {
-	public class DoubleCoinsPopup : Extention
+	public class DoubleCoinsPopup : ExtentionUIPopup
 	{
 		#region Properties
 		private DoubleCoinsPopupData _data;
+		private Wallet _wallet;
 		private bool _newSession = false;
 		private bool _openSession = false;
 		private string _videoAdID = null;
 		private int _sessions = 0;
-		private int _coinsEarned = 0;
+		private int _additionalCoins = 0;
+		private System.Action<bool> _callback;
 		#endregion
 
-		#region Events
-		public event System.Action<int> DoubleCoinsConfirm;
-		public event System.Action DoubleCoinsCancel;
+		#region Settings
+		private const int BUTTON_AGREE = 10;
+		private const int BUTTON_CANCEL = 12;
 		#endregion
 
 		#region Init
-		public DoubleCoinsPopup(GameData gameData, APIManager apiManager, string videoAdID) : base(apiManager)
+		public DoubleCoinsPopup(GameData gameData, APIManager apiManager, Wallet wallet, LocalisationManager localisation, string videoAdID, string genericPopupID, 
+			object popupHeaderStringID, object popupMessageStringID,
+			object agreeButtonLocalisationID, object cancelButtonLocalisationID, int agreeButtonColorID = 0, int cancelButtonColorID = 0) : base(apiManager, localisation, genericPopupID, popupHeaderStringID, popupMessageStringID)
 		{
 			_data = gameData.Get<DoubleCoinsPopupData>().First;
+
+			if (_data == null)
+			{
+				throw new UnityException("No DoubleCoinsPopupData found in game data");
+			}
+
+			_wallet = wallet;
 			_videoAdID = videoAdID;
 			_sessions = 0;
+
+			CreateButtonKeys(BUTTON_AGREE, agreeButtonLocalisationID, agreeButtonColorID);
+			CreateButtonKeys(BUTTON_CANCEL, cancelButtonLocalisationID, cancelButtonColorID);
 		}
 		#endregion
 
 		#region Controls
-		public void RegisterSessionStart()
+		internal override void RegisterSessionStart()
 		{
 			_newSession = true;
 			_openSession = true;
 		}
 
-		public void RegisterSessionEnd()
+		internal override void RegisterSessionEnd()
 		{
 			if (_openSession)
 			{
@@ -50,33 +64,45 @@ namespace Zedarus.ToolKit.Extentions.OneTapGames.DoubleCoinsPopup
 			}
 		}
 
-		public bool DisplayPopup(UIManager uiManager, string genericPopupID, string popupHeader, string popupMessage, int coinsEarned, 
-			string doubleButtonLabel, string cancelButtonLabel, 
-			int doubleButtonLabelColorID = 0, int cancelButtonColorID = 0)
+		public bool DisplayPopup(UIManager uiManager, int coinsEarned, System.Action<bool> callback)
 		{
-
-			if (CanUse(coinsEarned))
+			if (CanUse(coinsEarned) && _data.Multiplier > 1)
 			{
-				_coinsEarned = coinsEarned;
+				int multiplier = _data.Multiplier - 1;
 
-				List<Zedarus.ToolKit.UI.UIGenericPopupButtonData> buttons = new List<Zedarus.ToolKit.UI.UIGenericPopupButtonData>();
+				if (multiplier < 0)
+				{
+					multiplier = 0;
+				}
 
-				buttons.Add(new Zedarus.ToolKit.UI.UIGenericPopupButtonData(
-					doubleButtonLabel, OnDoubleConfirmed, doubleButtonLabelColorID
-				));
+				_additionalCoins = coinsEarned * multiplier;
 
-				buttons.Add(new Zedarus.ToolKit.UI.UIGenericPopupButtonData(
-					cancelButtonLabel, OnCancel, cancelButtonColorID
-				));
+				string header = Localise(POPUP_HEADER);
+				string message = Localise(POPUP_MESSAGE);
 
-				uiManager.OpenPopup(genericPopupID, new Zedarus.ToolKit.UI.UIGenericPopupData(
-					popupHeader, popupMessage, buttons.ToArray()
-				));
+				if (header != null)
+				{
+					header = string.Format(header, coinsEarned);
+				}
+
+				if (message != null)
+				{
+					message = string.Format(message, coinsEarned);
+				}
+
+				DisplayPopup(uiManager, header, message,
+					CreateButton(BUTTON_AGREE, OnDoubleConfirmed, BUTTON_AGREE),
+					CreateButton(BUTTON_CANCEL, OnCancel, BUTTON_CANCEL)
+				);
+
+				_callback = callback;
 
 				return true;
 			}
 			else
 			{
+				_additionalCoins = 0;
+				_callback = null;
 				return false;
 			}
 		}
@@ -126,18 +152,28 @@ namespace Zedarus.ToolKit.Extentions.OneTapGames.DoubleCoinsPopup
 		private void Use()
 		{
 			_newSession = false;
-			if (DoubleCoinsConfirm != null)
+
+			if (_callback != null)
 			{
-				DoubleCoinsConfirm(_coinsEarned);
+				if (_wallet != null)
+				{
+					_wallet.Deposit(_additionalCoins);
+				}
+
+				_callback(true);
+				_additionalCoins = 0;
+				_callback = null;
 			}
 		}
 
 		private void Decline()
 		{
 			_newSession = false;
-			if (DoubleCoinsCancel != null)
+			if (_callback != null)
 			{
-				DoubleCoinsCancel();
+				_callback(false);
+				_additionalCoins = 0;
+				_callback = null;
 			}
 		}
 		#endregion

@@ -228,7 +228,7 @@ Troubleshooting:
 
 ##### Second Chance Popup
 
-- Add `AddExtention(new SecondChancePopup(...));` in your `InitExtentions()` override in `AppController`. Class' constructor is documented, so just follow instructions for each parameter to setup extention correctly.
+- Add `AddExtention(new SecondChancePopup(...));` in your `InitExtentions()` override in `AppController`. Class constructor is documented, so just follow instructions for each parameter to setup extention correctly.
 - Add this to your `GameData` class and set setting you like in game data editor in Unity
 
   ```c#
@@ -237,7 +237,7 @@ Troubleshooting:
   private SecondChancePopupData _seconChancePopupSettings;
   ```
 
-- Call `AppController.Instance.GetExtention<SecondChancePopup>().RegisterSessionStart()` and `AppController.Instance.GetExtention<SecondChancePopup>().RegisterSessionEnd()` when game session starts and end. *Important* to note, that both should only be called when actual session starts or ends, not when second chance was used. So `RegisterSessionStart()` should not be called when player's character was resurrected for example, and  `RegisterSessionEnd()` should not be called exactly on player's death, because he might use second chance. Instead, you need first to check if player used second chance, and only then call this method
+- If you haven't already, add call `AppController.Instance.RegisterGameSessionStart()` and `AppController.Instance.RegisterGameSessionEnd()` when game session starts and end. *Important* to note, that both should only be called when actual session starts or ends, not when second chance was used. So `RegisterSessionStart()` should not be called when player's character was resurrected for example, and  `RegisterSessionEnd()` should not be called exactly on player's death, because he might use second chance. Instead, you need first to check if player used second chance, and only then call this method
 - Call this before you enter game over state:
 
   ```c#
@@ -246,11 +246,11 @@ Troubleshooting:
   );
   ```
 
-  This returns `true` if second chance popup is pesented (and so you need to wait for player's choice before finally entering game over state), and `false` if not and you can safely enter final game over state in that case. Callback should a method that receives `bool` parameter. If parameter is `true` then second chance should be activated. If `false` then user decinded not use second chance.
+  This returns `true` if second chance popup is pesented (and so you need to wait for player's choice before finally entering game over state), and `false` if not and you can safely enter final game over state in that case. Callback should be a method that receives `bool` parameter. If parameter is `true` then second chance should be activated. If `false` then user decinded not use second chance.
 
 ##### Double Coins Popup
 
-- Add `AddExtention(new Zedarus.ToolKit.Extentions.OneTapGames.DoubleCoinsPopup.DoubleCoinsPopup(Data.Game, API, "<double_coins_video_ad_id>"));` in your `InitExtentions()` override in `AppController`
+- Add `AddExtention(new Zedarus.ToolKit.Extentions.OneTapGames.DoubleCoinsPopup.DoubleCoinsPopup(...));` in your `InitExtentions()` override in `AppController`. Class' constructor is documented, so just follow instructions for each parameter to setup extention correctly.
 - Add this to your `GameData` class and set setting you like in game data editor in Unity
 
   ```c#
@@ -259,25 +259,14 @@ Troubleshooting:
   private DoubleCoinsPopupData _doubleCoinsPopupData;
   ```
 
-- Subscribe (and also remember to unsubscribe!) to popup events:
-
-  ```c#
-  DoubleCoinsPopup doubleCoinsPopup = AppController.Instance.GetExtention<DoubleCoinsPopup>();
-  if (doubleCoinsPopup != null)
-  {
-  	doubleCoinsPopup.DoubleCoinsConfirm += OnDoubleEarnedCoinsConfirm;
-  	doubleCoinsPopup.DoubleCoinsCancel += OnDoubleEarnedCoinsCancel;
-  }
-  ```
-
-- Call `AppController.Instance.GetExtention<DoubleCoinsPopup>().RegisterSessionStart()` and `AppController.Instance.GetExtention<DoubleCoinsPopup>().RegisterSessionEnd()` when game session starts and end. *Important* to note, that both should only be called when actual session starts or ends, not when second chance was used, etc. So `RegisterSessionStart()` should *not* be called when player's character was resurrected for example, and  `RegisterSessionEnd()` should not be called exactly on player's death, because he might use second chance. Instead, you need first to check if player used second chance, and only then call this method
+- If you haven't already, add call `AppController.Instance.RegisterGameSessionStart()` and `AppController.Instance.RegisterGameSessionEnd()` when game session starts and end. *Important* to note, that both should only be called when actual session starts or ends, not when second chance was used. So `RegisterSessionStart()` should not be called when player's character was resurrected for example, and  `RegisterSessionEnd()` should not be called exactly on player's death, because he might use second chance. Instead, you need first to check if player used second chance, and only then call this method
 - Call this before you enter game over state:
 
   ```c#
-  AppController.Instance.GetExtention<DoubleCoinsPopup>().DisplayPopup();
+  AppController.Instance.GetExtention<DoubleCoinsPopup>().DisplayPopup(UIManager.Instance, <earned coins during session>, <callback>);
   ```
 
-  This returns `true` if popup is pesented (and so you need to wait for player's choice before finally entering game over state), and `false` if not and you can safely enter final game over state in that case
+  This returns `true` if popup is pesented (and so you need to wait for player's choice before finally entering game over state), and `false` if not and you can safely enter final game over state in that case. Callback should be a method that receives `bool` parameter.  If parameter is `true` then player chose to double coins. If `false` then user decinded not to double coins.
 
 ##### Free Remove Ads
 

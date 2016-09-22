@@ -50,8 +50,13 @@ namespace Zedarus.ToolKit.Extentions.OneTapGames.SecondChancePopup
 			object freeChanceButtonLabelID, object paidChanceButtonLabelID, object cancelButtonLabelID, 
 			int freeChanceButtonColorID = 0, int paidChanceButtonColorID = 0, int cancelButtonColorID = 0) : base(apiManager, localisation, genericPopupID, popupHeaderStringID, popupMessageStringID)
 		{
-			// TODO: check for null here and throw exception
 			_data = gameData.Get<SecondChancePopupData>().First;
+
+			if (_data == null)
+			{
+				throw new UnityException("No SecondChancePopupData found in game data");
+			}
+
 			_wallet = wallet;
 
 			_videoAdID = videoAdID;
@@ -64,12 +69,12 @@ namespace Zedarus.ToolKit.Extentions.OneTapGames.SecondChancePopup
 		#endregion
 
 		#region Controls
-		public void RegisterSessionStart()
+		internal override void RegisterSessionStart()
 		{
 			_newSession = true;
 		}
 
-		public void RegisterSessionEnd()
+		internal override void RegisterSessionEnd()
 		{
 			_sessions++;
 		}

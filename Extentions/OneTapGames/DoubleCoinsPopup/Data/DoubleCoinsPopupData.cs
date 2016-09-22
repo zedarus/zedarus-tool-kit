@@ -24,6 +24,10 @@ namespace Zedarus.ToolKit.Extentions.OneTapGames.DoubleCoinsPopup
 		[SerializeField]
 		[DataField("Sessions Offset")]
 		private int _sessionsOffset = 0;
+
+		[SerializeField]
+		[DataField("Multiplier")]
+		private int _multiplier = 2;
 		#endregion
 
 		#region Initalization
@@ -50,6 +54,11 @@ namespace Zedarus.ToolKit.Extentions.OneTapGames.DoubleCoinsPopup
 		public bool Enabled
 		{
 			get { return _enabled; }
+		}
+
+		public int Multiplier
+		{
+			get { return _multiplier; }
 		}
 		#endregion
 

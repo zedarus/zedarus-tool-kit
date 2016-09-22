@@ -49,8 +49,13 @@ namespace Zedarus.ToolKit.Extentions
 
 		protected void DisplayPopup(UIManager uiManager, params UIGenericPopupButtonData[] buttons)
 		{
+			DisplayPopup(uiManager, Localise(POPUP_HEADER), Localise(POPUP_MESSAGE), buttons);
+		}
+
+		protected void DisplayPopup(UIManager uiManager, string header, string message, params UIGenericPopupButtonData[] buttons)
+		{
 			uiManager.OpenPopup(_genericPopupID, new Zedarus.ToolKit.UI.UIGenericPopupData(
-				Localise(POPUP_HEADER), Localise(POPUP_MESSAGE), buttons
+				header, message, buttons
 			));
 		}
 		#endregion

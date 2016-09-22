@@ -42,6 +42,16 @@ namespace Zedarus.ToolKit.Extentions
 			get { return "Extention Event Name"; }
 		}
 		#endregion
+
+		#region Sessions
+		internal virtual void RegisterSessionStart()
+		{
+		}
+
+		internal virtual void RegisterSessionEnd()
+		{
+		}
+		#endregion
 	}
 }
 

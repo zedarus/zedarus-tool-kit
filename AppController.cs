@@ -407,6 +407,22 @@ namespace Zedarus.ToolKit
 
 			return null;
 		}
+
+		public void RegisterGameSessionStart()
+		{
+			foreach (Extention extention in _extentions)
+			{
+				extention.RegisterSessionStart();
+			}
+		}
+
+		public void RegisterGameSessionEnd()
+		{
+			foreach (Extention extention in _extentions)
+			{
+				extention.RegisterSessionEnd();
+			}
+		}
 		#endregion
 	}
 
