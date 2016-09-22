@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using Zedarus.ToolKit.API;
 using Zedarus.ToolKit.Settings;
@@ -50,17 +51,26 @@ namespace Zedarus.ToolKit.Helpers.Modules
 			}
 		}
 
-		public void OnFacebookButtonPress()
+		public void OnFacebookButtonPress(string placement)
 		{
-			API.Analytics.LogEvent("Promo - Open Facebook Page");
+			API.Analytics.LogEvent("Promo - Open Facebook Page", new Dictionary<string, object> {
+				{ "placement", placement }
+			});
 			Application.OpenURL(GameData.Settings.FacebookURL);
 		}
 
 		public void OpenRateAppPage()
 		{
+			API.Analytics.LogEvent("Promo - Open AppStore Rate Link");
 			// TODO: log to analytics here
 			API.Analytics.LogRateApp(true);
 			Application.OpenURL(GameData.RateMePopup.CurrentPlatformURL);
+		}
+
+		public void ShareScore(string text)
+		{
+			API.Analytics.LogEvent("Promo - Share Score");
+			API.Share.Share(text, null, null);
 		}
 		#endregion
 

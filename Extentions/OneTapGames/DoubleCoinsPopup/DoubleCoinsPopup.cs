@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using Zedarus.ToolKit.Data.Game;
@@ -140,6 +140,13 @@ namespace Zedarus.ToolKit.Extentions.OneTapGames.DoubleCoinsPopup
 				DoubleCoinsCancel();
 			}
 		}
+
+		private void LogAnalytics(string action)
+		{
+			_api.Analytics.LogEvent("Monetisation - Double Coins", new Dictionary<string, object> {
+				{ "action", action }
+			});
+		}
 		#endregion
 
 		#region Getters
@@ -148,18 +155,14 @@ namespace Zedarus.ToolKit.Extentions.OneTapGames.DoubleCoinsPopup
 		#region UI Callbacks
 		private void OnDoubleConfirmed()
 		{
-			API.Analytics.LogEvent("Monetisation - Double Coins", new Dictionary<string, object> {
-				{ "action", "yes" }
-			});
+			LogAnalytics("yes");
 
 			API.Ads.ShowRewardedVideo(_videoAdID, OnSecondChanceRewardVideoClose, OnSecondChanceRewardVideoReward, 0);
 		}
 
 		private void OnCancel()
 		{
-			API.Analytics.LogEvent("Monetisation - Double Coins", new Dictionary<string, object> {
-				{ "action", "no" }
-			});
+			LogAnalytics("no");
 
 			Decline();
 		}
