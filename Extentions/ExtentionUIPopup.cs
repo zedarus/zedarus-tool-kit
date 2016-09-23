@@ -43,7 +43,6 @@ namespace Zedarus.ToolKit.Extentions
 
 		protected UIGenericPopupButtonData CreateButton(string label, System.Action callback, int colorKey)
 		{
-			Debug.Log("Color: " + GetColor(colorKey));
 			return new UIGenericPopupButtonData(label, callback, GetColor(colorKey));
 		}
 
