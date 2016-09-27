@@ -247,6 +247,7 @@ Troubleshooting:
   ```
 
   This returns `true` if second chance popup is pesented (and so you need to wait for player's choice before finally entering game over state), and `false` if not and you can safely enter final game over state in that case. Callback should be a method that receives `bool` parameter. If parameter is `true` then second chance should be activated. If `false` then user decinded not use second chance.
+  :exclamation: Please not that it is important to pass `adBlock` object – this should be a UI invisible image object that lays on top of all your UI and blocks user's clicks while ad is loaded and displayed.
 
 ##### Double Coins Popup
 
@@ -266,10 +267,11 @@ Troubleshooting:
   AppController.Instance.GetExtention<DoubleCoinsPopup>().DisplayPopup(UIManager.Instance, <earned coins during session>, <callback>);
   ```
 
-  This returns `true` if popup is pesented (and so you need to wait for player's choice before finally entering game over state), and `false` if not and you can safely enter final game over state in that case. Callback should be a method that receives `bool` parameter.  If parameter is `true` then player chose to double coins. If `false` then user decinded not to double coins.
+  This returns `true` if popup is pesented (and so you need to wait for player's choice before finally entering game over state), and `false` if not and you can safely enter final game over state in that case. Callback should be a method that receives `bool` parameter.  If parameter is `true` then player chose to double coins. If `false` then user decinded not to double coins. 
+  :exclamation: Please not that it is important to pass `adBlock` object – this should be a UI invisible image object that lays on top of all your UI and blocks user's clicks while ad is loaded and displayed.
 
 ##### Free Remove Ads
 
 - Add `AddExtention(new Zedarus.ToolKit.Extentions.OneTapGames.FreeRemoveAds.FreeRemoveAds(Data.Game, Data.Player, API, "<double_coins_video_ad_id>"));` in your `InitExtentions()` override in `AppController`
 - Set correct settings in API settings section in Game Data DB
-- Call `DisplayPopup()` method on `FreeRemoveAds` instance and pass all required parameters
+- Call `DisplayPopup()` method on `FreeRemoveAds` instance and pass all required parameters. :exclamation: Please not that it is important to pass `adBlock` object – this should be a UI invisible image object that lays on top of all your UI and blocks user's clicks while ad is loaded and displayed.
