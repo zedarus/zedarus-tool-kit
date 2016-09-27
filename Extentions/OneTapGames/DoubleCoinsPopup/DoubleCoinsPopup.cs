@@ -19,18 +19,24 @@ namespace Zedarus.ToolKit.Extentions.OneTapGames.DoubleCoinsPopup
 		private string _videoAdID = null;
 		private int _sessions = 0;
 		private int _additionalCoins = 0;
+		private int _coinsEarned = 0;
 		private System.Action<bool> _callback;
+		private UIManager _ui = null;
 		#endregion
 
 		#region Settings
 		private const int BUTTON_AGREE = 10;
 		private const int BUTTON_CANCEL = 12;
+		private const int BUTTON_SUCCESS = 13;
+		private const int MESSAGE_SUCCESS = 14;
 		#endregion
 
 		#region Init
 		public DoubleCoinsPopup(GameData gameData, APIManager apiManager, Wallet wallet, LocalisationManager localisation, string videoAdID, string genericPopupID, 
 			object popupHeaderStringID, object popupMessageStringID,
-			object agreeButtonLocalisationID, object cancelButtonLocalisationID, int agreeButtonColorID = 0, int cancelButtonColorID = 0) : base(apiManager, localisation, genericPopupID, popupHeaderStringID, popupMessageStringID)
+			object agreeButtonLocalisationID, object cancelButtonLocalisationID,
+			object successMessageLocalisationID, object successButtonLocalisationID,
+			int agreeButtonColorID = 0, int cancelButtonColorID = 0) : base(apiManager, localisation, genericPopupID, popupHeaderStringID, popupMessageStringID)
 		{
 			_data = gameData.Get<DoubleCoinsPopupData>().First;
 
@@ -45,6 +51,9 @@ namespace Zedarus.ToolKit.Extentions.OneTapGames.DoubleCoinsPopup
 
 			CreateButtonKeys(BUTTON_AGREE, agreeButtonLocalisationID, agreeButtonColorID);
 			CreateButtonKeys(BUTTON_CANCEL, cancelButtonLocalisationID, cancelButtonColorID);
+			CreateButtonKeys(BUTTON_SUCCESS, successButtonLocalisationID, 0);
+
+			CreateLocalisationKey(MESSAGE_SUCCESS, successMessageLocalisationID);
 		}
 		#endregion
 
@@ -68,6 +77,8 @@ namespace Zedarus.ToolKit.Extentions.OneTapGames.DoubleCoinsPopup
 		{
 			if (CanUse(coinsEarned) && _data.Multiplier > 1)
 			{
+				_ui = uiManager;
+
 				AssignAdBlock(adBlock);
 				int multiplier = _data.Multiplier - 1;
 
@@ -76,6 +87,7 @@ namespace Zedarus.ToolKit.Extentions.OneTapGames.DoubleCoinsPopup
 					multiplier = 0;
 				}
 
+				_coinsEarned = coinsEarned;
 				_additionalCoins = coinsEarned * multiplier;
 
 				string header = Localise(POPUP_HEADER);
@@ -161,9 +173,15 @@ namespace Zedarus.ToolKit.Extentions.OneTapGames.DoubleCoinsPopup
 					_wallet.Deposit(_additionalCoins);
 				}
 
-				_callback(true);
+				if (_ui != null)
+				{
+					DisplayPopup(_ui, null, string.Format(Localise(MESSAGE_SUCCESS), _coinsEarned + _additionalCoins),
+						CreateButton(BUTTON_SUCCESS, OnSuccesClick, BUTTON_SUCCESS)
+					);
+				}
+
 				_additionalCoins = 0;
-				_callback = null;
+				_coinsEarned = 0;
 			}
 		}
 
@@ -190,6 +208,15 @@ namespace Zedarus.ToolKit.Extentions.OneTapGames.DoubleCoinsPopup
 		#endregion
 
 		#region UI Callbacks
+		private void OnSuccesClick()
+		{
+			if (_callback != null)
+			{
+				_callback(true);
+				_callback = null;
+			}
+		}
+
 		private void OnDoubleConfirmed()
 		{
 			LogAnalytics("yes");

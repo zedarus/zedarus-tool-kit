@@ -20,13 +20,13 @@ namespace Zedarus.ToolKit.Extentions.OneTapGames.FreeRemoveAds
 		#endregion
 
 		#region Settings
-		private const int BUTTON_FREE = 3;
-		private const int BUTTON_PAID = 4;
-		private const int BUTTON_CANCEL = 5;
-		private const int BUTTON_SUCCESS = 6;
-		private const int BUTTON_FAILURE = 7;
-		private const int MESSAGE_SUCCESS = 8;
-		private const int MESSAGE_FAILURE = 9;
+		private const int BUTTON_FREE = 30;
+		private const int BUTTON_PAID = 40;
+		private const int BUTTON_CANCEL = 50;
+		private const int BUTTON_SUCCESS = 60;
+		private const int BUTTON_FAILURE = 70;
+		private const int MESSAGE_SUCCESS = 80;
+		private const int MESSAGE_FAILURE = 90;
 		#endregion
 
 		#region Init
