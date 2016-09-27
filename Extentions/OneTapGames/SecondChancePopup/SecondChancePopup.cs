@@ -79,10 +79,11 @@ namespace Zedarus.ToolKit.Extentions.OneTapGames.SecondChancePopup
 			_sessions++;
 		}
 
-		public bool DisplayPopup(UIManager uiManager, int score, System.Action<bool> callback)
+		public bool DisplayPopup(UIManager uiManager, int score, System.Action<bool> callback, GameObject adBlock)
 		{
 			if (CanUseSecondChance(score))
 			{
+				AssignAdBlock(adBlock);
 				if (_wallet.Balance >= _data.Price)
 				{
 					DisplayPopup(uiManager, 
@@ -183,6 +184,7 @@ namespace Zedarus.ToolKit.Extentions.OneTapGames.SecondChancePopup
 		private void OnFreeSecondChanceConfirmed()
 		{
 			LogAnalytics("free");
+			ActivateAdBlock();
 			API.Ads.ShowRewardedVideo(_videoAdID, OnSecondChanceRewardVideoClose, OnSecondChanceRewardVideoReward, 0);
 		}
 
@@ -206,21 +208,25 @@ namespace Zedarus.ToolKit.Extentions.OneTapGames.SecondChancePopup
 
 		private void OnSecondChanceRewardVideoClose()
 		{
-			Zedarus.ToolKit.DelayedCall.Create(WaitAndCheckForReward, 1f);
+			Zedarus.ToolKit.DelayedCall.Create(WaitAndCheckForReward, 2f);
 		}
 
 		private void WaitAndCheckForReward()
 		{
+			DeactivateAdBlock();
 			if (_newSession)
 			{
+				LogAnalytics("reward - failure");
 				Decline();
 			}
 		}
 
 		private void OnSecondChanceRewardVideoReward(int productID)
 		{
+			DeactivateAdBlock();
 			if (_newSession)
 			{
+				LogAnalytics("reward - success");
 				Use();
 			}
 		}

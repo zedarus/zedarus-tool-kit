@@ -14,6 +14,7 @@ namespace Zedarus.ToolKit.Extentions
 		#region Properties
 		private LocalisationManager _localisation;
 		private string _genericPopupID;
+		private GameObject _adsBlock = null;
 
 		private Dictionary<int, object> _localisationKeys;
 		private Dictionary<int, int> _colorKeys;
@@ -130,6 +131,29 @@ namespace Zedarus.ToolKit.Extentions
 			else
 			{
 				return "NO_LOCALISATION_KEY";
+			}
+		}
+		#endregion
+
+		#region Ads Block
+		protected void AssignAdBlock(GameObject adBlock)
+		{
+			_adsBlock = adBlock;
+		}
+
+		protected void ActivateAdBlock()
+		{
+			if (_adsBlock != null)
+			{
+				_adsBlock.SetActive(true);
+			}
+		}
+
+		protected void DeactivateAdBlock()
+		{
+			if (_adsBlock != null)
+			{
+				_adsBlock.SetActive(false);
 			}
 		}
 		#endregion
