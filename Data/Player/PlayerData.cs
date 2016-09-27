@@ -13,6 +13,7 @@ using Zedarus.ToolKit.Data.Player;
 using Zedarus.ToolKit.Events;
 using Zedarus.ToolKit.Settings;
 using Zedarus.ToolKit.Data.Game;
+using Zedarus.ToolKit.Extentions.OneTapGames.RateMePopup;
 
 namespace Zedarus.ToolKit.Data.Player
 {
@@ -38,7 +39,7 @@ namespace Zedarus.ToolKit.Data.Player
 		{
 			AddModel<APIState>();
 			AddModel<AchievementsTracker>();
-			AddModel<RateMePopup>();
+			AddModel<RateMePopupModel>();
 			AddModel<AudioState>();
 		}
 
@@ -128,11 +129,6 @@ namespace Zedarus.ToolKit.Data.Player
 		public AchievementsTracker AchievementsTracker
 		{
 			get { return GetModel<AchievementsTracker>(); }
-		}
-
-		public RateMePopup RateMePopup
-		{
-			get { return GetModel<RateMePopup>(); }
 		}
 
 		public AudioState AudioState

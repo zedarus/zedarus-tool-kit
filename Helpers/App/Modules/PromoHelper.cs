@@ -59,14 +59,6 @@ namespace Zedarus.ToolKit.Helpers.Modules
 			Application.OpenURL(GameData.Settings.FacebookURL);
 		}
 
-		public void OpenRateAppPage()
-		{
-			API.Analytics.LogEvent("Promo - Open AppStore Rate Link");
-			// TODO: log to analytics here
-			API.Analytics.LogRateApp(true);
-			Application.OpenURL(GameData.RateMePopup.CurrentPlatformURL);
-		}
-
 		public void ShareScore(string text)
 		{
 			API.Analytics.LogEvent("Promo - Share Score");

@@ -218,7 +218,6 @@ Troubleshooting:
 - `OnMoreLevelsPress()` - opens URL that was specified in settings in game data and return `true`. Returns `false` otherwise so you can do something else, like display rate me popup
 - `OnMoreGamesPress()` - either opens URL or display interstitial ad with custom placement (all specified in settings in game data)
 - `OnFacebookButtonPress()` - opens URL that was specified in settings in game data
-- `OpenRateAppPage()` - open rate URL from game data Rate Popup settings and also logs opening in analytics API
 
 ### Extentions
 
@@ -273,3 +272,28 @@ Troubleshooting:
 - Add `AddExtention(new Zedarus.ToolKit.Extentions.OneTapGames.FreeRemoveAds.FreeRemoveAds(Data.Game, Data.Player, API, "<double_coins_video_ad_id>"));` in your `InitExtentions()` override in `AppController`
 - Set correct settings in API settings section in Game Data DB
 - Call `DisplayPopup()` method on `FreeRemoveAds` instance and pass all required parameters
+
+##### Rate Me Popup
+
+- Add `AddExtention(new Zedarus.ToolKit.Extentions.OneTapGames.RateMePopup.RateMePopup(...));` in your `InitExtentions()` override in `AppController`. Class' constructor is documented, so just follow instructions for each parameter to setup extention correctly.
+- Add this to your `PlayerData` class in `SetupModelsList()` method override
+
+  ```c#
+  AddModel<RateMePopup>();
+  ```
+
+
+- Add this to your `GameData` class and set setting you like in game data editor in Unity
+
+  ```c#
+  [SerializeField]
+  [DataTable(5, "Rate Me Popup Settings", typeof(RateMePopupData))]
+  private RateMePopupData _rateMePopup;
+  ```
+
+- Call this where you need it: 
+
+  ```c#
+  AppController.Instance.GetExtention<RateMePopup>().DisplayPopup(UIManager.Instance, <callback>, <between_level>, <skip_reward>);
+  ```
+

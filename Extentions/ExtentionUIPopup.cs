@@ -37,6 +37,11 @@ namespace Zedarus.ToolKit.Extentions
 		#endregion
 
 		#region UI
+		protected UIGenericPopupButtonData CreateButton(int labelKey, System.Action callback)
+		{
+			return CreateButton(labelKey, callback, labelKey);
+		}
+
 		protected UIGenericPopupButtonData CreateButton(int labelKey, System.Action callback, int colorKey)
 		{
 			return CreateButton(Localise(labelKey), callback, colorKey);

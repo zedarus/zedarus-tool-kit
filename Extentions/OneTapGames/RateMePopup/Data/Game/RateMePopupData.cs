@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
 using System;
 using System.Collections;
+using Zedarus.ToolKit.Data.Game;
 
-namespace Zedarus.ToolKit.Data.Game
+namespace Zedarus.ToolKit.Extentions.OneTapGames.RateMePopup
 {
 	[Serializable]
 	public class RateMePopupData : GameDataModel, IGameDataModel

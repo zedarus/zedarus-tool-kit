@@ -33,10 +33,6 @@ namespace Zedarus.ToolKit.Data.Game
 		private List<LeaderboardData> _leaderboards;
 
 		[SerializeField]
-		[DataTable(1006, "Rate Me Popup", typeof(RateMePopupData))]
-		private RateMePopupData _rateMePopup;
-
-		[SerializeField]
 		[DataTable(1007, "Promo - Rewards", typeof(PromoReward))]
 		private List<PromoReward> _promoRewards;
 
@@ -196,11 +192,6 @@ namespace Zedarus.ToolKit.Data.Game
 		public SettingsData Settings
 		{
 			get { return _settings; }
-		}
-
-		public RateMePopupData RateMePopup
-		{
-			get { return _rateMePopup; }
 		}
 
 		public List<AchievementConditionData> AchivementConditions
