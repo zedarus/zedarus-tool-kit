@@ -33,6 +33,9 @@ namespace Zedarus.ToolKit.API
 		public event Action GrantReward;
 		public event Action BannerDisplayed;
 		public event Action BannerRemoved;
+		public event Action<string> RewardVideoClick;
+		public event Action<string, string> RewardVideoFailed;
+		public event Action<string> RewardVideoComplete;
 		#endregion
 
 		#region Properties
@@ -235,9 +238,13 @@ namespace Zedarus.ToolKit.API
 			}
 			if (state.Equals ("click")) {
 				// Do something when an ad is clicked on
+				if (RewardVideoClick != null)
+					RewardVideoClick(tag);
 			}
 			if (state.Equals ("failed")) {
 				// Do something when an ad fails to show
+				if (RewardVideoFailed != null)
+					RewardVideoFailed(tag, "failed");
 				if (InterstitialClosed != null)
 					InterstitialClosed();
 			}
@@ -246,14 +253,20 @@ namespace Zedarus.ToolKit.API
 			}
 			if (state.Equals ("fetch_failed")) {
 				// Do something when an ad did not fetch
+				if (RewardVideoFailed != null)
+					RewardVideoFailed(tag, "fetch_failed");
 			}
 			if (state.Equals ("incentivized_result_complete")) {
 				// The user has watched the entire video and should be given a reward.
+				if (RewardVideoComplete != null)
+					RewardVideoComplete(tag);
 				if (GrantReward != null)
 					GrantReward();
 			}
 			if (state.Equals ("incentivized_result_incomplete")) {
 				// The user did not watch the entire video and should not be given a reward.
+				if (RewardVideoFailed != null)
+					RewardVideoFailed(tag, "incomplete");
 				if (InterstitialClosed != null)
 					InterstitialClosed();
 			}

@@ -186,6 +186,9 @@ namespace Zedarus.ToolKit.API
 				_interstitialClosedCallback = callback;
 				_rewardCallback = rewardCallback;
 				_rewardProductID = productID;
+
+				LogRewardAnalytics("start", tag);
+
 				EventManager.SendEvent(IDs.Events.DisableMusicDuringAd);
 				#if UNITY_EDITOR
 				DelayedCall.Create(OnGrantReward, 2f);
@@ -307,6 +310,9 @@ namespace Zedarus.ToolKit.API
 				wrapper.GrantReward += OnGrantReward;
 				wrapper.BannerDisplayed += OnBannerDisplayed;
 				wrapper.BannerRemoved += OnBannerRemoved;
+				wrapper.RewardVideoClick += OnRewardVideoClick;
+				wrapper.RewardVideoComplete += OnRewardVideoComplete;
+				wrapper.RewardVideoFailed += OnRewardVideoFailed;
 			}
 		}
 
@@ -320,11 +326,29 @@ namespace Zedarus.ToolKit.API
 				wrapper.GrantReward -= OnGrantReward;
 				wrapper.BannerDisplayed -= OnBannerDisplayed;
 				wrapper.BannerRemoved -= OnBannerRemoved;
+				wrapper.RewardVideoClick -= OnRewardVideoClick;
+				wrapper.RewardVideoComplete -= OnRewardVideoComplete;
+				wrapper.RewardVideoFailed -= OnRewardVideoFailed;
 			}
 		}
 		#endregion
 
 		#region Event Handlers
+		private void OnRewardVideoClick(string tag)
+		{
+			LogRewardAnalytics("click", tag);
+		}
+
+		private void OnRewardVideoComplete(string tag)
+		{
+			LogRewardAnalytics("success", tag);
+		}
+
+		private void OnRewardVideoFailed(string tag, string reason)
+		{
+			LogRewardAnalytics("fail", tag, reason);
+		}
+
 		private void OnInterstitialClosed()
 		{
 			EventManager.SendEvent(IDs.Events.EnableMusicAfterAd);
@@ -385,6 +409,23 @@ namespace Zedarus.ToolKit.API
 		#endregion
 
 		#region Helpers
+		private void LogRewardAnalytics(string eventtName, string tag, string reason = null)
+		{
+			Dictionary<string, object> parameters = new Dictionary<string, object>();
+
+			if (!string.IsNullOrEmpty(tag))
+			{
+				parameters.Add("tag", tag);
+			}
+
+			if (!string.IsNullOrEmpty(reason))
+			{
+				parameters.Add("reason", reason);
+			}
+
+			Manager.Analytics.LogEvent("Reward Video - " + eventtName, parameters);
+		}
+
 		public bool Enabled
 		{
 			get 

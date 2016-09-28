@@ -12,6 +12,9 @@ namespace Zedarus.ToolKit.API
 		event Action GrantReward;
 		event Action BannerDisplayed;
 		event Action BannerRemoved;
+		event Action<string> RewardVideoClick;
+		event Action<string, string> RewardVideoFailed;
+		event Action<string> RewardVideoComplete;
 		#endregion
 
 		#region Controls - Caching
