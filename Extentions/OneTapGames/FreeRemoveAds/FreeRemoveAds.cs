@@ -41,6 +41,8 @@ namespace Zedarus.ToolKit.Extentions.OneTapGames.FreeRemoveAds
 			_playerData = playerData.APIState;
 			_videoAdID = videoAdID;
 
+			apiManager.Ads.CacheRewardVideos(_videoAdID, true);
+
 			CreateButtonKeys(BUTTON_FREE, freeRemoveButtonLabel, freeRemoveButtonColorID);
 			CreateButtonKeys(BUTTON_PAID, paidRemoveButtonLabel, paidRemoveButtonColorID);
 			CreateButtonKeys(BUTTON_CANCEL, cancelButtonLabel, cancelButtonColorID);

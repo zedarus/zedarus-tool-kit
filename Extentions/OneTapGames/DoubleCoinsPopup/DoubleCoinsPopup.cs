@@ -49,6 +49,8 @@ namespace Zedarus.ToolKit.Extentions.OneTapGames.DoubleCoinsPopup
 			_videoAdID = videoAdID;
 			_sessions = 0;
 
+			apiManager.Ads.CacheRewardVideos(_videoAdID, true);
+
 			CreateButtonKeys(BUTTON_AGREE, agreeButtonLocalisationID, agreeButtonColorID);
 			CreateButtonKeys(BUTTON_CANCEL, cancelButtonLocalisationID, cancelButtonColorID);
 			CreateButtonKeys(BUTTON_SUCCESS, successButtonLocalisationID, 0);

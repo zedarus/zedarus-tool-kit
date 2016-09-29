@@ -65,13 +65,13 @@ namespace Zedarus.ToolKit.API
 			_interstitialsCached = true;
 		}
 
-		public void CacheRewardVideos(string tag, params string[] otherTags)
+		public void CacheRewardVideos(string tag, bool force, params string[] otherTags)
 		{
-			if (_rewardVideosCached)
+			if (_rewardVideosCached && !force)
 				return;
 
 			IAdsWrapperInterface wrapper = Wrapper;
-			if (Enabled && wrapper != null)
+			if (wrapper != null)
 			{
 				wrapper.CacheRewardedVideo(tag);
 				foreach (string otherTag in otherTags)

@@ -62,6 +62,8 @@ namespace Zedarus.ToolKit.Extentions.OneTapGames.SecondChancePopup
 			_videoAdID = videoAdID;
 			_sessions = 0;
 
+			apiManager.Ads.CacheRewardVideos(_videoAdID, true);
+
 			CreateButtonKeys(BUTTON_FREE, freeChanceButtonLabelID, freeChanceButtonColorID);
 			CreateButtonKeys(BUTTON_PAID, paidChanceButtonLabelID, paidChanceButtonColorID);
 			CreateButtonKeys(BUTTON_CANCEL, cancelButtonLabelID, cancelButtonColorID);
