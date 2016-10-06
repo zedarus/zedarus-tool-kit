@@ -11,11 +11,13 @@ namespace Zedarus.ToolKit.PoolManagement
 		private List<T> _active;
 		private Transform _container;
 		private bool _autoReuse;
+		private bool _autoResize;
 
 		#region Contstructors
-		public PoolManager(Transform container, int size, bool autoReuse, T[] prefabs, params int[] prefabsShuffleBag)
+		public PoolManager(Transform container, int size, bool autoReuse, bool autoResize, T[] prefabs, params int[] prefabsShuffleBag)
 		{
 			_autoReuse = autoReuse;
+			_autoResize = autoResize;
 			_pool = new List<T>();
 			_active = new List<T>();
 
@@ -62,15 +64,15 @@ namespace Zedarus.ToolKit.PoolManagement
 			prefabs = null;
 		}
 
-		public PoolManager(Transform container, int size, bool autoReuse, string[] prefabs, params int[] prefabsShuffleBag) : this(container, size, autoReuse, ConvertPathsToPrefabs(prefabs), prefabsShuffleBag) {}
-		public PoolManager(Transform container, int size, bool autoReuse) : this(container, size, autoReuse, new string[0]) {}
+		public PoolManager(Transform container, int size, bool autoReuse, bool autoResize, string[] prefabs, params int[] prefabsShuffleBag) : this(container, size, autoReuse, autoResize, ConvertPathsToPrefabs(prefabs), prefabsShuffleBag) {}
+		public PoolManager(Transform container, int size, bool autoReuse, bool autoResize) : this(container, size, autoReuse, autoResize, new string[0]) {}
 
-		public PoolManager(Transform parent, string containerName, int size, bool autoReuse, T[] prefabs, params int[] prefabsShuffleBag) : this(CreateContainer(parent, containerName), size, autoReuse, prefabs, prefabsShuffleBag) {}
-		public PoolManager(Transform parent, string containerName, int size, bool autoReuse, string[] prefabs, params int[] prefabsShuffleBag) : this(CreateContainer(parent, containerName), size, autoReuse, prefabs, prefabsShuffleBag) {}
-		public PoolManager(T prefab, Transform container, int size, bool autoReuse) : this(container, size, autoReuse, new T[] { prefab }, 1) { }
-		public PoolManager(string prefab, Transform container, int size, bool autoReuse) : this(Resources.Load<T>(prefab), container, size, autoReuse) { }
-		public PoolManager(T prefab, Transform parent, string containerName, int size, bool autoReuse) : this(prefab, CreateContainer(parent, containerName), size, autoReuse) { }
-		public PoolManager(string prefab, Transform parent, string containerName, int size, bool autoReuse) : this(prefab, CreateContainer(parent, containerName), size, autoReuse) { }
+		public PoolManager(Transform parent, string containerName, int size, bool autoReuse, bool autoResize, T[] prefabs, params int[] prefabsShuffleBag) : this(CreateContainer(parent, containerName), size, autoReuse, autoResize, prefabs, prefabsShuffleBag) {}
+		public PoolManager(Transform parent, string containerName, int size, bool autoReuse, bool autoResize, string[] prefabs, params int[] prefabsShuffleBag) : this(CreateContainer(parent, containerName), size, autoReuse, autoResize, prefabs, prefabsShuffleBag) {}
+		public PoolManager(T prefab, Transform container, int size, bool autoReuse, bool autoResize) : this(container, size, autoReuse, autoResize, new T[] { prefab }, 1) { }
+		public PoolManager(string prefab, Transform container, int size, bool autoReuse, bool autoResize) : this(Resources.Load<T>(prefab), container, size, autoReuse, autoResize) { }
+		public PoolManager(T prefab, Transform parent, string containerName, int size, bool autoReuse, bool autoResize) : this(prefab, CreateContainer(parent, containerName), size, autoReuse, autoResize) { }
+		public PoolManager(string prefab, Transform parent, string containerName, int size, bool autoReuse, bool autoResize) : this(prefab, CreateContainer(parent, containerName), size, autoReuse, autoResize) { }
 		#endregion
 
 		#region Constructor Helpers
@@ -120,6 +122,11 @@ namespace Zedarus.ToolKit.PoolManagement
 				_active.Add(item);
 				return item;
 			}
+			else if (_autoResize && _active.Count > 0)
+			{
+				ResizePoolByOne();
+				return GetItemFromPool();
+			}
 			else if (_autoReuse && _active.Count > 0)
 			{
 				ReturnItemToPool(_active[0]);
@@ -166,6 +173,17 @@ namespace Zedarus.ToolKit.PoolManagement
 		public List<T> Active
 		{
 			get { return _active; }
+		}
+
+		private void ResizePoolByOne()
+		{
+			T newPoolObject = GameObject.Instantiate(_active[Random.Range(0, _active.Count)]);
+			if (newPoolObject != null)
+			{
+				newPoolObject.transform.SetParent(_container);
+				newPoolObject.Init();
+				_pool.Add(newPoolObject);
+			}
 		}
 	}
 }
