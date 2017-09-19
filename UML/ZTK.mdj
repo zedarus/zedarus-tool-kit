@@ -1,7 +1,7 @@
 {
 	"_type": "Project",
 	"_id": "AAAAAAFF+h6SjaM2Hec=",
-	"name": "Untitled",
+	"name": "ZedarusToolKit",
 	"ownedElements": [
 		{
 			"_type": "UMLModel",
@@ -9,7 +9,7 @@
 			"_parent": {
 				"$ref": "AAAAAAFF+h6SjaM2Hec="
 			},
-			"name": "Model",
+			"name": "Data",
 			"ownedElements": [
 				{
 					"_type": "UMLClassDiagram",
@@ -24,5 +24,9 @@
 			],
 			"visibility": "public"
 		}
-	]
+	],
+	"author": "Kostya Stankevych",
+	"company": "Zedarus Games",
+	"copyright": "Kostya Stankevych",
+	"version": "prototype"
 }
