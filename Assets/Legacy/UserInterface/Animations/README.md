@@ -1,1 +1,0 @@
-Extract Animations package to your project Assets folder and use them either "as it is" or as a base for your own animations.
