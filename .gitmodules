@@ -1,0 +1,3 @@
+[submodule "Submodules/Zenject"]
+	path = Submodules/Zenject
+	url = git@github.com:svermeulen/Zenject.git
