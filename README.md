@@ -7,7 +7,7 @@ Create following symlinks:
 ## OS X
 
 ```
-ln -s ~/<path-to-repo>/Assets/ ./Assets
+ln -s ~/<path-to-repo>/Assets/Plugins/ZTK ./Assets/Plugins/ZTK
 ```
 
 ## Windows
