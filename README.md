@@ -13,5 +13,5 @@ ln -s ~/<path-to-repo>/Assets/Plugins/ZTK ./Assets/Plugins/ZTK
 ## Windows
 
 ```
-mklink /D C:\Users\<user>\AppData\Roaming\MonoDevelop-{version}\Config C:\<path-to-repo>\Config
+mklink /d <local_link> <relative_link_to_ZTK>
 ```
